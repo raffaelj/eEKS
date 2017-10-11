@@ -4,7 +4,7 @@ simple accounting software with automation for "[Anlage EKS][1]" (a document nee
 
 alternative pronounciation ([IPA][2]): [iːks] ;-)
 
-__EKS__ = income from self-employment (German: __E__in__k__ommen aus __s__elbständiger Tätigkeit)  
+__EKS__ = income from self-employment (German: Einkommen aus selbständiger Tätigkeit)  
 __e__ = easy, electronic... or in German: einfach, erledigt, elektronisch...
 
 This will be a complete rewrite of a "works for me" solution with some bugs in a private repo of mine.
