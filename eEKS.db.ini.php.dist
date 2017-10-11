@@ -1,0 +1,11 @@
+;<?php // valid PHP and INI file
+;die(); // For further security
+;/*
+
+host = localhost
+username = yourUsername
+password = yourPassword
+dbname = yourDatabase
+
+;*/
+;?>

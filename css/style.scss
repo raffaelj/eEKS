@@ -1,0 +1,86 @@
+/* eEKS styles */
+
+// default stuff
+html {
+  margin:0;
+  padding:0;
+  background:#fcfcfc;
+}
+
+body {
+  margin: 0;
+  padding:0;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  @media print{
+    font-size:11pt;
+    line-height:2em;
+  }
+}
+
+a {
+  color: #1D90B7;
+}
+
+// custom classes for easier styling
+.text-right {text-align:right;}
+.text-left {text-align:left;}
+.number{text-align:right;}
+
+// set page size and reset a view rules for printing
+
+// page size A4 - standard in Germany
+// Only a view browsers understand the CSS rule `size`.
+// Firefox ignores the rule. Opera, Google Chrome and
+// Internet Explorer have better results.
+// 
+// more paper sizes: 
+// https://en.wikipedia.org/wiki/Paper_size#International_paper_sizes
+@page {
+  size: A4;
+  // size: A4 landscape;
+  margin:0;
+  padding:0;
+}
+
+@media print{
+  html,body,main,page,.page{
+    margin:0;
+    padding:0;
+    border:none;
+    box-shadow: 0;
+  }
+  .no-print{display:none;}
+}
+
+// navigation
+nav {
+  display:block;
+  @media print{display:none;}
+}
+
+// tables
+
+table {
+  td,th { 
+    padding: 6px;
+  }
+  &.lm_grid tr:nth-child(1){// headlines with background color
+    background: #C5C924;
+  }
+  th {
+    background: inherit;
+    color: #222;
+    a { color: #222;
+      text-decoration: none;
+    }
+  }
+  tr {
+    &:nth-child(even) {// different colors for even and odd rows
+      background: #eee;
+    }
+    &.lm_active, &:hover {// highlight hover and current row edited
+      background: #c2e3ff;
+    }
+  }
+}
