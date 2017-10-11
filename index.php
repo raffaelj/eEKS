@@ -15,11 +15,9 @@ header('Content-Type: text/html; charset=utf-8');
 // store your login credentials outside your webroot
 $db_config = parse_ini_file('eEKS.db.ini.php');
 
-// user configuration
-$eeks_config = parse_ini_file('eEKS.config.ini.php', true);
-
 // include eEKS, lazy_mofo will be included in eEKS.php
 include('eEKS.php');
+
 
 // connect with pdo 
 try {
@@ -32,6 +30,8 @@ catch(PDOException $e) {
 // create LM/eEKS object, pass in PDO connection and i18n code
 $ee = new eEKS($dbh, 'de-de');
 
+// user configuration
+$ee->eeks_config = parse_ini_file('eEKS.config.ini.php', true);
 
 // table name for updates, inserts and deletes
 $ee->table = 'Buchhaltung';           // !!! change to "accounting" after translating the database
@@ -39,36 +39,7 @@ $ee->table = 'Buchhaltung';           // !!! change to "accounting" after transl
 // identity / primary key for table
 $ee->identity_name = 'ID';
 
-// this part should be in an external template file
-
-$page_title = 'test';
-$class = 'test';
-
-echo '<!DOCTYPE html>
-<html>
-<head>
-	<meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>' . $page_title . ' - eEKS</title>
-  <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
-  <link rel="stylesheet" type="text/css" href="css/style.min.css">
-</head>
-<body class="' . $class . '">
-';
-
 // run eEKS/LM
 $ee->run();
-
-echo "</body></html>";
-// end of template part
-
-
-
-
-
-
-
-
-
 
 ?>

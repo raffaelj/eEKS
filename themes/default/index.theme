@@ -1,0 +1,24 @@
+<?php
+// this part should be in an external template file
+
+$page_title = 'test';
+$class = 'test';
+
+$header = '<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>' . $page_title . ' - eEKS</title>
+  <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
+  <link rel="stylesheet" type="text/css" href="css/style.min.css">
+</head>
+<body class="' . $class . '">
+<h1>eEKS</h1>
+';
+
+// content of LM will be here
+
+$footer = "<p>Dont't worry, be happy ;-)</p>
+</body>
+</html>";
