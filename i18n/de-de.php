@@ -77,3 +77,39 @@ $this->thumb_path = 'thumbs';              // optional, leave blank if you don't
 $this->date_out = 'd.m.Y';
 $this->datetime_out = 'd.m.Y, H:i';
 
+
+/******************************************************************************/
+/*                        eEKS specific translation                           */
+
+// rename fieldnames from database
+
+$this->rename['date_created'] = 'Erstellt am';
+$this->rename['date_last_changed'] = 'zuletzt geändert';
+$this->rename['value_date'] = 'Zahlungs-Datum';
+$this->rename['voucher_date'] = 'Beleg-Datum';
+$this->rename['gross_amount'] = 'Bruttobetrag';
+$this->rename['tax_rate'] = 'Steuersatz';
+$this->rename['account'] = 'Konto';
+$this->rename['invoice_number'] = 'Rechnungs-Nr.';
+$this->rename['from_to'] = 'Auftraggeber/ Empfänger';
+$this->rename['posting_text'] = 'Buchungstext';
+$this->rename['object'] = 'Gegenstand';
+$this->rename['type_of_costs'] = 'Kostenart/ Erlösart';
+$this->rename['cat_01'] = 'Beschäftigungsart';
+$this->rename['cat_02'] = 'Geschäftsbereich';
+$this->rename['cat_03'] = 'Projekt';
+$this->rename['cat_04'] = 'Fördermittelgeber_in';
+$this->rename['cat_05'] = 'Kategorie 5';
+$this->rename['cat_06'] = 'Kategorie 6';
+$this->rename['cat_07'] = 'Kategorie 7';
+$this->rename['cat_08'] = 'Kategorie 8';
+$this->rename['cat_09'] = 'Kategorie 9';
+$this->rename['cat_10'] = 'Kategorie 10';
+$this->rename['notes_01'] = 'Notizen';
+$this->rename['notes_02'] = 'Garantie';
+$this->rename['notes_03'] = 'Notiz 3';
+$this->rename['notes_04'] = 'Notiz 4';
+$this->rename['notes_05'] = 'Notiz 5';
+$this->rename['file_01'] = 'Beleg';
+$this->rename['file_02'] = 'Datei 2';
+$this->rename['file_03'] = 'Datei 3';
