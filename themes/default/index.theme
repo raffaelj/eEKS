@@ -26,6 +26,6 @@ $header = '<!DOCTYPE html>
 
 // content of LM will be here
 
-$footer = "<p>Dont't worry, be happy ;-)</p>
+$footer = "<p>Don't worry, be happy ;-)</p>
 </body>
 </html>";
