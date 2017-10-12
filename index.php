@@ -30,14 +30,96 @@ catch(PDOException $e) {
 // create LM/eEKS object, pass in PDO connection and i18n code
 $ee = new eEKS($dbh, 'de-de');
 
-// user configuration
+// user configuration --> could be in function __construct
 $ee->eeks_config = parse_ini_file('eEKS.config.ini.php', true);
+$ee->config_from_ini();
 
-// table name for updates, inserts and deletes
-$ee->table = 'Buchhaltung';           // !!! change to "accounting" after translating the database
+// the query should be in a function
+// this function should recognize which parts are active (like category 5)
+// the function should change the query at different pages
+$ee->grid_sql = "
+SELECT
+  a.value_date
+, a.voucher_date
+, a.gross_amount
+, a.tax_rate
+, a.account
+, a.invoice_number
+, a.from_to
+/* , a.posting_text */
+, a.object
+, a.type_of_costs
+, a.cat_01
+/* , a.cat_02 */
+, a.cat_03
+/* , a.cat_04 */
+/* , a.cat_05 */
+/* , a.cat_06 */
+/* , a.cat_07 */
+/* , a.cat_08 */
+/* , a.cat_09 */
+/* , a.cat_10 */
+, a.notes_01
+, a.notes_02
+/* , a.notes_03 */
+/* , a.notes_04 */
+/* , a.notes_05 */
+, a.file_01
+/* , a.file_02 */
+/* , a.file_03 */
+, a.ID
+FROM accounting a
+ORDER BY a.value_date DESC, a.voucher_date DESC
+";
 
-// identity / primary key for table
-$ee->identity_name = 'ID';
+$ee->form_sql = "
+SELECT
+  a.ID
+, a.value_date
+, a.voucher_date
+, a.gross_amount
+, a.tax_rate
+, a.account
+, a.invoice_number
+, a.from_to
+, a.posting_text
+, a.object
+, a.type_of_costs
+, a.cat_01
+, a.cat_02
+, a.cat_03
+, a.cat_04
+/* , a.cat_05 */
+/* , a.cat_06 */
+/* , a.cat_07 */
+/* , a.cat_08 */
+/* , a.cat_09 */
+/* , a.cat_10 */
+, a.notes_01
+, a.notes_02
+/* , a.notes_03 */
+/* , a.notes_04 */
+/* , a.notes_05 */
+, a.file_01
+/* , a.file_02 */
+/* , a.file_03 */
+FROM accounting a
+WHERE a.ID = :ID
+";
+
+$ee->form_sql_param[":$ee->identity_name"] = @$_REQUEST[$ee->identity_name]; 
+
+// should not be here
+
+$ee->form_input_control['file_01'] = '--image';
+$ee->form_input_control['file_02'] = '--image';
+$ee->form_input_control['file_03'] = '--image';
+
+$ee->grid_output_control['file_01'] = '--image'; // image clickable  
+$ee->grid_output_control['file_02'] = '--image'; // image clickable  
+$ee->grid_output_control['file_03'] = '--image'; // image clickable  
+
+
 
 // run eEKS/LM
 $ee->run();

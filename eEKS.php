@@ -8,6 +8,11 @@ class eEKS extends lazy_mofo{
   
   public $eeks_config = array();
   
+  // overwrite LM variables
+  
+  public $table = 'accounting';    // table name for updates, inserts and deletes
+  public $identity_name = 'ID';    // identity / primary key for table
+  
   
   function template($content){
     
