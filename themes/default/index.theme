@@ -26,6 +26,9 @@ $header = '<!DOCTYPE html>
 
 // content of LM will be here
 
-$footer = "<p>Don't worry, be happy ;-)</p>
+$footer = '<footer class="center">
+  <p>Don\'t worry, be happy ;-)</p>
+  <p><a href="https://github.com/raffaelj/eeks">Sourcecode on Github</a></p>
+</footer>
 </body>
-</html>";
+</html>';
