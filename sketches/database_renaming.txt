@@ -1,0 +1,41 @@
+ID                ID --> evtl. = Beleg-Nr.
+
+date_created      ErstellDatum
+date_last_changed ÄnderungsDatum
+
+value_date        ZahlDatum
+voucher_date      BelegDatum/Rechnungsdatum
+gross_amount      Bruttobetrag
+tax_rate          Steuersatz
+account           Konto
+invoice_number    RechnungsNr
+from_to           Auftraggeber/Empfänger
+posting_text      Buchungstext
+object            Zusatztext (was)
+type_of_costs     KostenErloesArt
+
+cat_01            ArtDerBeschaeftigung
+cat_02            Geschaeftsbereich
+cat_03            Projekt
+cat_04            Foerdermittelgeber_in
+cat_05
+cat_06
+cat_07
+cat_08
+cat_09
+cat_10
+
+notes_01          Notizen
+notes_02          Garantie
+notes_03
+notes_04
+notes_05
+
+file_01           Scan/Datei/Beleg
+file_02           z. B. Produktfoto
+file_03           z. B. Anleitung
+
+                  BelegNr --> notwendig? (ID)
+                  AusgabeEinnahme --> ergibt sich aus Vorzeichen bei Bruttobetrag
+
+
