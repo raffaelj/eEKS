@@ -27,7 +27,7 @@ $header = '<!DOCTYPE html>
 // content of LM will be here
 
 $footer = '<footer class="center">
-  <p>Don\'t worry, be happy ;-)</p>
+  <p>' . $this->slogan . '</p>
   <p><a href="https://github.com/raffaelj/eeks">Sourcecode on Github</a></p>
 </footer>
 </body>
