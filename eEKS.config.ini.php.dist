@@ -1,0 +1,47 @@
+;<?php
+;die(); // For further security
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;/*
+;; don't change anything above this line
+;;
+;; eEKS configuration
+;;
+;; change your config and rename this file to `eEKS.config.ini.php`
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; eEKS specific config
+
+[eeks]
+
+;; name of theme must be the same like the folder name with `index.theme` file
+theme = default
+; theme = test
+
+;; feature does not exist, but would be nice to have
+;; change to true for demo data
+demo = false
+
+;; slogan
+slogan = "Don't worry, be happy ;-)"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; lazy_mofo config
+
+[lm]
+timezone = 'Europe/Berlin'
+return_to_edit_after_insert = false
+return_to_edit_after_update = false
+grid_show_images = true
+grid_show_search_box = true
+
+;; pagination
+grid_limit = 50
+
+;; max chars in cell
+grid_ellipse_at = 100
+
+
+
+
+;; don't change anything below this line
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;*/
+;?>
