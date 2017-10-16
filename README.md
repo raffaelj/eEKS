@@ -28,8 +28,8 @@ Don't use this software if you dont't know what's going on. Don't use it on a pu
   * [x] multi from grid (without confirmation)
   * [x] from form
 * grid - set class names (or data attributes) for data types
-* [x] number, date, datetime
-* [ ] i18n number format (dot, comma)
+  * [x] number, date, datetime
+* i18n number format (dot, comma)
   * [x] number_in()
   * [x] number_out()
   * [ ] ...?
@@ -40,10 +40,6 @@ Don't use this software if you dont't know what's going on. Don't use it on a pu
   * [x] i18n number format
   * [x] no inline styles
 * [ ] ...
-* [ ] 
-* [ ] 
-* [ ] 
-
 
 
 
