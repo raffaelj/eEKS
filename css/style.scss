@@ -25,7 +25,7 @@ a {
 // custom classes for easier styling
 .text-right {text-align:right;}
 .text-left {text-align:left;}
-.number{text-align:right;}
+.number,.date,.datetime{display:block;text-align:right;}
 .center{margin:0 auto;text-align:center;}
 
 // set page size and reset a view rules for printing
@@ -126,7 +126,6 @@ table {
   }
   &:checked{
     + label{
-      // border:2px solid green;
       position:fixed;top: 50%;
       left: 50%;
       margin-left: 154px;
@@ -158,8 +157,6 @@ table {
     left:50%;
     width:290px;
     padding:5px;
-    // height:150px;
-    // border:2px solid orange;
     border-radius:5px;
     margin-top:-77px;
     margin-left:-152px;

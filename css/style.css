@@ -23,7 +23,8 @@ a {
 .text-left {
   text-align: left; }
 
-.number {
+.number, .date, .datetime {
+  display: block;
   text-align: right; }
 
 .center {
