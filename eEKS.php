@@ -11,6 +11,11 @@ class eEKS extends lazy_mofo{
   public $name = "eEKS";
   public $slogan = "";
   
+  // number format
+  public $decimals = 2;
+  public $dec_point = '.';
+  public $thousands_sep = ',';
+  
   // overwrite LM variables
   
   public $table = 'accounting';    // table name for updates, inserts and deletes
@@ -113,7 +118,20 @@ class eEKS extends lazy_mofo{
     
     // purpose: convert local format to database format
     
-    // ...
+    if(mb_strlen($str) == 0)
+      return null;
+    
+    $str = $this->clean_out($str);
+    
+    if($this->dec_point != '.'){
+      $str = str_replace($this->thousands_sep, '', $str);
+      $str = str_replace($this->dec_point, '.', $str);
+      $str = floatval($str);
+    }
+    
+    $str = number_format((float)$str, 2, '.', '');
+    
+    return $str;
     
   }
   
@@ -122,10 +140,32 @@ class eEKS extends lazy_mofo{
     
     // purpose: convert database format to local format
     
-    // ...
+    if(mb_strlen($str) == 0)
+      return;
+    
+    $str = $this->clean_out($str);
+    
+    $str = number_format((float)$str, $this->decimals, $this->dec_point, $this->thousands_sep);
+    
+    return $str;
     
   }
   
+  
+  function html_number_output($str){
+    
+    // purpose: set class names for different numbers
+    
+    $str = $this->number_out($str);
+    
+    $class = "number";
+    if ($str == 0) $class .= " zero";
+    if ($str < 0)  $class .= " minus";
+    if ($str > 0)  $class .= " plus";
+    
+    return "<span class='$class'>$str</span>";
+    
+  }
   
   //////////////////////////////////////////////////////////////////////////////
   // custom grid(s)
@@ -556,8 +596,10 @@ class eEKS extends lazy_mofo{
       $val = $this->date_in($val);
     elseif($cmd == 'datetime')
       $val = $this->date_in($val, true);
-    elseif($cmd == 'number' && mb_strlen($this->restricted_numeric_input) > 0)
+    elseif($cmd == 'number' && mb_strlen($this->restricted_numeric_input) > 0){
+      $val = $this->number_in($val);
       $val = preg_replace($this->restricted_numeric_input, '', $val);
+    }
     
     if(mb_strlen($val) == 0)
       $val = null;
@@ -588,10 +630,10 @@ class eEKS extends lazy_mofo{
       $cmd = 'text';
 
     // set input size    
-    if($called_from == 'grid')
-      $size = $this->grid_text_input_size;
-    else
-      $size = $this->form_text_input_size;
+    // if($called_from == 'grid')
+      // $size = $this->grid_text_input_size;
+    // else
+      // $size = $this->form_text_input_size;
 
     $class = $this->get_class_name($column_name); 
 
@@ -612,24 +654,24 @@ class eEKS extends lazy_mofo{
     elseif($validate_error == '')
     $validate_placeholder_alternative = "<span class='lm_validate_tip'>" . $this->clean_out($validate[$column_name][2]) . "</span>";
   
-  $max_length = '';
-  if(intval(@$this->text_input_max_length[$column_name]) > 0)
-    $max_length = "maxlength='" . $this->text_input_max_length[$column_name] . "'";
-  elseif($this->text_input_max_length_default > 0)
-    $max_length = "maxlength='" . $this->text_input_max_length_default . "'";
+    $max_length = '';
+    if(intval(@$this->text_input_max_length[$column_name]) > 0)
+      $max_length = "maxlength='" . $this->text_input_max_length[$column_name] . "'";
+    elseif($this->text_input_max_length_default > 0)
+      $max_length = "maxlength='" . $this->text_input_max_length_default . "'";
 
     if($cmd == 'text')
-      return "<input type='text' name='$column_name' class='$class' value='" . $this->clean_out($value) . "' size='$size' $max_length placeholder='$validate_placeholder'>$validate_error $validate_placeholder_alternative";
+      return "<input type='text' name='$column_name' class='$class' value='" . $this->clean_out($value) . "' $max_length placeholder='$validate_placeholder'>$validate_error $validate_placeholder_alternative";
     elseif($cmd == 'password')
-      return "<input type='password' name='$column_name' class='$class' value='" . $this->clean_out($value) . "' size='$size' $max_length placeholder='$validate_placeholder'>$validate_error $validate_placeholder_alternative";
+      return "<input type='password' name='$column_name' class='$class' value='" . $this->clean_out($value) . "' $max_length placeholder='$validate_placeholder'>$validate_error $validate_placeholder_alternative";
     elseif($cmd == 'number')
-      return "<input type='text' name='$column_name' class='$class' value='" . $this->clean_out($value) . "' size='18' $max_length placeholder='$validate_placeholder'>$validate_error $validate_placeholder_alternative";
+      return "<input type='text' name='$column_name' class='$class $cmd' value='" . $this->number_out($value) . "' $max_length placeholder='$validate_placeholder'>$validate_error $validate_placeholder_alternative";
     elseif($cmd == 'date')
-      return "<input type='text' name='$column_name' class='$class' value='" . $this->date_out($value) . "' size='18' $max_length placeholder='$validate_placeholder'>$validate_error $validate_placeholder_alternative";
+      return "<input type='text' name='$column_name' class='$class $cmd' value='" . $this->date_out($value) . "' $max_length placeholder='$validate_placeholder'>$validate_error $validate_placeholder_alternative";
     elseif($cmd == 'datetime')
-      return "<input type='text' name='$column_name' class='$class' value='" . $this->date_out($value, true) . "' size='18' $max_length placeholder='$validate_placeholder'>$validate_error $validate_placeholder_alternative";
+      return "<input type='text' name='$column_name' class='$class $cmd' value='" . $this->date_out($value, true) . "' $max_length placeholder='$validate_placeholder'>$validate_error $validate_placeholder_alternative";
     elseif($cmd == 'textarea')
-      return "<textarea name='$column_name' class='$class' cols='60' rows='6' placeholder='$validate_placeholder'>" . $this->clean_out($value) . "</textarea>$validate_error $validate_placeholder_alternative";
+      return "<textarea name='$column_name' class='$class' placeholder='$validate_placeholder'>" . $this->clean_out($value) . "</textarea>$validate_error $validate_placeholder_alternative";
     elseif($cmd == 'readonly_datetime')
       return $this->date_out($value, true);
     elseif($cmd == 'readonly_date')
@@ -687,6 +729,11 @@ class eEKS extends lazy_mofo{
       return $this->html_image_output($value);
     elseif($cmd == 'html')
       return $this->html_html_output($value);
+    // elseif($cmd == 'number')
+      // return $this->number_out($value);
+    elseif($cmd == 'number')
+      // return "<span class='$cmd'>" . $this->number_out($value) . "</span>";
+      return $this->html_number_output($value);
     elseif(is_callable($cmd))
       return call_user_func($cmd, $column_name, $value, $command, $called_from);
     else
@@ -694,6 +741,7 @@ class eEKS extends lazy_mofo{
 
   }
   
+  //////////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
   function form($error = ''){
 

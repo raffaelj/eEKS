@@ -81,6 +81,12 @@ $this->datetime_out = 'd.m.Y, H:i';
 /******************************************************************************/
 /*                        eEKS specific translation                           */
 
+
+// number format
+$this->decimals = 2;
+$this->dec_point = ',';
+$this->thousands_sep = '.';
+
 // rename fieldnames from database
 
 $this->rename['date_created'] = 'Erstellt am';
