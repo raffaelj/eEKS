@@ -17,6 +17,44 @@ This time I try to have a cleaner coding style, avoid any German language in the
 
 Don't use this software if you dont't know what's going on. Don't use it on a public available web server. It's in a very early state with no security features. I use it in a local environment with [XAMPP][4].
 
+## Notes
+
+* grid_multi_delete works, but has no confirmation message
+
+## To do
+
+* delete dataset without javascript
+  * [x] single from grid
+  * [x] multi from grid (without confirmation)
+  * [x] from form
+* grid - set class names (or data attributes) for data types
+* [x] number, date, datetime
+* [ ] i18n number format (dot, comma)
+  * [x] number_in()
+  * [x] number_out()
+  * [ ] ...?
+* [ ] custom search box
+* [ ] filter functions (for search box)
+* [x] custom function cast_value (i18n number format)
+* custom function get_input_control
+  * [x] i18n number format
+  * [x] no inline styles
+* [ ] ...
+* [ ] 
+* [ ] 
+* [ ] 
+
+
+
+
+
+
+
+
+
+
+
+
 
  [1]: https://www3.arbeitsagentur.de/web/content/DE/Formulare/Detail/index.htm?dfContentId=L6019022DSTBAI516946
  [2]: https://en.wiktionary.org/wiki/Wiktionary:International_Phonetic_Alphabet
