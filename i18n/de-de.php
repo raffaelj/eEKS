@@ -33,7 +33,7 @@ $this->form_text_record_added = 'Eintrag hinzugefügt';
 // links on grid
 $this->grid_add_link    = "<a href='[script_name]action=edit&amp;[qs]' class='lm_grid_add_link'>Neuer Eintrag</a>";
 $this->grid_edit_link   = "<a href='[script_name]action=edit&amp;[identity_name]=[identity_id]&amp;[qs]'>[ändern]</a>";
-$this->grid_delete_link = "<a href='#' onclick='return _delete(\"[identity_id]\");'>[löschen]</a>";
+// $this->grid_delete_link = "<a href='#' onclick='return _delete(\"[identity_id]\");'>[löschen]</a>";
 $this->grid_export_link = "<a href='[script_name]_export=1&amp;[qs]' title='CSV herunterladen'>Exportieren</a>";
 
 // search box

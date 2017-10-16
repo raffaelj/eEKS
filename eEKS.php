@@ -15,7 +15,10 @@ class eEKS extends lazy_mofo{
   
   public $table = 'accounting';    // table name for updates, inserts and deletes
   public $identity_name = 'ID';    // identity / primary key for table
-  // public $image_style = "";
+  
+  // lm used a hidden form and javascript
+  // this solution uses CSS, a checkbox and a confirm button
+  public $grid_delete_link = "<input type='checkbox' name='[identity_name]' id='delete_[identity_id]' value='[identity_id]' class='button_delete'><label for='delete_[identity_id]'>X</label><div class='delete_confirm'><p>[delete_confirm]</p><input type='submit' name='confirm_delete' value='OK' class='button_delete_confirm'></div>";
   
   
   function template($content){
@@ -265,6 +268,7 @@ class eEKS extends lazy_mofo{
       $grid_delete_link = str_replace('[script_name]', $uri_path, $grid_delete_link);
       $grid_delete_link = str_replace('[qs]', $qs, $grid_delete_link);
       $grid_delete_link = str_replace('[identity_name]', $this->identity_name, $grid_delete_link);
+      $grid_delete_link = str_replace('[delete_confirm]', $this->delete_confirm, $grid_delete_link);
       $grid_export_link = str_replace('[script_name]', $uri_path, $grid_export_link);
       $grid_export_link = str_replace('[qs]', $qs, $grid_export_link);
       $links = $grid_edit_link . ' ' . $grid_delete_link;
@@ -327,7 +331,8 @@ class eEKS extends lazy_mofo{
       
       $html .= $add_record_search_bar;
 
-      $html .= "<form action='$uri_path$qs' method='post' onsubmit='return _update_grid()' enctype='multipart/form-data'>\n";
+      // $html .= "<form action='$uri_path$qs' method='post' onsubmit='return _update_grid()' enctype='multipart/form-data'>\n";
+      $html .= "<form action='$uri_path$qs&amp;action=update_grid' method='post' enctype='multipart/form-data'>\n";
       $html .= "<input type='hidden' name='_posted' value='1'>\n";
       $html .= "<input type='hidden' name='_csrf' value='$_SESSION[_csrf]'>\n";
 
@@ -406,13 +411,108 @@ class eEKS extends lazy_mofo{
       $html .= $pagination_button_bar;
       $html .= "</form>\n";
       $html .= "</div><!-- close #lm -->\n";
-  $html .= $this->delete_js(0, 'grid');
+  // $html .= $this->delete_js(0, 'grid');
 
       return $html;
 
   }
-    
   
+  //////////////////////////////////////////////////////////////////////////////
+  function delete(){
+
+        // purpose: called from contoller to display update() data
+
+        // call user function to validate or whatever
+        $error = '';
+        if($this->on_delete_user_function != '')
+            $error = call_user_func($this->on_delete_user_function);
+
+        // go back on validation error
+        if($error != ''){
+            if($_POST['_called_from'] == 'form')
+                $this->edit($error);
+            else
+                $this->index($error);
+
+            return;
+        }
+        
+        // delete data
+        $flag = $this->sql_delete();
+
+        // user function after delete
+        if($this->after_delete_user_function != '')
+            call_user_func($this->after_delete_user_function);
+
+        // redirect user
+        $url = $this->get_uri_path() . "_success=3&" . $this->get_qs();
+        $this->redirect($url, $flag);
+
+    }
+  
+  // function confirm_delete(){
+    
+  // }
+  
+  function sql_delete(){
+
+        // purpose: delete the requested record
+        // returns: false on error, true on success
+        
+        $identity_id = $this->cast_id($_POST[$this->identity_name]);
+
+        if($identity_id == 0){
+            $this->display_error("missing identity_value", 'delete()');
+            return false;
+        }
+
+        if(!$this->upload_delete($this->table, $this->identity_name, $identity_id, '*', $this->form_input_control))
+            return false;
+
+        $sql_param = array(':identity_id' => $identity_id);
+        $sql = "delete from `$this->table` where `$this->identity_name` = :identity_id limit 1";
+        if($this->query($sql, $sql_param, 'delete()') === false)
+            return false;
+
+    }
+  
+  //////////////////////////////////////////////////////////////////////////////
+  function update_grid(){
+    
+    
+    if($_POST['confirm_delete'] == 'OK'){
+      $this->delete();
+      return;
+    }
+      
+    
+    
+
+        // purpose: called from contoller to display update() data
+
+        // call user function to validate or whatever
+        $error = '';
+        if($this->on_update_grid_user_function != '')
+            $error = call_user_func($this->on_update_grid_user_function);
+
+        // go back on validation error
+        if($error != ''){
+            $this->index($error);
+            return;
+        }
+        
+        // update data
+        $flag = $this->sql_update_grid();
+
+        // user function after updates
+        if($this->after_update_grid_user_function != '')
+            call_user_func($this->after_update_grid_user_function);
+
+        // redirect user
+        $url = $this->get_uri_path() . "_success=2&" . $this->get_qs();
+        $this->redirect($url, $flag);
+
+    }
   
   //////////////////////////////////////////////////////////////////////////////
   // custom search box
