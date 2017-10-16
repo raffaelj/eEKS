@@ -63,6 +63,8 @@ nav {
 // tables
 
 table {
+  border-spacing: 2px;
+  border-collapse: separate;
   td,th { 
     padding: 6px;
   }
@@ -93,10 +95,15 @@ table {
   height:2em;
 }
 
-// lm form
-
-.lm_form {
-  margin: 0 auto;
+// lm_success
+.lm_success{
+  margin: .5em auto;
+  padding: .5em;
+  width: 50%;
+  border: 2px solid khaki;
+  border-radius: 5px;
+  text-align: center;
+  color: #222;
 }
 
 // delete button
@@ -108,7 +115,7 @@ table {
 .button_delete{
   display:none;
   + label{
-    display: block;
+    display: inline-block;
     width: 1.4em;
     height: 1.3em;
     padding-bottom: .1em;
@@ -120,22 +127,22 @@ table {
     text-align: center;
     color: #fff;
     &:hover, &:focus{
-      background-color:red;
-      color:#000;
+      background-color:#aa1818;
+      color:#fff;
     }
   }
   &:checked{
     + label{
-      position:fixed;top: 50%;
-      left: 50%;
-      margin-left: 154px;
-      margin-top: -101px;
-      background: #efefef;
-      border: 1px solid #ccc;
-      color: #aaa;
-      &:hover{
-        color:#000;
-        background:#fff;
+      // position:fixed;top: 50%;
+      // left: 50%;
+      // margin-left: 154px;
+      // margin-top: -101px;
+      // background: #efefef;
+      // border: 1px solid #ccc;
+      // color: #aaa;
+      &:hover,&:focus{
+        background-color:tomato;
+        color:#fff;
       }
       &:before{
         content:"";
@@ -147,6 +154,20 @@ table {
         height:100%;
         background-color:rgba(0,0,0,.1);
         border-radius:0px;
+      }
+      &:after{
+        content:"X";
+        position:fixed;top: 50%;
+        left: 50%;
+        margin-left: 154px;
+        margin-top: -101px;
+        background: #efefef;
+        border: 1px solid #ccc;
+        color: #aaa;
+        width: 1.4em;
+        height: 1.3em;
+        padding-bottom: .1em;
+        border-radius: 50%;
       }
     }
   }
@@ -165,3 +186,37 @@ table {
     text-align:center;
   }
 }
+
+///////////// lm form
+
+.lm_form {
+  margin: 0 auto;
+}
+
+.lm_form_button_bar{
+  text-align: center;
+  padding: 1em;
+  border-top: 5px solid #ccc;
+  background-color: #fafafa;
+  .button_delete{// delete button
+    + label{
+      width: auto;
+      height: auto;
+      border-radius: 5px;
+      padding: .1em .2em;
+      font-size: 1.2em;
+      line-height: 1.2em;
+      &:hover, &:focus{
+        
+      }
+    }
+    &:checked{
+      + label{
+        &:after{
+          line-height:1.4em;
+        }
+      }
+    }
+  }
+}
+

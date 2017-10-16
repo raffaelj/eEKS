@@ -21,8 +21,6 @@ $this->update_grid_confirm = 'Sind Sie sicher, dass Sie diese [count] Einträge 
 // form buttons
 $this->form_add_button    = "<input type='submit' value='Hinzufügen' class='lm_button'>";
 $this->form_update_button = "<input type='submit' value='Aktualisieren' class='lm_button'>"; 
-$this->form_back_button   = "<input type='button' value='&lt; Zurück' class='lm_button dull' onclick='_back();'>";
-$this->form_delete_button = "<input type='button' value='Löschen' class='lm_button error' onclick='_delete();'>"; 
 
 // titles in the <th> of top of the edit form 
 $this->form_text_title_add    = 'Eintrag hinzufügen';   
@@ -33,7 +31,6 @@ $this->form_text_record_added = 'Eintrag hinzugefügt';
 // links on grid
 $this->grid_add_link    = "<a href='[script_name]action=edit&amp;[qs]' class='lm_grid_add_link'>Neuer Eintrag</a>";
 $this->grid_edit_link   = "<a href='[script_name]action=edit&amp;[identity_name]=[identity_id]&amp;[qs]'>[ändern]</a>";
-// $this->grid_delete_link = "<a href='#' onclick='return _delete(\"[identity_id]\");'>[löschen]</a>";
 $this->grid_export_link = "<a href='[script_name]_export=1&amp;[qs]' title='CSV herunterladen'>Exportieren</a>";
 
 // search box
@@ -81,6 +78,9 @@ $this->datetime_out = 'd.m.Y, H:i';
 /******************************************************************************/
 /*                        eEKS specific translation                           */
 
+
+// form delete button text = grid_text_delete
+$this->form_back_button_text   = "Zurück";
 
 // number format
 $this->decimals = 2;

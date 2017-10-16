@@ -23,12 +23,31 @@ class eEKS extends lazy_mofo{
   
   // lm used a hidden form and javascript
   // this solution uses CSS, a checkbox and a confirm button
-  public $grid_delete_link = "<input type='checkbox' name='[identity_name]' id='delete_[identity_id]' value='[identity_id]' class='button_delete'><label for='delete_[identity_id]'>X</label><div class='delete_confirm'><p>[delete_confirm]</p><input type='submit' name='confirm_delete' value='OK' class='button_delete_confirm'></div>";
+  public $grid_delete_link = "<input type='checkbox' name='[identity_name]' id='delete_[identity_id]' value='[identity_id]' class='button_delete'><label for='delete_[identity_id]'>X</label><div class='delete_confirm'><p>[delete_confirm]</p><input type='submit' name='confirm_delete' value='[grid_text_delete]' class='button_delete_confirm'></div>";
   
+  
+  public $form_delete_button = "<input type='checkbox' name='delete_check' id='delete_check' value='not-important' class='button_delete'><label for='delete_check'>[grid_text_delete]</label><div class='delete_confirm'><p>[delete_confirm]</p><input type='submit' name='confirm_delete' value='[grid_text_delete]' class='button_delete_confirm'></div>";
+  
+  
+  public $form_back_button_text   = "Back";
+  
+  function back_button($identity_id = 0){
+    
+    $uri_path = $this->get_uri_path();
+    $qs = $this->get_qs(); 
+    $back_link = $uri_path . $qs;
+    
+    // append id for row highlighting
+    if($identity_id > 0)
+      $back_link .= "&amp;$this->identity_name=$identity_id";
+    
+    return "<a href='$back_link'>$this->form_back_button_text</a>";
+  }
   
   function template($content){
     
     // purpose: use template file for HTML output
+    
     // could be nicer but it works
     // $header and $footer are defined in the theme file
     // $ content is the part LM/eEKS generates
@@ -309,6 +328,7 @@ class eEKS extends lazy_mofo{
     $grid_delete_link = str_replace('[qs]', $qs, $grid_delete_link);
     $grid_delete_link = str_replace('[identity_name]', $this->identity_name, $grid_delete_link);
     $grid_delete_link = str_replace('[delete_confirm]', $this->delete_confirm, $grid_delete_link);
+    $grid_delete_link = str_replace('[grid_text_delete]', $this->grid_text_delete, $grid_delete_link);
     $grid_export_link = str_replace('[script_name]', $uri_path, $grid_export_link);
     $grid_export_link = str_replace('[qs]', $qs, $grid_export_link);
     $links = $grid_edit_link . ' ' . $grid_delete_link;
@@ -371,7 +391,6 @@ class eEKS extends lazy_mofo{
     
     $html .= $add_record_search_bar;
 
-    // $html .= "<form action='$uri_path$qs' method='post' onsubmit='return _update_grid()' enctype='multipart/form-data'>\n";
     $html .= "<form action='$uri_path$qs&amp;action=update_grid' method='post' enctype='multipart/form-data'>\n";
     $html .= "<input type='hidden' name='_posted' value='1'>\n";
     $html .= "<input type='hidden' name='_csrf' value='$_SESSION[_csrf]'>\n";
@@ -451,7 +470,6 @@ class eEKS extends lazy_mofo{
     $html .= $pagination_button_bar;
     $html .= "</form>\n";
     $html .= "</div><!-- close #lm -->\n";
-    // $html .= $this->delete_js(0, 'grid');
 
     return $html;
 
@@ -490,9 +508,6 @@ class eEKS extends lazy_mofo{
 
     }
   
-  // function confirm_delete(){
-    
-  // }
   
   function sql_delete(){
 
@@ -551,6 +566,55 @@ class eEKS extends lazy_mofo{
     $this->redirect($url, $flag);
 
   }
+  
+  //////////////////////////////////////////////////////////////////////////////
+  function update(){
+
+    // purpose: called from contoller to display update() data
+    
+    // purpose 2: if delete point to delete()
+    
+    if($_POST['confirm_delete'] == $this->grid_text_delete){
+      $this->delete();
+      return;
+    }
+
+    $error = '';
+
+    // validation system
+    $is_valid = $this->validate($this->on_update_validate);
+    if(!$is_valid)
+      $error = $this->validate_text_general; //optional general error at the top
+
+    // call user function to validate or whatever
+    if($is_valid && $this->on_update_user_function != '')
+      $error = call_user_func($this->on_update_user_function);
+
+    // go back on validation error
+    if($error != '' || !$is_valid){
+      $this->edit($error);
+      return;
+    }
+
+    // update data
+    $id = $this->sql_update();
+
+    // user function after update
+    if($this->after_update_user_function != '')
+      call_user_func($this->after_update_user_function);
+    
+    // send user back to edit screen if desired
+    $action = '';
+    if($this->return_to_edit_after_update)
+      $action = 'action=edit&';
+
+    // redirect user
+    $url = $this->get_uri_path() . "{$action}_success=2&$this->identity_name=$id&" . $this->get_qs();
+    $this->redirect($url, $id);
+
+  }
+  
+  
   
   //////////////////////////////////////////////////////////////////////////////
   // custom search box
@@ -729,10 +793,7 @@ class eEKS extends lazy_mofo{
       return $this->html_image_output($value);
     elseif($cmd == 'html')
       return $this->html_html_output($value);
-    // elseif($cmd == 'number')
-      // return $this->number_out($value);
     elseif($cmd == 'number')
-      // return "<span class='$cmd'>" . $this->number_out($value) . "</span>";
       return $this->html_number_output($value);
     elseif(is_callable($cmd))
       return call_user_func($cmd, $column_name, $value, $command, $called_from);
@@ -878,16 +939,19 @@ class eEKS extends lazy_mofo{
     else
       $html .= "<input type='hidden' name='action' value='insert'>\n";
     
+    // populate link placeholders
+    $this->form_delete_button = str_replace('[grid_text_delete]', $this->grid_text_delete, $this->form_delete_button);
+    $this->form_delete_button = str_replace('[delete_confirm]', $this->delete_confirm, $this->form_delete_button);
+    
     // add buttons
     if($action == 'edit')
-      $html .= "<div class='lm_form_button_bar'>$this->form_back_button $this->form_delete_button $this->form_update_button</div>";
+      $html .= "<div class='lm_form_button_bar'>" . $this->back_button($identity_id) . " $this->form_delete_button $this->form_update_button</div>";
     else
-      $html .= "<div class='lm_form_button_bar'>$this->form_back_button $this->form_add_button</div>";
+      $html .= "<div class='lm_form_button_bar'>" . $this->back_button($identity_id) . " $this->form_add_button</div>";
 
     $html .= $this->form_additional_html;
     $html .= "</form>\n";
     $html .= "</div><!-- close #lm -->\n";
-    $html .= $this->delete_js($identity_id, 'form');
     
     return $html;    
 
