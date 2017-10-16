@@ -119,6 +119,8 @@ $ee->grid_output_control['file_01'] = '--image'; // image clickable
 $ee->grid_output_control['file_02'] = '--image'; // image clickable  
 $ee->grid_output_control['file_03'] = '--image'; // image clickable  
 
+$ee->grid_input_control['notes_01'] = '--text';
+
 
 
 // run eEKS/LM
