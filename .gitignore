@@ -1,4 +1,7 @@
 *.ini.php
+thumbs
+uploads
+tests
 
 # Windows image file caches
 Thumbs.db
