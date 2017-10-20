@@ -11,6 +11,10 @@ class eEKS extends lazy_mofo{
   public $name = "eEKS";
   public $slogan = "";
   
+  // for testing
+  // column names in this array are shown together in a multi-value column
+  public $multi_column = array('invoice_number', 'account', 'cat_02', 'cat_03', 'notes_02');
+  
   // number format
   public $decimals = 2;
   public $dec_point = '.';
@@ -392,20 +396,24 @@ class eEKS extends lazy_mofo{
     $head = "<tr>\n";
     if($this->grid_multi_delete)
       $head .= "<th><a href='#' onclick='return _toggle();' title='toggle checkboxes'>$this->grid_text_delete</a></th>\n";
-      
+    
+    
+    $edit_delete = "";
     $i = 0;
     foreach($columns as $column_name){
 
       $title = $this->format_title($column_name, @$this->rename[$column_name]);
 
       if($column_name == $this->identity_name && $i == ($column_count - 1))
-        $head .= "    <th></th>\n"; // if identity is last column then this is the column with the edit and delete links
-      else
+        $edit_delete = "    <th></th>\n"; // if identity is last column then this is the column with the edit and delete links
+      elseif(!in_array($column_name, $this->multi_column))
         $head .= "    <th><a href='{$uri_path}_order_by=" . ($i + 1) . "&amp;_desc=$_desc_invert&amp;" . $this->get_qs('_search') . "'>$title</a></th>\n";
   
       $i++;
 
     }
+    $head .= "<th>multiple values</th>";
+    $head .= "$edit_delete";
     $head .= "</tr>\n";
           
     // start generating output //
@@ -437,6 +445,7 @@ class eEKS extends lazy_mofo{
 
     $html .= "<table class='lm_grid'>\n";
     $html .= $head;
+    
 
     // print rows
     $j = 0;
@@ -454,16 +463,33 @@ class eEKS extends lazy_mofo{
       if($this->grid_multi_delete){
         $html .= "<td><label><input type='checkbox' name='_delete[]' value='{$row[$this->identity_name]}'></label></td>\n";
       }
-
+      
+      
+      // set empty variables for test with multi-value column
+      $multi_column_content = "";
+      $edit_delete = "";
+      
       // print columns
       $i = 0;
       foreach($columns as $column_name){
+        
+        $title = $this->format_title($column_name, @$this->rename[$column_name]);
 
         $value = $row[$column_name];
 
         // edit & delete links
         if($column_name == $this->identity_name && $i == ($column_count - 1))
-          $html .= "    <td>" . str_replace('[identity_id]', $value, $links) . "</td>\n";
+          $edit_delete .= "    <td>" . str_replace('[identity_id]', $value, $links) . "</td>\n";
+        
+        
+        // test with multi-value column
+        elseif(in_array($column_name, $this->multi_column)){
+          $multi_column_content .= "<div>";
+          if(mb_strlen($value) > 0) $multi_column_content .= "$title: ";
+          $multi_column_content .= $this->get_output_control($column_name . '-' . $row[$this->identity_name], $value, '--text', 'grid') . "</div>";
+          
+        }
+        
 
         // input fields
         elseif(array_key_exists($column_name, $this->grid_input_control)){
@@ -483,6 +509,10 @@ class eEKS extends lazy_mofo{
         $i++; // column index
       }
 
+      $html .= "<td>$multi_column_content</td>";
+      $multi_column_content = ""; // reset
+      $html .= $edit_delete;
+      $edit_delete = ""; // reset
       $html .= "</tr>\n";
 
       // repeat header
