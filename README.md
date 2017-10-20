@@ -17,6 +17,23 @@ This time I try to have a cleaner coding style, avoid any German language in the
 
 Don't use this software if you dont't know what's going on. Don't use it on a public available web server. It's in a very early state with no security features. I use it in a local environment with [XAMPP][4].
 
+## Features of eEKS
+
+* all accounting data in one table with customizable categorization
+* basic overviews with filter functions (coming soon)
+* automation of "Anlage EKS" (coming soon)
+* ...
+
+## Code features compared to lazy_mofo/datagrid (all work in progress)
+
+* no javascript for basic functionality like delete or back link
+* no inline styles
+* duplicate existing dataset
+* multi-value column
+* i18n of number_format (dot or comma as decimal points etc.)
+* text align right for numbers and dates
+* template files
+
 ## Notes
 
 * grid_multi_delete works, but has no confirmation message
