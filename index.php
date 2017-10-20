@@ -48,8 +48,10 @@ SELECT
 , a.from_to
 /* , a.posting_text */
 , a.object
-, a.type_of_costs
-, a.cat_01
+/* , a.type_of_costs */
+, t.type_of_costs
+, a.mode_of_employment
+/* , a.cat_01 */
 /* , a.cat_02 */
 , a.cat_03
 /* , a.cat_04 */
@@ -69,6 +71,8 @@ SELECT
 /* , a.file_03 */
 , a.ID
 FROM accounting a
+LEFT JOIN type_of_costs t
+ON a.type_of_costs = t.ID
 ORDER BY a.value_date DESC, a.voucher_date DESC
 ";
 
