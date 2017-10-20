@@ -28,9 +28,30 @@ class eEKS extends lazy_mofo{
   
   public $form_delete_button = "<input type='checkbox' name='delete_check' id='delete_check' value='not-important' class='button_delete'><label for='delete_check'>[grid_text_delete]</label><div class='delete_confirm'><p>[delete_confirm]</p><input type='submit' name='confirm_delete' value='[grid_text_delete]' class='button_delete_confirm'></div>";
   
+  public $form_duplicate_button_text = "Copy to new entry";
+  public $form_duplicate_button = "<input type='submit' name='duplicate' value='[form_duplicate_button_text]' class='lm_button'>";
+  // public $form_duplicate_button = "<a href='?action=duplicate&amp;[identity_name]=[identity_id]'>[form_duplicate_button_text]</a>";
   
   public $form_back_button_text   = "Back";
   
+  //////////////////////////////////////////////////////////////////////////////
+  function run(){
+
+    // purpose: built-in controller 
+
+    switch($this->get_action()){
+      case "edit":          $this->edit();        break;
+      case "insert":        $this->insert();      break;
+      case "update":        $this->update();      break;
+      case "update_grid":   $this->update_grid(); break;
+      case "delete":        $this->delete();      break;
+      // case "duplicate":     $this->duplicate();      break;
+      default:              $this->index();
+    }
+
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////
   function back_button($identity_id = 0){
     
     $uri_path = $this->get_uri_path();
@@ -44,6 +65,7 @@ class eEKS extends lazy_mofo{
     return "<a href='$back_link'>$this->form_back_button_text</a>";
   }
   
+  //////////////////////////////////////////////////////////////////////////////
   function template($content){
     
     // purpose: use template file for HTML output
@@ -59,6 +81,7 @@ class eEKS extends lazy_mofo{
     
   }
   
+  //////////////////////////////////////////////////////////////////////////////
   function config_from_ini(){
     
     // purpose: use ini file instead of overwriting variables in PHP
@@ -75,6 +98,7 @@ class eEKS extends lazy_mofo{
     
   }
   
+  //////////////////////////////////////////////////////////////////////////////
   function edit($error = ''){
     
     // purpose: called from contoller to display form() and add or edit a record
@@ -83,6 +107,7 @@ class eEKS extends lazy_mofo{
     
   }
   
+  //////////////////////////////////////////////////////////////////////////////
   function index($error = ''){
     
     // purpose: called from contoller to display update() data
@@ -91,6 +116,7 @@ class eEKS extends lazy_mofo{
     
   }
   
+  //////////////////////////////////////////////////////////////////////////////
   function html_image_input($field_name, $file_name){
 
     // purpose: if image exists, display image and delete checkbox. also display file input
@@ -115,6 +141,7 @@ class eEKS extends lazy_mofo{
 
   }
   
+  //////////////////////////////////////////////////////////////////////////////
   function html_image_output($file_name){
 
     // purpose: if image exists, display image depending on settings and if thumbnail exists
@@ -394,6 +421,9 @@ class eEKS extends lazy_mofo{
     $html .= "<form action='$uri_path$qs&amp;action=update_grid' method='post' enctype='multipart/form-data'>\n";
     $html .= "<input type='hidden' name='_posted' value='1'>\n";
     $html .= "<input type='hidden' name='_csrf' value='$_SESSION[_csrf]'>\n";
+    
+    // save changes button on top to avoid wrong submit button on pressing `Enter`
+    $html .= $button;
 
     // quit if there's no data
     if($count <= 0){
@@ -538,7 +568,7 @@ class eEKS extends lazy_mofo{
     
     // purpose 2: if delete point to delete()
     
-    if($_POST['confirm_delete'] == 'OK'){
+    if(isset($_POST['confirm_delete']) && $_POST['confirm_delete'] == $this->grid_text_delete){
       $this->delete();
       return;
     }
@@ -573,9 +603,17 @@ class eEKS extends lazy_mofo{
     // purpose: called from contoller to display update() data
     
     // purpose 2: if delete point to delete()
+    // purpose 3: if duplicate point to duplicate()
     
-    if($_POST['confirm_delete'] == $this->grid_text_delete){
+    // point to delete
+    if(isset($_POST['confirm_delete']) && $_POST['confirm_delete'] == $this->grid_text_delete){
       $this->delete();
+      return;
+    }
+    
+    // point to duplicate
+    if(isset($_POST['duplicate']) && $_POST['duplicate'] == $this->form_duplicate_button_text){
+      $this->duplicate();
       return;
     }
 
@@ -595,6 +633,8 @@ class eEKS extends lazy_mofo{
       $this->edit($error);
       return;
     }
+    
+    
 
     // update data
     $id = $this->sql_update();
@@ -613,6 +653,58 @@ class eEKS extends lazy_mofo{
     $this->redirect($url, $id);
 
   }
+  
+  
+  
+  //////////////////////////////////////////////////////////////////////////////
+  function duplicate(){
+    
+    // copy from function insert() with some additions
+    
+    // purpose: called from contoller to display insert() data
+    
+    // differences to lm:
+    // * unset posted ID 
+    // * force `return_to_edit_after_insert` to update duplicated data
+    
+    // unset posted ID
+    unset($_POST[$this->identity_name]);
+    
+    $error = '';
+
+    // validation system
+    $is_valid = $this->validate($this->on_insert_validate);
+    if(!$is_valid)
+      $error = $this->validate_text_general; //optional general error at the top
+
+    // call user function to validate or whatever
+    if($is_valid && $this->on_insert_user_function != '')
+      $error = call_user_func($this->on_insert_user_function);
+
+    // go back on validation error
+    if($error != '' || !$is_valid){
+      $this->edit($error);
+      return;
+    }
+
+    // insert data
+    $id = $this->sql_insert();
+
+    // user function after insert
+    if($this->after_insert_user_function != '')
+      call_user_func($this->after_insert_user_function, $id);
+    
+    // send user back to edit screen if desired
+    $action = '';
+    // if($this->return_to_edit_after_insert)
+      $action = 'action=edit&';
+
+    // redirect user
+    $url = $this->get_uri_path() . "{$action}_success=1&$this->identity_name=$id&" . $this->get_qs(''); // do carry items defined in query_string_list, '' removes the default
+    $this->redirect($url, $id);
+
+  }
+  
   
   
   
@@ -933,6 +1025,9 @@ class eEKS extends lazy_mofo{
     if($action == 'edit')
       $html .= "<input type='hidden' name='$this->identity_name' value='$identity_id'>\n";
 
+    // if($action == 'duplicate')
+      // $html .= "<input type='hidden' name='$this->identity_name' value='$identity_id'>\n";
+
     // action 
     if($action == 'edit')
       $html .= "<input type='hidden' name='action' value='update'>\n";
@@ -942,10 +1037,13 @@ class eEKS extends lazy_mofo{
     // populate link placeholders
     $this->form_delete_button = str_replace('[grid_text_delete]', $this->grid_text_delete, $this->form_delete_button);
     $this->form_delete_button = str_replace('[delete_confirm]', $this->delete_confirm, $this->form_delete_button);
+    $this->form_duplicate_button = str_replace('[identity_name]', $this->identity_name, $this->form_duplicate_button);
+    $this->form_duplicate_button = str_replace('[identity_id]', $identity_id, $this->form_duplicate_button);
+    $this->form_duplicate_button = str_replace('[form_duplicate_button_text]', $this->form_duplicate_button_text, $this->form_duplicate_button);
     
     // add buttons
     if($action == 'edit')
-      $html .= "<div class='lm_form_button_bar'>" . $this->back_button($identity_id) . " $this->form_delete_button $this->form_update_button</div>";
+      $html .= "<div class='lm_form_button_bar'>" . $this->back_button($identity_id) . " $this->form_update_button $this->form_delete_button $this->form_duplicate_button</div>";
     else
       $html .= "<div class='lm_form_button_bar'>" . $this->back_button($identity_id) . " $this->form_add_button</div>";
 
