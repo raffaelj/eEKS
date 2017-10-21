@@ -29,7 +29,7 @@ $this->form_text_record_saved = 'Eintrag gespeichert';
 $this->form_text_record_added = 'Eintrag hinzugefügt';
 
 // links on grid
-$this->grid_add_link    = "<a href='[script_name]action=edit&amp;[qs]' class='lm_grid_add_link'>Neuer Eintrag</a>";
+$this->grid_add_link    = "<a href='[script_name]action=edit&amp;[qs]' class='lm_button lm_grid_add_link'>Neuer Eintrag</a>";
 $this->grid_edit_link   = "<a href='[script_name]action=edit&amp;[identity_name]=[identity_id]&amp;[qs]'>[ändern]</a>";
 $this->grid_export_link = "<a href='[script_name]_export=1&amp;[qs]' title='CSV herunterladen'>Exportieren</a>";
 
@@ -37,7 +37,7 @@ $this->grid_export_link = "<a href='[script_name]_export=1&amp;[qs]' title='CSV 
 $this->grid_search_box = "
 <form action='[script_name]' class='lm_search_box'>
     <input type='text' name='_search' value='[_search]' size='20' class='lm_search_input'>
-    <a href='[script_name]' style='margin: 0 10px 0 -20px; display: inline-block;' title='Suche zurücksetzen'>x</a>
+    <a href='[script_name]' title='Suche zurücksetzen' class='button_clear_search'>x</a>
     <input type='submit' class='lm_button lm_search_button' value='Suche'>
     <input type='hidden' name='action' value='search'>[query_string_list]
 </form>"; 
@@ -78,6 +78,8 @@ $this->datetime_out = 'd.m.Y, H:i';
 /******************************************************************************/
 /*                        eEKS specific translation                           */
 
+// language for html lang attribute
+$this->html_lang = "de";
 
 // form delete button text = grid_text_delete
 $this->form_back_button_text   = "Zurück";

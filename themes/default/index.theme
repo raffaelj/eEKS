@@ -8,16 +8,19 @@ $page_title = 'test';
 $class = 'test';
 
 $header = '<!DOCTYPE html>
-<html>
+<html lang="' . $this->html_lang . '">
 <head>
 	<meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>' . $page_title . ' - eEKS</title>
+  <title>' . $page_title . ' - ' . $this->name .'</title>
   <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
   <link rel="stylesheet" type="text/css" href="css/style.min.css">
 </head>
 <body class="' . $class . '">
-<h1><a href="' . $this->get_uri_path() . '">eEKS</a></h1>
+  <header>
+    <h1><a href="' . $this->get_uri_path() . '">eEKS</a></h1>
+  </header>
+  <main>
 ';
 
 // navigation
@@ -26,9 +29,16 @@ $header = '<!DOCTYPE html>
 
 // content of LM will be here
 
-$footer = '<footer class="center">
-  <p>' . $this->slogan . '</p>
-  <p><a href="https://github.com/raffaelj/eeks">Sourcecode on Github</a></p>
-</footer>
+$footer = '
+  </main>
+    <footer class="center">
+    <p>' . $this->slogan . '</p>
+    <p><a href="https://github.com/raffaelj/eeks">Sourcecode on Github</a></p>
+  </footer>
 </body>
 </html>';
+
+echo $header;
+echo $this->search_box();
+echo $content;
+echo $footer;

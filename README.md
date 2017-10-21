@@ -40,6 +40,8 @@ Don't use this software if you dont't know what's going on. Don't use it on a pu
 
 ## To do
 
+### revise lm code and features
+
 * delete dataset without javascript
   * [x] single from grid
   * [x] multi from grid (without confirmation)
@@ -56,9 +58,53 @@ Don't use this software if you dont't know what's going on. Don't use it on a pu
 * custom function get_input_control
   * [x] i18n number format
   * [x] no inline styles
-* [ ] ...
+* [ ] no inline styles
+* [x] no javascript for basic usage
+* [x] output via template file
 
+### pages
 
+* [ ] dashboard (with views)
+* [x] accounting (default page)
+  * [ ] extra: records without value_date
+* [ ] options
+  * [ ] change content of tables
+  * [ ] change (some) content of ini files
+
+### searchbox
+
+* [x] not in grid
+* [ ] add filters
+
+### filters
+
+* [ ] income/costs
+* [ ] value_date (from - to)
+* [ ] vaoucher_date (from - to)
+* [ ] without value_date
+* [ ] type_of_costs
+* [ ] mode_of_employment
+* [ ] filter by custom category
+* [ ] full text search
+* [ ] GROUP BY everything (except notes, files)
+
+### views
+
+* [ ] monthly sums
+  * [ ] type_of_costs = income
+  * [ ] type_of_costs = costs
+  * [ ] chart_of_accounts (EKS)
+
+### EKS preview
+
+* [ ] configuration file for not changing/ personal data
+* [ ] concluded
+* [ ] estimated
+  * [ ] automated sums on every page
+  * [ ] save estimated data for comparing in the future
+* because browsers dont't understand mixed page sizes (landscape and portrait) in print CSS
+  * [ ] page 1-2
+  * [ ] page 3-6
 
 
 

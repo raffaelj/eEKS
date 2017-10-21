@@ -37,9 +37,26 @@ grid_show_search_box = true
 grid_limit = 50
 
 ;; max chars in cell
-grid_ellipse_at = 100
+grid_ellipse_at = 80
+
+;; activate checkboxes for multiple deletions
+;grid_multi_delete = true
 
 
+;; modes of employment
+;; change the names for your needs but never change the order after using it
+;; 
+;; Some of these examples may not make sense in other countries than Germany
+;; with other tax or unemployment laws.
+
+[mode_of_employment]
+1 = "freelance"
+2 = "private"
+3 = "commercial"
+4 = "subject to social insurance"
+5 = "short time employed"
+6 = "financial compensation"
+7 = "other"
 
 
 ;; don't change anything below this line

@@ -15,7 +15,14 @@ body {
       line-height: 2em; } }
 
 a {
-  color: #1D90B7; }
+  color: #1D90B7;
+  text-decoration: none; }
+  a:hover, a:focus {
+    text-decoration: underline dotted; }
+
+p {
+  margin: .1em 0;
+  padding: 0; }
 
 .text-right {
   text-align: right; }
@@ -28,7 +35,8 @@ a {
   text-align: right; }
 
 .center {
-  margin: 0 auto;
+  margin-left: auto;
+  margin-right: auto;
   text-align: center; }
 
 @page {
@@ -44,11 +52,35 @@ a {
 
   .no-print {
     display: none; } }
-nav {
+main, header, footer, nav {
   display: block; }
+
+footer {
+  margin-top: 1em;
+  padding: .5em;
+  border-top: 4px solid #ccc;
+  background: #222;
+  color: #efefef; }
   @media print {
-    nav {
+    footer {
       display: none; } }
+
+header {
+  margin: 0;
+  padding: .5em;
+  border-bottom: 4px solid #ccc;
+  background: #222;
+  color: #efefef; }
+  header h1 {
+    font-size: 1.3em;
+    margin: .2em; }
+  @media print {
+    header {
+      display: none; } }
+
+@media print {
+  nav {
+    display: none; } }
 
 table {
   border-spacing: 2px;
@@ -81,6 +113,24 @@ table {
   text-align: center;
   color: #222; }
 
+.button
+, .lm_button {
+  padding: .5em;
+  margin: 5px;
+  border: 0;
+  border-radius: 2px;
+  background-color: #43bee8;
+  color: #222;
+  font-size: 1em;
+  font-weight: bold;
+  text-decoration: none;
+  cursor: pointer; }
+  .button:hover
+  , .button:focus
+  , .lm_button:hover, .lm_button:focus {
+    background-color: #1D90B7;
+    text-decoration: none; }
+
 .delete_confirm {
   display: none; }
 
@@ -97,7 +147,8 @@ table {
     font-size: 1em;
     line-height: 1.4em;
     text-align: center;
-    color: #fff; }
+    color: #fff;
+    cursor: pointer; }
     .button_delete + label:hover, .button_delete + label:focus {
       background-color: #aa1818;
       color: #fff; }
@@ -159,5 +210,15 @@ table {
     line-height: 1.2em; }
   .lm_form_button_bar .button_delete:checked + label:after {
     line-height: 1.4em; }
+
+.lm_add_search .lm_search_box {
+  display: inline-block; }
+@media print {
+  .lm_add_search {
+    display: none; } }
+
+.button_clear_search {
+  margin: 0 10px 0 -20px;
+  display: inline-block; }
 
 /*# sourceMappingURL=style.css.map */

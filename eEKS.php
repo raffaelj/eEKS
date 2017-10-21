@@ -20,10 +20,16 @@ class eEKS extends lazy_mofo{
   public $dec_point = '.';
   public $thousands_sep = ',';
   
+  // language for html lang attribute
+  public $html_lang = "en";
+  
   // overwrite LM variables
   
   public $table = 'accounting';    // table name for updates, inserts and deletes
   public $identity_name = 'ID';    // identity / primary key for table
+  
+  // links on grid
+  public $grid_add_link    = "<a href='[script_name]action=edit&amp;[qs]' class='lm_button lm_grid_add_link'>Add a Record</a>";
   
   // lm used a hidden form and javascript
   // this solution uses CSS, a checkbox and a confirm button
@@ -34,9 +40,17 @@ class eEKS extends lazy_mofo{
   
   public $form_duplicate_button_text = "Copy to new entry";
   public $form_duplicate_button = "<input type='submit' name='duplicate' value='[form_duplicate_button_text]' class='lm_button'>";
-  // public $form_duplicate_button = "<a href='?action=duplicate&amp;[identity_name]=[identity_id]'>[form_duplicate_button_text]</a>";
   
   public $form_back_button_text   = "Back";
+  
+  // search box
+  public $grid_search_box = "
+  <form action='[script_name]' class='lm_search_box'>
+    <input type='text' name='_search' value='[_search]' size='20' class='lm_search_input'>
+    <a href='[script_name]' title='Clear Search' class='button_clear_search'>x</a>
+    <input type='submit' class='lm_button lm_search_button' value='Search'>
+    <input type='hidden' name='action' value='search'>[query_string_list]
+  </form>"; 
   
   //////////////////////////////////////////////////////////////////////////////
   function run(){
@@ -49,10 +63,16 @@ class eEKS extends lazy_mofo{
       case "update":        $this->update();      break;
       case "update_grid":   $this->update_grid(); break;
       case "delete":        $this->delete();      break;
-      // case "duplicate":     $this->duplicate();      break;
       default:              $this->index();
     }
 
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////
+  function views(){
+    
+    // purpose: show different views with different grids, forms and searchboxes
+    
   }
   
   //////////////////////////////////////////////////////////////////////////////
@@ -67,6 +87,7 @@ class eEKS extends lazy_mofo{
       $back_link .= "&amp;$this->identity_name=$identity_id";
     
     return "<a href='$back_link'>$this->form_back_button_text</a>";
+    
   }
   
   //////////////////////////////////////////////////////////////////////////////
@@ -74,14 +95,7 @@ class eEKS extends lazy_mofo{
     
     // purpose: use template file for HTML output
     
-    // could be nicer but it works
-    // $header and $footer are defined in the theme file
-    // $ content is the part LM/eEKS generates
-    
     include('themes/'.$this->eeks_config['eeks']['theme'].'/index.theme');
-    echo $header;
-    echo $content;
-    echo $footer;
     
   }
   
@@ -345,13 +359,9 @@ class eEKS extends lazy_mofo{
       return;    
     }
 
-    // populate link placeholders    
-    $grid_add_link = $this->grid_add_link;
+    // populate link placeholders
     $grid_edit_link = $this->grid_edit_link;
     $grid_delete_link = $this->grid_delete_link;
-    $grid_export_link = $this->grid_export_link;
-    $grid_add_link = str_replace('[script_name]', $uri_path, $grid_add_link);
-    $grid_add_link = str_replace('[qs]', $qs, $grid_add_link);
     $grid_edit_link = str_replace('[script_name]', $uri_path, $grid_edit_link);
     $grid_edit_link = str_replace('[qs]', $qs, $grid_edit_link);
     $grid_edit_link = str_replace('[identity_name]', $this->identity_name, $grid_edit_link);
@@ -360,8 +370,6 @@ class eEKS extends lazy_mofo{
     $grid_delete_link = str_replace('[identity_name]', $this->identity_name, $grid_delete_link);
     $grid_delete_link = str_replace('[delete_confirm]', $this->delete_confirm, $grid_delete_link);
     $grid_delete_link = str_replace('[grid_text_delete]', $this->grid_text_delete, $grid_delete_link);
-    $grid_export_link = str_replace('[script_name]', $uri_path, $grid_export_link);
-    $grid_export_link = str_replace('[qs]', $qs, $grid_export_link);
     $links = $grid_edit_link . ' ' . $grid_delete_link;
 
     // pagination and save changes link bar
@@ -369,29 +377,8 @@ class eEKS extends lazy_mofo{
     $button = '';
     if(count($this->grid_input_control) > 0 || $this->grid_multi_delete == true)
       $button = "<input type='submit' name='__update_grid' value='$this->grid_text_save_changes' class='lm_button lm_save_changes_button'>";
-    $pagination_button_bar = "<table class='lm_pagination'><tr><td>$pagination</td><td>$button</td></tr></table>\n";
-
-    // search bar
-    $search_box = '';
-    if($this->grid_show_search_box){
-  
-      // carry values defined in query_string_list
-      $query_string_list_inputs = '';
-      if(mb_strlen($this->query_string_list) > 0){
-        $arr = explode(',', trim($this->query_string_list, ', '));
-        foreach($arr as $val)
-          $query_string_list_inputs .= "<input type='hidden' name='$val' value='" . $this->clean_out(@$_REQUEST[$val]) . "'>";
-      }
-          
-      $search_box = $this->grid_search_box;
-      $search_box = str_replace('[script_name]', $uri_path . $this->get_qs('') , $search_box); // for 'x' cancel do add get_qs('') to carry query_string_list
-      $search_box = str_replace('[_search]', $_search, $search_box);
-      $search_box = str_replace('[_csrf]', $_SESSION['_csrf'], $search_box);
-      $search_box = str_replace('[query_string_list]', $query_string_list_inputs, $search_box);
-    }
-
-    $add_record_search_bar = "<table class='lm_add_search'><tr><td>$grid_add_link &nbsp; $grid_export_link</td><td>$search_box</td></tr></table>\n";
-
+    $pagination_button_bar = "<div class='lm_pagination'>$pagination </div>\n";
+    
     // generate table header
     $head = "<tr>\n";
     if($this->grid_multi_delete)
@@ -417,15 +404,13 @@ class eEKS extends lazy_mofo{
     $head .= "</tr>\n";
           
     // start generating output //
-    $html = "<div id='lm'>\n";
+    $html = "<div class='lm'>\n";
 
     if(mb_strlen($success) > 0)
-        $html .= "<div class='lm_success'><b>$success</b></div>\n";
+      $html .= "<div class='lm_success'><b>$success</b></div>\n";
     if(mb_strlen($error) > 0)
-        $html .= "<div class='lm_error'><b>$error</b></div>\n";
+      $html .= "<div class='lm_error'><b>$error</b></div>\n";
     
-    $html .= $add_record_search_bar;
-
     $html .= "<form action='$uri_path$qs&amp;action=update_grid' method='post' enctype='multipart/form-data'>\n";
     $html .= "<input type='hidden' name='_posted' value='1'>\n";
     $html .= "<input type='hidden' name='_csrf' value='$_SESSION[_csrf]'>\n";
@@ -435,7 +420,7 @@ class eEKS extends lazy_mofo{
 
     // quit if there's no data
     if($count <= 0){
-      $html .= "<div class='lm_error'><b>$this->grid_text_no_records_found</b></div></form></div><!-- close #lm -->\n";
+      $html .= "<div class='lm_error'><b>$this->grid_text_no_records_found</b></div></form></div>\n";
       return $html;    
     }
 
@@ -528,12 +513,70 @@ class eEKS extends lazy_mofo{
 
     // buttons & pagination, close form
     $html .= $pagination_button_bar;
+    $html .= $button;
     $html .= "</form>\n";
-    $html .= "</div><!-- close #lm -->\n";
+    $html .= "</div>\n";
 
     return $html;
 
   }
+  
+  //////////////////////////////////////////////////////////////////////////////
+  // custom search box
+    
+    // filter by income/costs
+    // filter by value date or voucher date
+    // filters by categories
+    
+  function search_box(){
+    
+    // purpose: search_box as own function, not inside grid()
+    
+    // local copies 
+    $uri_path = $this->get_uri_path();
+    
+    // get input
+    $_search = $this->clean_out(@$_REQUEST['_search']);
+    $qs = $this->get_qs();
+    
+    // populate link placeholders    
+    $grid_add_link = $this->grid_add_link;
+    $grid_export_link = $this->grid_export_link;
+    $grid_add_link = str_replace('[script_name]', $uri_path, $grid_add_link);
+    $grid_add_link = str_replace('[qs]', $qs, $grid_add_link);
+    $grid_export_link = str_replace('[script_name]', $uri_path, $grid_export_link);
+    $grid_export_link = str_replace('[qs]', $qs, $grid_export_link);
+    
+    // search bar
+    $search_box = '';
+    if($this->grid_show_search_box){
+  
+      // carry values defined in query_string_list
+      $query_string_list_inputs = '';
+      if(mb_strlen($this->query_string_list) > 0){
+        $arr = explode(',', trim($this->query_string_list, ', '));
+        foreach($arr as $val)
+          $query_string_list_inputs .= "<input type='hidden' name='$val' value='" . $this->clean_out(@$_REQUEST[$val]) . "'>";
+      }
+          
+      $search_box = $this->grid_search_box;
+      $search_box = str_replace('[script_name]', $uri_path . $this->get_qs('') , $search_box); // for 'x' cancel do add get_qs('') to carry query_string_list
+      $search_box = str_replace('[_search]', $_search, $search_box);
+      $search_box = str_replace('[_csrf]', $_SESSION['_csrf'], $search_box);
+      $search_box = str_replace('[query_string_list]', $query_string_list_inputs, $search_box);
+    }
+
+    $add_record_search_bar = "<div class='lm_add_search'>$grid_add_link $grid_export_link $search_box</div>\r\n";
+    
+    return $add_record_search_bar;
+    
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////
+  // filter functions
+    
+    // see custom search box above
+  
   
   //////////////////////////////////////////////////////////////////////////////
   function delete(){
@@ -738,17 +781,6 @@ class eEKS extends lazy_mofo{
   
   
   
-  //////////////////////////////////////////////////////////////////////////////
-  // custom search box
-    
-    // filter by income/costs
-    // filter by value date or voucher date
-    // filters by categories
-  
-  //////////////////////////////////////////////////////////////////////////////
-  // filter functions
-    
-    // see custom search box above
   
   //////////////////////////////////////////////////////////////////////////////
   // custom function cast_value
@@ -1079,7 +1111,7 @@ class eEKS extends lazy_mofo{
 
     $html .= $this->form_additional_html;
     $html .= "</form>\n";
-    $html .= "</div><!-- close #lm -->\n";
+    $html .= "</div>\n";
     
     return $html;    
 

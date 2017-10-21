@@ -42,7 +42,7 @@ SELECT
   a.value_date
 , a.voucher_date
 , a.gross_amount
-, a.tax_rate
+/* , a.tax_rate */
 , a.account
 , a.invoice_number
 , a.from_to
@@ -73,8 +73,12 @@ SELECT
 FROM accounting a
 LEFT JOIN type_of_costs t
 ON a.type_of_costs = t.ID
+WHERE (COALESCE(a.from_to, '') LIKE :_search 
+or    COALESCE(a.object, '') LIKE :_search) 
 ORDER BY a.value_date DESC, a.voucher_date DESC
 ";
+// grid sql parameters
+$ee->grid_sql_param[':_search'] = '%' . trim(@$_REQUEST['_search']) . '%';
 
 $ee->form_sql = "
 SELECT
@@ -125,7 +129,7 @@ $ee->grid_output_control['file_03'] = '--image'; // image clickable
 
 $ee->grid_output_control['gross_amount'] = '--number'; // 
 
-$ee->grid_input_control['notes_01'] = '--text';
+// $ee->grid_input_control['notes_01'] = '--text';
 
 
 

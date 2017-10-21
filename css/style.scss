@@ -20,13 +20,22 @@ body {
 
 a {
   color: #1D90B7;
+  text-decoration:none;
+  &:hover,&:focus{
+    text-decoration: underline dotted;
+  }
+}
+
+p{
+  margin:.1em 0;
+  padding:0;
 }
 
 // custom classes for easier styling
 .text-right {text-align:right;}
 .text-left {text-align:left;}
 .number,.date,.datetime{display:block;text-align:right;}
-.center{margin:0 auto;text-align:center;}
+.center{margin-left:auto;margin-right:auto;text-align:center;}
 
 // set page size and reset a view rules for printing
 
@@ -54,9 +63,37 @@ a {
   .no-print{display:none;}
 }
 
+// set display block for HTML5 elements in older browsers
+main,header,footer,nav{
+  display:block;
+}
+
+// footer
+footer{
+  margin-top: 1em;
+  padding: .5em;
+  border-top: 4px solid #ccc;
+  background: #222;
+  color: #efefef;
+  @media print{display:none;}
+}
+
+// header
+header{
+  margin:0;
+  padding: .5em;
+  border-bottom: 4px solid #ccc;
+  background: #222;
+  color: #efefef;
+  h1{
+    font-size: 1.3em;
+    margin: .2em;
+  }
+  @media print{display:none;}
+}
+
 // navigation
 nav {
-  display:block;
   @media print{display:none;}
 }
 
@@ -106,7 +143,28 @@ table {
   color: #222;
 }
 
-// delete button
+///////////// buttons
+
+.button
+,.lm_button
+{
+  padding:.5em;
+  margin:5px;
+  border: 0;
+  border-radius:2px;
+  background-color:#43bee8;
+  color: #222;
+  font-size: 1em;
+  font-weight: bold;
+  text-decoration:none;
+  cursor: pointer;
+  &:hover,&:focus{
+    background-color:#1D90B7;
+    text-decoration:none;
+  }
+}
+
+///////////// delete button
 
 .delete_confirm{
   display:none;
@@ -126,6 +184,7 @@ table {
     line-height: 1.4em;
     text-align: center;
     color: #fff;
+    cursor: pointer;
     &:hover, &:focus{
       background-color:#aa1818;
       color:#fff;
@@ -133,13 +192,6 @@ table {
   }
   &:checked{
     + label{
-      // position:fixed;top: 50%;
-      // left: 50%;
-      // margin-left: 154px;
-      // margin-top: -101px;
-      // background: #efefef;
-      // border: 1px solid #ccc;
-      // color: #aaa;
       &:hover,&:focus{
         background-color:tomato;
         color:#fff;
@@ -220,3 +272,15 @@ table {
   }
 }
 
+///////////// search box
+
+.lm_add_search {
+  .lm_search_box{
+    display: inline-block;
+  }
+  @media print{display:none;}
+}
+.button_clear_search{
+  margin: 0 10px 0 -20px;
+  display: inline-block;
+}
