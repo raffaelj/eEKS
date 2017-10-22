@@ -35,12 +35,13 @@ $this->grid_export_link = "<a href='[script_name]_export=1&amp;[qs]' title='CSV 
 
 // search box
 $this->grid_search_box = "
-<form action='[script_name]' class='lm_search_box'>
+  <form action='[script_name]' class='lm_search_box'>
+    [filters]
     <input type='text' name='_search' value='[_search]' size='20' class='lm_search_input'>
-    <a href='[script_name]' title='Suche zurücksetzen' class='button_clear_search'>x</a>
-    <input type='submit' class='lm_button lm_search_button' value='Suche'>
+    <a href='[script_name]' title='[grid_search_box_clear]' class='button_clear_search'>x</a>
+    <input type='submit' class='lm_button lm_search_button' value='[grid_search_box_search]'>
     <input type='hidden' name='action' value='search'>[query_string_list]
-</form>"; 
+  </form>"; 
 
 
 // grid messages
@@ -83,6 +84,12 @@ $this->html_lang = "de";
 
 // form delete button text = grid_text_delete
 $this->form_back_button_text   = "Zurück";
+$this->grid_search_box_clear = "Suche zurücksetzen";
+$this->grid_search_box_search = "Suche";
+
+// placeholders for date filters
+$this->date_filter_from = "from";
+$this->date_filter_to = "to";
 
 // number format
 $this->decimals = 2;

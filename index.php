@@ -34,51 +34,9 @@ $ee = new eEKS($dbh, 'de-de');
 $ee->eeks_config = parse_ini_file('eEKS.config.ini.php', true);
 $ee->config_from_ini();
 
-// the query should be in a function
-// this function should recognize which parts are active (like category 5)
-// the function should change the query at different pages
-$ee->grid_sql = "
-SELECT
-  a.value_date
-, a.voucher_date
-, a.gross_amount
-/* , a.tax_rate */
-, a.account
-, a.invoice_number
-, a.from_to
-/* , a.posting_text */
-, a.object
-/* , a.type_of_costs */
-, t.type_of_costs
-, a.mode_of_employment
-/* , a.cat_01 */
-/* , a.cat_02 */
-, a.cat_03
-/* , a.cat_04 */
-/* , a.cat_05 */
-/* , a.cat_06 */
-/* , a.cat_07 */
-/* , a.cat_08 */
-/* , a.cat_09 */
-/* , a.cat_10 */
-, a.notes_01
-, a.notes_02
-/* , a.notes_03 */
-/* , a.notes_04 */
-/* , a.notes_05 */
-, a.file_01
-/* , a.file_02 */
-/* , a.file_03 */
-, a.ID
-FROM accounting a
-LEFT JOIN type_of_costs t
-ON a.type_of_costs = t.ID
-WHERE (COALESCE(a.from_to, '') LIKE :_search 
-or    COALESCE(a.object, '') LIKE :_search) 
-ORDER BY a.value_date DESC, a.voucher_date DESC
-";
-// grid sql parameters
-$ee->grid_sql_param[':_search'] = '%' . trim(@$_REQUEST['_search']) . '%';
+// automatic generation of grid_sql
+// needs some configuration in config file
+$ee->grid_sql = $ee->generate_grid_sql();
 
 $ee->form_sql = "
 SELECT
@@ -131,7 +89,11 @@ $ee->grid_output_control['gross_amount'] = '--number'; //
 
 // $ee->grid_input_control['notes_01'] = '--text';
 
-
+// echo "<pre><code style='font-size: .7em;'>";
+// print_r($ee->generate_grid_sql());
+// echo "\r\n";
+// print_r($ee->grid_sql_param);
+// echo "</pre></code>";
 
 // run eEKS/LM
 $ee->run();

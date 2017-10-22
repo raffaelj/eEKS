@@ -44,13 +44,27 @@ class eEKS extends lazy_mofo{
   public $form_back_button_text   = "Back";
   
   // search box
+  public $grid_search_box_clear = "Clear Search";
+  public $grid_search_box_search = "Search";
   public $grid_search_box = "
   <form action='[script_name]' class='lm_search_box'>
+    [filters]
     <input type='text' name='_search' value='[_search]' size='20' class='lm_search_input'>
-    <a href='[script_name]' title='Clear Search' class='button_clear_search'>x</a>
-    <input type='submit' class='lm_button lm_search_button' value='Search'>
+    <a href='[script_name]' title='[grid_search_box_clear]' class='button_clear_search'>x</a>
+    <input type='submit' class='lm_button lm_search_button' value='[grid_search_box_search]'>
     <input type='hidden' name='action' value='search'>[query_string_list]
-  </form>"; 
+  </form>";
+  
+  // placeholders for date filters
+  public $date_filter_from = "from";
+  public $date_filter_to = "to";
+  
+  // query string for search filters
+  // date filters: _date_between,_from,_to
+  // income/costs: _amount (pos, neg)
+  // main category filters (_mode_of_employment,_type_of_costs): _moe, _tov
+  // custom category filters: _cat_01 ...
+  public $query_string_list = "_date_between,_from,_to,_moe,_toc,_amount";
   
   //////////////////////////////////////////////////////////////////////////////
   function run(){
@@ -519,7 +533,169 @@ class eEKS extends lazy_mofo{
 
     return $html;
 
+  }//end of grid()
+  
+  //////////////////////////////////////////////////////////////////////////////
+  function generate_grid_sql(){
+    
+    // purpose: generate sql query ($this->grid_sql) with defined filter options
+    
+    $search_in_columns = $this->eeks_config['search_in_columns'];
+    $date_filters = $this->eeks_config['date_filters'];
+    
+    $query = "";
+    $query .= "SELECT\r\n";
+    
+    $missing_identity_name = true;
+    $where = array();
+    $date_filter = array();
+    
+    // set table aliases
+    // $table_alias = array();
+    // $number_of_joins = count($this->eeks_config['sql_joins']);
+    // $a = "a";
+    // for($i = 0; $i <= $number_of_joins; $i++){
+      // $table_alias[] = $a++;
+    // }
+    // print_r($table_alias);
+      
+    
+    $i = 0;
+    foreach($this->eeks_config['active_columns']['table'] as $val){
+      
+      if($i != 0)
+        $query .= ", ";
+      
+      if(array_key_exists($val, $this->eeks_config['sql_joins']))
+        $query .= $this->eeks_config['sql_joins'][$val]['alias'] . "." .$this->eeks_config['sql_joins'][$val]['column'] . "\r\n";
+        // $query .= $this->eeks_config['sql_joins'][$val]['table'] . "." .$this->eeks_config['sql_joins'][$val]['column'] . "\r\n";
+      else
+        $query .= "a.$val\r\n";
+        // $query .= $this->table . ".$val\r\n";
+      
+      if($val == $this->identity_name)
+        $missing_identity_name = false;
+      
+      // set variable for where filters
+      if(in_array($val, $search_in_columns))
+        $where[] = $val;
+      
+      // set variable for date filters
+      if(in_array($val, $date_filters) && $val == @$_REQUEST['_date_between'] && ( mb_strlen(trim(@$_REQUEST['_from'])) > 0 || mb_strlen(trim(@$_REQUEST['_to'])) > 0 ))
+        $date_filter[] = $val;
+      
+      $i++;
+    }
+    
+    // prevent missing ID
+    if($missing_identity_name)
+      $query .= ", a.$this->identity_name\r\n";
+    
+    // add FROM table with alias `a`
+    $query .= "FROM $this->table a\r\n";
+    
+    // add LEFT JOIN --> must be in the automation process !!!
+    foreach($this->eeks_config['sql_joins'] as $key=>$val){
+      $query .= "LEFT JOIN ".$val['table']." ".$val['alias']."\r\n";
+      $query .= "ON a.$key = ".$val['alias'].".".$val['ID']."\r\n";
+    }
+    
+    
+    // add WHERE clause for full text search
+    if(!empty($where)){
+      
+      $query .= "WHERE (";
+      
+      $i = 0;
+      foreach($where as $val){
+        if($i != 0)
+          $query .= "OR ";
+        $query .= "COALESCE(a.$val, '') LIKE :_search\r\n";
+        $i++;
+      }
+      
+      $query .= ")\r\n";
+      
+      // add grid_sql_param
+      $this->grid_sql_param[':_search'] = '%' . trim(@$_REQUEST['_search']) . '%';
+      
+    }
+    
+    // add AND clause for date filters
+    if(!empty($date_filter)){
+      foreach($date_filter as $val){
+        $query .= "AND a.$val BETWEEN COALESCE(NULLIF(:_from, ''), 0) AND COALESCE(NULLIF(:_to, ''), '9999-12-31')\r\n";
+        // OR a.$val IS NULL\r\n
+      }
+      
+      // add grid_sql_param
+      $this->grid_sql_param[':_from'] = $this->date_in(@$_REQUEST['_from']);
+      $this->grid_sql_param[':_to'] = $this->date_in(@$_REQUEST['_to']);
+    }
+    
+    // add ORDER BY
+    $sort_order = $this->eeks_config['sort_order'];
+    $count = count($sort_order);
+    if($count > 0){
+      $query .= "ORDER BY ";
+      $i = 0;
+      foreach($this->eeks_config['sort_order'] as $key=>$val){
+        if($i >= 1)
+          $query .= ", ";
+        $query .= "a.$key $val";
+        $i++;
+      }
+    }
+    
+    return $query;
+    
+  }//end of generate_grid_sql
+  
+  //////////////////////////////////////////////////////////////////////////////
+  function search_box_filters(){
+    
+    // purpose: more filters for searching
+    // output: html
+    
+    $date_filters = $this->eeks_config['date_filters'];
+    
+    $_from = $this->clean_out(@$_GET['_from']);
+    $_to = $this->clean_out(@$_GET['_to']);
+    
+    $html = "";
+    
+    // date filter
+    $count = count($date_filters);
+    if($count > 0){
+      $html .= "<fieldset>";
+      
+      if($count == 1) // text
+        $html .= "<input type='hidden' name='_date_between' readonly='readonly' value='".$date_filters[0] . "'>" . $this->rename[$date_filters[0]] . ": ";
+      else{ // select
+        $html .= "<select name='_date_between'>";
+        
+        foreach($date_filters as $val){
+          $selected = "";
+          if(isset($_GET["_date_between"]) && $val == $_GET["_date_between"]) 
+            $selected .= ' selected="selected"';
+          $html .= "<option value='$val'$selected>".$this->rename[$val]."</option>";
+        }
+        $html .= "</select>";
+      }
+      
+      
+      $html .= "<input type='date' name='_from' value='".$_from."' placeholder='$this->date_filter_from' size='10' class='lm_search_between_input'>";
+      $html .= "<input type='date' name='_to' value='".$_to."' placeholder='$this->date_filter_to' size='10' class='lm_search_between_input'>";
+      
+      $html .= "</fieldset>";
+      
+      return $html;
+      
+    }
+    
+    
   }
+  
   
   //////////////////////////////////////////////////////////////////////////////
   // custom search box
@@ -564,6 +740,9 @@ class eEKS extends lazy_mofo{
       $search_box = str_replace('[_search]', $_search, $search_box);
       $search_box = str_replace('[_csrf]', $_SESSION['_csrf'], $search_box);
       $search_box = str_replace('[query_string_list]', $query_string_list_inputs, $search_box);
+      $search_box = str_replace('[grid_search_box_clear]', $this->grid_search_box_clear, $search_box);
+      $search_box = str_replace('[grid_search_box_search]', $this->grid_search_box_search, $search_box);
+      $search_box = str_replace('[filters]', $this->search_box_filters(), $search_box);
     }
 
     $add_record_search_bar = "<div class='lm_add_search'>$grid_add_link $grid_export_link $search_box</div>\r\n";
@@ -571,12 +750,6 @@ class eEKS extends lazy_mofo{
     return $add_record_search_bar;
     
   }
-  
-  //////////////////////////////////////////////////////////////////////////////
-  // filter functions
-    
-    // see custom search box above
-  
   
   //////////////////////////////////////////////////////////////////////////////
   function delete(){
@@ -1113,9 +1286,9 @@ class eEKS extends lazy_mofo{
     $html .= "</form>\n";
     $html .= "</div>\n";
     
-    return $html;    
+    return $html;
 
-  }
+  }// end of form()
   
   
 }// end of class eEKS

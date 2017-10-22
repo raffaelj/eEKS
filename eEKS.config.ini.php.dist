@@ -42,21 +42,68 @@ grid_ellipse_at = 80
 ;; activate checkboxes for multiple deletions
 ;grid_multi_delete = true
 
+;; column names of date filters in search box
+[date_filters]
+0 = value_date
+1 = voucher_date
 
-;; modes of employment
-;; change the names for your needs but never change the order after using it
-;; 
-;; Some of these examples may not make sense in other countries than Germany
-;; with other tax or unemployment laws.
+;; column names for full text search in search box
+[search_in_columns]
+0 = from_to
+1 = object
 
-[mode_of_employment]
-1 = "freelance"
-2 = "private"
-3 = "commercial"
-4 = "subject to social insurance"
-5 = "short time employed"
-6 = "financial compensation"
-7 = "other"
+;; active columns in default table to show in grid
+;; comment or uncomment the following lines for your needs
+[active_columns]
+table[] = value_date
+table[] = voucher_date
+table[] = gross_amount
+; table[] = tax_rate
+table[] = account
+table[] = invoice_number
+table[] = from_to
+; table[] = posting_text
+table[] = object
+; table[] = type_of_costs
+table[] = type_of_costs
+table[] = mode_of_employment
+; table[] = cat_01
+; table[] = cat_02
+table[] = cat_03
+; table[] = cat_04
+; table[] = cat_05
+; table[] = cat_06
+; table[] = cat_07
+; table[] = cat_08
+; table[] = cat_09
+; table[] = cat_10
+table[] = notes_01
+table[] = notes_02
+; table[] = notes_03
+; table[] = notes_04
+; table[] = notes_05
+table[] = file_01
+; table[] = file_02
+; table[] = file_03
+
+
+;; default sort order of default table
+[sort_order]
+value_date = DESC
+voucher_date = DESC
+
+
+;; joins for sql query
+;; description coming soon
+[sql_joins]
+type_of_costs[table] = type_of_costs
+type_of_costs[ID] = ID
+type_of_costs[column] = type_of_costs
+type_of_costs[alias] = t
+mode_of_employment[table] = mode_of_employment
+mode_of_employment[ID] = ID
+mode_of_employment[column] = mode_of_employment
+mode_of_employment[alias] = m
 
 
 ;; don't change anything below this line
