@@ -1,8 +1,8 @@
 # eEKS
 
-simple accounting software with automation for "[Anlage EKS][1]" (a document needed in Germany for freelancers with unemployment benefits)
+Simple accounting software with automation for "[Anlage EKS][1]" (a document needed in Germany for freelancers with unemployment benefits)
 
-alternative pronounciation ([IPA][2]): [iːks] ;-)
+Alternative pronounciation ([IPA][2]): [iːks] ;-)
 
 __EKS__ = income from self-employment (German: Einkommen aus selbständiger Tätigkeit)  
 __e__ = easy, electronic... or in German: einfach, erledigt, elektronisch...
@@ -13,9 +13,15 @@ The original one grew over a view years after experimenting with Open Office Bas
 
 This time I try to have a cleaner coding style, avoid any German language in the source code and translate it later with a language file.
 
+The code is based on lazy_mofo/datagrid with a lot of additions.
+
 ## Warning
 
 Don't use this software if you dont't know what's going on. Don't use it on a public available web server. It's in a very early state with no security features. I use it in a local environment with [XAMPP][4].
+
+## Version and license
+
+coming soon
 
 ## Features of eEKS
 
@@ -31,8 +37,10 @@ Don't use this software if you dont't know what's going on. Don't use it on a pu
 * duplicate existing dataset
 * multi-value column
 * i18n of number_format (dot or comma as decimal points etc.)
-* text align right for numbers and dates
+* class names for some content types like numbers and dates to allow styling by content
 * template files
+* automatic generation of grid_sql (with config in ini file)
+* filters in search box
 
 ## Notes
 
@@ -51,14 +59,13 @@ Don't use this software if you dont't know what's going on. Don't use it on a pu
 * i18n number format (dot, comma)
   * [x] number_in()
   * [x] number_out()
-  * [ ] ...?
-* [ ] custom search box
-* [ ] filter functions (for search box)
+* [x] custom search box
+* [x] filter functions (for search box)
 * [x] custom function cast_value (i18n number format)
 * custom function get_input_control
   * [x] i18n number format
   * [x] no inline styles
-* [ ] no inline styles
+* [x] no inline styles
 * [x] no javascript for basic usage
 * [x] output via template file
 
@@ -74,18 +81,18 @@ Don't use this software if you dont't know what's going on. Don't use it on a pu
 ### searchbox
 
 * [x] not in grid
-* [ ] add filters
+* [x] add filters
 
 ### filters
 
 * [ ] income/costs
-* [ ] value_date (from - to)
-* [ ] vaoucher_date (from - to)
+* [x] value_date (from - to)
+* [x] vaoucher_date (from - to)
 * [ ] without value_date
 * [ ] type_of_costs
 * [ ] mode_of_employment
 * [ ] filter by custom category
-* [ ] full text search
+* [x] full text search
 * [ ] GROUP BY everything (except notes, files)
 
 ### views
@@ -94,6 +101,9 @@ Don't use this software if you dont't know what's going on. Don't use it on a pu
   * [ ] type_of_costs = income
   * [ ] type_of_costs = costs
   * [ ] chart_of_accounts (EKS)
+  * [ ] cash basis accounting (German: EÜR)
+* [ ] EKS preview
+* [ ] charts --> maybe with javascript
 
 ### EKS preview
 
