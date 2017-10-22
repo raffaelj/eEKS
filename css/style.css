@@ -221,4 +221,11 @@ table {
   margin: 0 10px 0 -20px;
   display: inline-block; }
 
+fieldset {
+  display: inline-block;
+  margin: 0;
+  padding: .1em;
+  border: 1px solid #ccc;
+  border-radius: 2px; }
+
 /*# sourceMappingURL=style.css.map */
