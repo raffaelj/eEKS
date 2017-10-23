@@ -34,17 +34,25 @@ class eEKS extends lazy_mofo{
   // links on grid
   public $grid_add_link    = "<a href='[script_name]action=edit&amp;[qs]' class='lm_button lm_grid_add_link'>Add a Record</a>";
   
-  public $grid_edit_link   = "<a href='[script_name]action=edit&amp;[identity_name]=[identity_id]&amp;[qs]' class='icon lm_grid_edit_link'>[edit]</a>";
+  public $grid_edit_link_text   = "edit";
+  public $grid_edit_link   = "<a href='[script_name]action=edit&amp;[identity_name]=[identity_id]&amp;[qs]' class='lm_button lm_icon lm_grid_edit_link' title='[grid_edit_link_text]'>[[grid_edit_link_text]]</a>";
   
   // lm used a hidden form and javascript
   // this solution uses CSS, a checkbox and a confirm button
-  public $grid_delete_link = "<input type='checkbox' name='[identity_name]' id='delete_[identity_id]' value='[identity_id]' class='button_delete'><label for='delete_[identity_id]'>X</label><div class='delete_confirm'><p>[delete_confirm]</p><input type='submit' name='confirm_delete' value='[grid_text_delete]' class='button_delete_confirm'></div>";
+  public $grid_delete_link = "<input type='checkbox' name='[identity_name]' id='delete_[identity_id]' value='[identity_id]' class='button_delete'><label for='delete_[identity_id]' class='lm_button lm_icon alarm'>X</label><div class='delete_confirm'><p>[delete_confirm]</p><input type='submit' name='confirm_delete' value='[grid_text_delete]' class='button_delete_confirm lm_button alarm'></div>";
   
   
-  public $form_delete_button = "<input type='checkbox' name='delete_check' id='delete_check' value='not-important' class='button_delete'><label for='delete_check'>[grid_text_delete]</label><div class='delete_confirm'><p>[delete_confirm]</p><input type='submit' name='confirm_delete' value='[grid_text_delete]' class='button_delete_confirm'></div>";
+  // form buttons
+  public $form_add_button_text    = "Add";
+  public $form_add_button    = "<input type='submit' value='[form_add_button_text]' class='lm_button confirm'>";
+  
+  public $form_update_button_text = "Update"; 
+  public $form_update_button = "<input type='submit' value='[form_update_button_text]' class='lm_button confirm'>"; 
+  
+  public $form_delete_button = "<input type='checkbox' name='delete_check' id='delete_check' value='not-important' class='button_delete alarm'><label for='delete_check' class='lm_button alarm'>[grid_text_delete]</label><div class='delete_confirm'><p>[delete_confirm]</p><input type='submit' name='confirm_delete' value='[grid_text_delete]' class='lm_button alarm'></div>";
   
   public $form_duplicate_button_text = "Copy to new entry";
-  public $form_duplicate_button = "<input type='submit' name='duplicate' value='[form_duplicate_button_text]' class='lm_button'>";
+  public $form_duplicate_button = "<input type='submit' name='duplicate' value='[form_duplicate_button_text]' class='lm_button attention'>";
   
   public $form_back_button_text   = "Back";
   
@@ -425,6 +433,7 @@ class eEKS extends lazy_mofo{
     $grid_delete_link = $this->grid_delete_link;
     $grid_edit_link = str_replace('[script_name]', $uri_path, $grid_edit_link);
     $grid_edit_link = str_replace('[qs]', $qs, $grid_edit_link);
+    $grid_edit_link = str_replace('[grid_edit_link_text]', $this->grid_edit_link_text, $grid_edit_link);
     $grid_edit_link = str_replace('[identity_name]', $this->identity_name, $grid_edit_link);
     $grid_delete_link = str_replace('[script_name]', $uri_path, $grid_delete_link);
     $grid_delete_link = str_replace('[qs]', $qs, $grid_delete_link);
@@ -470,9 +479,9 @@ class eEKS extends lazy_mofo{
     $html = "<div class='lm'>\n";
 
     if(mb_strlen($success) > 0)
-      $html .= "<div class='lm_success'><b>$success</b></div>\n";
+      $html .= "<div class='lm_success'><p>$success</p></div>\n";
     if(mb_strlen($error) > 0)
-      $html .= "<div class='lm_error'><b>$error</b></div>\n";
+      $html .= "<div class='lm_error'><p>$error</p></div>\n";
     
     $html .= "<form action='$uri_path$qs&amp;action=update_grid' method='post' enctype='multipart/form-data'>\n";
     $html .= "<input type='hidden' name='_posted' value='1'>\n";
@@ -483,7 +492,7 @@ class eEKS extends lazy_mofo{
 
     // quit if there's no data
     if($count <= 0){
-      $html .= "<div class='lm_error'><b>$this->grid_text_no_records_found</b></div></form></div>\n";
+      $html .= "<div class='lm_error'><p>$this->grid_text_no_records_found</p></div></form></div>\n";
       return $html;    
     }
 
@@ -1324,10 +1333,10 @@ class eEKS extends lazy_mofo{
     $html .= "<input type='hidden' name='_posted' value='1'>\n";
 
     if(mb_strlen($error) > 0)
-      $html .= "<div class='lm_error'><b>$error</b></div>\n";
+      $html .= "<div class='lm_error'><p>$error</p></div>\n";
     
     if(mb_strlen($success) > 0)
-      $html .= "<div class='lm_success'><b>$success</b></div>\n";
+      $html .= "<div class='lm_success'><p>$success</p></div>\n";
     
     $html .= "<table class='lm_form'>\n";
 
@@ -1387,10 +1396,13 @@ class eEKS extends lazy_mofo{
     $this->form_duplicate_button = str_replace('[identity_name]', $this->identity_name, $this->form_duplicate_button);
     $this->form_duplicate_button = str_replace('[identity_id]', $identity_id, $this->form_duplicate_button);
     $this->form_duplicate_button = str_replace('[form_duplicate_button_text]', $this->form_duplicate_button_text, $this->form_duplicate_button);
+    $this->form_update_button = str_replace('[form_update_button_text]', $this->form_update_button_text, $this->form_update_button);
+    $this->form_add_button = str_replace('[form_add_button_text]', $this->form_add_button_text, $this->form_add_button);
     
     // add buttons
+    // add extra hidden update button first to prevent wrong submit on `Enter`
     if($action == 'edit')
-      $html .= "<div class='lm_form_button_bar'>" . $this->back_button($identity_id) . " $this->form_update_button $this->form_delete_button $this->form_duplicate_button</div>";
+      $html .= "<div class='lm_form_button_bar'><span class='hidden'>$this->form_update_button</span>" . $this->back_button($identity_id) . "  $this->form_delete_button $this->form_duplicate_button $this->form_update_button</div>";
     else
       $html .= "<div class='lm_form_button_bar'>" . $this->back_button($identity_id) . " $this->form_add_button</div>";
 
