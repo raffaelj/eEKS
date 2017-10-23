@@ -1,22 +1,47 @@
-/* eEKS styles */
+/*** eEKS styles  ******* uncompressed SCSS file here:  ***
+https://github.com/raffaelj/eEKS/blob/master/css/style.scss
+**********************************************************/
+
+// define colors
+// `_tr` means transparent
+$clr_white: #fafafa;
+$clr_white_tr: rgba(220,220,240,.8);
+$clr_black: #0d0d0d;
+$clr_black_tr: rgba(0,0,0,.1);
+$clr_black_tr_light: rgba(0,0,0,.02);
+$clr_black_tr_light_2: rgba(0,0,0,.12);
+$clr_black_tr_dark: rgba(0,0,0,.5);
+$clr_grey: #ccc;
+$clr_grey_tr: rgba(250,250,250,0.8);
+$clr_dark_grey: #222;
+$clr_main: #1D90B7;//blue - rgb(29,144,183)
+$clr_main_tr: rgba(29,144,183,.5);//blue
+$clr_main_light: #29ABD7;//blue
+$clr_main_2: #A4BA1E;//green
+$clr_alarm: #FF6347;//red (tomato)
+$clr_alarm_dark: #8c0909;//dark red
+$clr_attention: #ffc435;//orange
+$clr_confirm: #C5C924;//green
+
+
+// mixins
+@mixin box-shadow($shadow...) {
+	-webkit-box-shadow: $shadow;
+	-moz-box-shadow: $shadow;
+	box-shadow: $shadow;
+}
 
 // default stuff
 html {
   margin:0;
   padding:0;
-  background:#fcfcfc;
 }
 
 body {
   margin: 0;
   padding:0;
   font-family: Arial, Helvetica, sans-serif;
-  font-size: 16px;
-  // optional background image
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  
+  font-size: 16px;  
   @media print{
     font-size:11pt;
     line-height:2em;
@@ -24,7 +49,7 @@ body {
 }
 
 a {
-  color: #1D90B7;
+  color: $clr_main;
   text-decoration:none;
   &:hover,&:focus{
     text-decoration: underline dotted;
@@ -41,10 +66,11 @@ p{
 .text-left {text-align:left;}
 .number,.date,.datetime{display:block;text-align:right;}
 .center{margin-left:auto;margin-right:auto;text-align:center;}
+.hidden{display:none;}
 
 // positive and negative numbers
-.minus{color: #8c0909;}
-.zero{color:#ccc;}
+.minus{color: $clr_alarm_dark;}
+.zero{color:$clr_grey;}
 .plus{}
 
 // set page size and reset a view rules for printing
@@ -68,7 +94,7 @@ p{
     margin:0;
     padding:0;
     border:none;
-    box-shadow: 0;
+    @include box-shadow(0);
   }
   .no-print{display:none;}
 }
@@ -80,16 +106,20 @@ main,header,footer,nav{
 
 // main
 main{
-  background-color: rgba(0,0,0,.02);
+  background-color: $clr_white;
+  padding:.2em 0 1em;
+  // optional background image is set via ini file and generated in template file with inline `style="background-image:$this->background_image;"`
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 }
 
 // footer
 footer{
-  margin-top: 1em;
   padding: .5em;
-  border-top: 4px solid #ccc;
-  background: #222;
-  color: #efefef;
+  border-top: 4px solid $clr_grey;
+  background: $clr_dark_grey;
+  color: $clr_white;
   @media print{display:none;}
 }
 
@@ -97,16 +127,16 @@ footer{
 header{
   margin:0;
   padding: .5em;
-  border-bottom: 4px solid #ccc;
-  background: #222;
-  color: #efefef;
+  border-bottom: 4px solid $clr_grey;
+  background: $clr_dark_grey;
+  color: $clr_white;
   h1{
     display:inline-block;
     font-size: 1.3em;
     line-height:1.3em;
     margin: 0;
     padding:0 .5em 0 0;
-    border-right: 4px dotted #ccc;
+    border-right: 4px dotted $clr_grey;
   }
   @media print{display:none;}
 }
@@ -125,20 +155,22 @@ table {
   border-spacing: 2px;
   border-collapse: separate;
   margin: .2em auto;
-  border: 1px solid #ccc;
+  border: 1px solid $clr_grey;
   border-radius: 6px;
+  font-size:14px;
   td,th { 
     padding: 4px;
-    border-bottom: 1px solid #bbb;
+    border-bottom: 1px solid $clr_grey;
   }
-  // &.lm_grid tr:nth-child(1){// headlines with background color
-    // background: #C5C924;
-  // }
   th {
-    background: #6FB5B8;
-    color: #222;
-    a { color: #222;
+    background: $clr_main_2;
+    color: $clr_dark_grey;
+    a {
+      display: block;
+      padding: .2em .1em .1em;
       text-decoration: none;
+      font-size: 1.05em;;
+      color: $clr_dark_grey;
     }
     &.col_edit{
       width:3em;
@@ -150,21 +182,16 @@ table {
     }
   }
   tr {
+    // rounded borders
     &:first-child th:first-child{border-top-left-radius:3px;}
     &:first-child th:last-child{border-top-right-radius:3px;}
     &:last-child td:first-child{border-bottom-left-radius:3px;}
     &:last-child td:last-child{border-bottom-right-radius:3px;}
-    &:nth-child(even) td {// different colors for even and odd rows
-      // background: #eee;
-      background: rgba(220,220,240,.8);
-    }
-    &:nth-child(odd) td {// different colors for even and odd rows
-      // background: #fefefe;
-      background: rgba(250,250,250,.8);
-    }
-    &.lm_active td, &:hover td {// highlight hover and current row edited
-      background: #c2e3ff;
-    }
+    // different colors for even and odd rows
+    &:nth-child(even) td {background-color: $clr_white_tr;}
+    &:nth-child(odd) td {background-color: $clr_grey_tr;}
+    // highlight hover and current row edited
+    &.lm_active td, &:hover td {background: $clr_main_tr;}
   }
 }
 
@@ -175,15 +202,24 @@ table {
   height:2em;
 }
 
-// lm_success
-.lm_success{
-  margin: .5em auto;
-  padding: .5em;
-  width: 50%;
-  border: 2px solid khaki;
-  border-radius: 5px;
+// lm_success and lm_error
+.lm_success
+,.lm_error{
+  margin: 0 auto;
   text-align: center;
-  color: #222;
+  color: $clr_dark_grey;
+  p{
+    display:inline-block;
+    padding: .5em;
+    width: 50%;
+    border: 2px solid $clr_attention;
+    border-radius: 5px;
+    background-color:$clr_grey_tr;
+    font-weight: bold;
+  }
+}
+.lm_error p{
+  border: 2px solid $clr_alarm;
 }
 
 ///////////// buttons and icons
@@ -196,32 +232,43 @@ table {
   margin:5px;
   border: 0;
   border-radius:2px;
-  background-color:#43bee8;
-  color: #222;
+  background-color:$clr_main;
+  color: $clr_dark_grey;
   font-family:inherit;
   font-size: 1em;
   font-weight: bold;
   text-decoration:none;
   cursor: pointer;
+  @include box-shadow(0 -2px 0 $clr_black_tr_light_2 inset);
   &:hover,&:focus{
-    background-color:#1D90B7;
+    background-color:$clr_main_light;
     text-decoration:none;
+      &.attention{background-color:$clr_confirm;}
+      &.alarm{background-color:$clr_alarm_dark;color:$clr_white;}
+      &.confirm{background-color:$clr_main;}
   }
   &.active{
-    border: 2px solid #efefef;
+    border: 2px solid $clr_white;
   }
+  &.attention{background-color:$clr_attention;}
+  &.alarm{background-color:$clr_alarm;}
+  &.confirm{background-color:$clr_confirm;}
 }
 
-.icon{
+.icon, .lm_icon{
   display: inline-block;
   height: 1em;
   width: 1em;
+  margin:0;
   padding: .1em;
-  border: 1px solid #222;
+  border: 1px solid $clr_dark_grey;
   border-radius: 2px;
-  &.lm_grid_edit_link{
+  text-align: center;
+  line-height: 1em;
+  font-weight: normal;
+  vertical-align: middle;
+  &.lm_grid_edit_link{// temporarily until icons are added
     overflow: hidden;
-    vertical-align:middle;
   }
 }
 
@@ -235,28 +282,22 @@ table {
   display:none;
   + label{
     display: inline-block;
-    width: 1.4em;
-    height: 1.3em;
-    padding-bottom: .1em;
-    border-radius: 50%;
-    background-color: tomato;
-    font-family: Arial, Helvetiva, sans-serif;
-    font-size: 1em;
-    line-height: 1.4em;
-    text-align: center;
-    vertical-align:middle;
-    color: #fff;
-    cursor: pointer;
     &:hover, &:focus{
-      background-color:#aa1818;
-      color:#fff;
+      background-color:$clr_alarm_dark;
+      color:$clr_white;
     }
   }
   &:checked{
     + label{
       &:hover,&:focus{
-        background-color:tomato;
-        color:#fff;
+        background-color:$clr_alarm;
+        color:$clr_dark_grey;
+        &:after{
+          color: $clr_dark_grey;
+        }
+        &:before{
+          color: $clr_dark_grey;
+        }
       }
       &:before{
         content:"";
@@ -266,22 +307,22 @@ table {
         left:0px;
         width:100%;
         height:100%;
-        background-color:rgba(0,0,0,.1);
+        background-color:$clr_black_tr;
         border-radius:0px;
       }
       &:after{
         content:"X";
         position:fixed;top: 50%;
         left: 50%;
+        width: 1.4em;
+        height: 1.4em;
         margin-left: 154px;
         margin-top: -101px;
-        background: #efefef;
-        border: 1px solid #ccc;
-        color: #aaa;
-        width: 1.4em;
-        height: 1.3em;
-        padding-bottom: .1em;
+        line-height: 1.4em;
+        border: 1px solid $clr_grey;
         border-radius: 50%;
+        color: $clr_grey;
+        background-color: $clr_white;
       }
     }
   }
@@ -292,11 +333,11 @@ table {
     left:50%;
     width:290px;
     padding:5px;
-    border-radius:5px;
     margin-top:-77px;
     margin-left:-152px;
-    background:#fefefe;
-    box-shadow: 0px 2px 10px 2px #444;
+    border-radius:5px;
+    background:$clr_white;
+    @include box-shadow(0px 2px 10px 2px $clr_black_tr_dark);
     text-align:center;
   }
 }
@@ -304,9 +345,9 @@ table {
 ///////////// lm form
 
 .lm_form {
-  margin: .2em auto;
+  margin: 0 auto;
   border-radius: 6px;
-  border: 1px solid #ccc;
+  border: 1px solid $clr_grey;
   width: 600px;
   max-width: 100%;
   td:first-child {
@@ -327,46 +368,11 @@ table {
     height: auto;
   }
 }
-// .lm_form {
-  // display:block;
-  // margin: .2em auto;
-  // border-radius: 2px;
-  // border: 1px solid #ccc;
-  // width: 600px;
-  // max-width: 100%;
-  // tbody,tfoot,thead,th{display:block;}
-  // tr,td{display:inline-block;}
-  // td:first-child {
-    // text-align: right;
-  // }
-// }
+
 
 .lm_form_button_bar{
   text-align: center;
-  // padding: 1em;
   padding-top: 1em;
-  // border-top: 5px solid #ccc;
-  // background-color: #fafafa;
-  .button_delete{// delete button
-    + label{
-      width: auto;
-      height: auto;
-      border-radius: 5px;
-      padding: .1em .2em;
-      font-size: 1.2em;
-      line-height: 1.2em;
-      &:hover, &:focus{
-        
-      }
-    }
-    &:checked{
-      + label{
-        &:after{
-          line-height:1.4em;
-        }
-      }
-    }
-  }
 }
 
 ///////////// search box and inputs
@@ -387,7 +393,7 @@ fieldset{
   display:inline-block;
   margin: 0;
   padding: .1em;
-  border: 1px solid #ccc;
+  border: 1px solid $clr_grey;
   border-radius: 2px;
 }
 input
@@ -402,9 +408,7 @@ input
   &:last-child{margin-right:0;}
 }
 option{
-  // margin:0;
-  // padding:0;
-  // font-size: 1em;
+  
 }
 
 ///////////// pagination
@@ -414,9 +418,9 @@ option{
     display: inline-block;
     margin: .2em 0 .1em;
     padding: .2em;
-    border: 1px solid #ccc;
+    border: 1px solid $clr_grey;
     border-radius: 2px;
-    background-color: rgba(255,255,255,.8);
+    background-color: $clr_grey_tr;
   }
 }
 
