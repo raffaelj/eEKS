@@ -20,12 +20,12 @@ $header = "<!DOCTYPE html>
   <link rel='shortcut icon' type='image/x-icon' href='favicon.ico' />
   <link rel='stylesheet' type='text/css' href='css/style.min.css'>
 </head>
-<body class='$class'$background_image>
+<body class='$class'>
   <header>
     <h1><a href='" . $this->get_uri_path() . "'>$this->name</a></h1>
     <nav>" . $this->search_box() . "</nav>
   </header>
-  <main>
+  <main$background_image>
 ";
 
 // navigation
