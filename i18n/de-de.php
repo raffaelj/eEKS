@@ -30,7 +30,7 @@ $this->form_text_record_added = 'Eintrag hinzugefügt';
 
 // links on grid
 $this->grid_add_link    = "<a href='[script_name]action=edit&amp;[qs]' class='lm_button lm_grid_add_link'>Neuer Eintrag</a>";
-$this->grid_edit_link   = "<a href='[script_name]action=edit&amp;[identity_name]=[identity_id]&amp;[qs]'>[ändern]</a>";
+$this->grid_edit_link   = "<a href='[script_name]action=edit&amp;[identity_name]=[identity_id]&amp;[qs]' class='icon lm_grid_edit_link'>[ändern]</a>";
 $this->grid_export_link = "<a href='[script_name]_export=1&amp;[qs]' title='CSV herunterladen'>Exportieren</a>";
 
 // search box
@@ -96,6 +96,9 @@ $this->decimals = 2;
 $this->dec_point = ',';
 $this->thousands_sep = '.';
 
+// rename multi-value column
+$this->multi_value_column_title = "Mehrere Einträge";
+
 // rename fieldnames from database
 
 $this->rename['date_created'] = 'Erstellt am';
@@ -110,10 +113,11 @@ $this->rename['from_to'] = 'Auftraggeber/ Empfänger';
 $this->rename['posting_text'] = 'Buchungstext';
 $this->rename['object'] = 'Gegenstand';
 $this->rename['type_of_costs'] = 'Kostenart/ Erlösart';
-$this->rename['cat_01'] = 'Beschäftigungsart';
-$this->rename['cat_02'] = 'Geschäftsbereich';
-$this->rename['cat_03'] = 'Projekt';
-$this->rename['cat_04'] = 'Fördermittelgeber_in';
+$this->rename['mode_of_employment'] = 'Beschäftigungsart';
+$this->rename['cat_01'] = 'Geschäftsbereich';
+$this->rename['cat_02'] = 'Projekt';
+$this->rename['cat_03'] = 'Fördermittelgeber_in';
+$this->rename['cat_04'] = 'Kategorie 4';
 $this->rename['cat_05'] = 'Kategorie 5';
 $this->rename['cat_06'] = 'Kategorie 6';
 $this->rename['cat_07'] = 'Kategorie 7';

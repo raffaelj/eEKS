@@ -12,6 +12,11 @@ body {
   padding:0;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 16px;
+  // optional background image
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  
   @media print{
     font-size:11pt;
     line-height:2em;
@@ -36,6 +41,11 @@ p{
 .text-left {text-align:left;}
 .number,.date,.datetime{display:block;text-align:right;}
 .center{margin-left:auto;margin-right:auto;text-align:center;}
+
+// positive and negative numbers
+.minus{color: #8c0909;}
+.zero{color:#ccc;}
+.plus{}
 
 // set page size and reset a view rules for printing
 
@@ -68,6 +78,11 @@ main,header,footer,nav{
   display:block;
 }
 
+// main
+main{
+  background-color: rgba(0,0,0,.02);
+}
+
 // footer
 footer{
   margin-top: 1em;
@@ -86,40 +101,68 @@ header{
   background: #222;
   color: #efefef;
   h1{
+    display:inline-block;
     font-size: 1.3em;
-    margin: .2em;
+    line-height:1.3em;
+    margin: 0;
+    padding:0 .5em 0 0;
+    border-right: 4px dotted #ccc;
   }
   @media print{display:none;}
 }
 
 // navigation
 nav {
+  // display: inline-block;
+  display: inline;
   @media print{display:none;}
 }
+
 
 // tables
 
 table {
   border-spacing: 2px;
   border-collapse: separate;
+  margin: .2em auto;
+  border: 1px solid #ccc;
+  border-radius: 6px;
   td,th { 
-    padding: 6px;
+    padding: 4px;
+    border-bottom: 1px solid #bbb;
   }
-  &.lm_grid tr:nth-child(1){// headlines with background color
-    background: #C5C924;
-  }
+  // &.lm_grid tr:nth-child(1){// headlines with background color
+    // background: #C5C924;
+  // }
   th {
-    background: inherit;
+    background: #6FB5B8;
     color: #222;
     a { color: #222;
       text-decoration: none;
     }
+    &.col_edit{
+      width:3em;
+    }
+  }
+  td{
+    &.col_multi_value{
+      font-size:.8em;
+    }
   }
   tr {
-    &:nth-child(even) {// different colors for even and odd rows
-      background: #eee;
+    &:first-child th:first-child{border-top-left-radius:3px;}
+    &:first-child th:last-child{border-top-right-radius:3px;}
+    &:last-child td:first-child{border-bottom-left-radius:3px;}
+    &:last-child td:last-child{border-bottom-right-radius:3px;}
+    &:nth-child(even) td {// different colors for even and odd rows
+      // background: #eee;
+      background: rgba(220,220,240,.8);
     }
-    &.lm_active, &:hover {// highlight hover and current row edited
+    &:nth-child(odd) td {// different colors for even and odd rows
+      // background: #fefefe;
+      background: rgba(250,250,250,.8);
+    }
+    &.lm_active td, &:hover td {// highlight hover and current row edited
       background: #c2e3ff;
     }
   }
@@ -143,17 +186,19 @@ table {
   color: #222;
 }
 
-///////////// buttons
+///////////// buttons and icons
 
 .button
 ,.lm_button
 {
+  display:inline-block;
   padding:.5em;
   margin:5px;
   border: 0;
   border-radius:2px;
   background-color:#43bee8;
   color: #222;
+  font-family:inherit;
   font-size: 1em;
   font-weight: bold;
   text-decoration:none;
@@ -161,6 +206,22 @@ table {
   &:hover,&:focus{
     background-color:#1D90B7;
     text-decoration:none;
+  }
+  &.active{
+    border: 2px solid #efefef;
+  }
+}
+
+.icon{
+  display: inline-block;
+  height: 1em;
+  width: 1em;
+  padding: .1em;
+  border: 1px solid #222;
+  border-radius: 2px;
+  &.lm_grid_edit_link{
+    overflow: hidden;
+    vertical-align:middle;
   }
 }
 
@@ -183,6 +244,7 @@ table {
     font-size: 1em;
     line-height: 1.4em;
     text-align: center;
+    vertical-align:middle;
     color: #fff;
     cursor: pointer;
     &:hover, &:focus{
@@ -242,14 +304,49 @@ table {
 ///////////// lm form
 
 .lm_form {
-  margin: 0 auto;
+  margin: .2em auto;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  width: 600px;
+  max-width: 100%;
+  td:first-child {
+    text-align: right;
+  }
+  textarea{
+    width:100%;
+    height:3em;
+  }
+  input{
+    width:100%;
+    height:2em;
+  }
+  input.number, input.date{
+    width:50%;
+  }
+  input[type=file]{
+    height: auto;
+  }
 }
+// .lm_form {
+  // display:block;
+  // margin: .2em auto;
+  // border-radius: 2px;
+  // border: 1px solid #ccc;
+  // width: 600px;
+  // max-width: 100%;
+  // tbody,tfoot,thead,th{display:block;}
+  // tr,td{display:inline-block;}
+  // td:first-child {
+    // text-align: right;
+  // }
+// }
 
 .lm_form_button_bar{
   text-align: center;
-  padding: 1em;
-  border-top: 5px solid #ccc;
-  background-color: #fafafa;
+  // padding: 1em;
+  padding-top: 1em;
+  // border-top: 5px solid #ccc;
+  // background-color: #fafafa;
   .button_delete{// delete button
     + label{
       width: auto;
@@ -272,11 +369,13 @@ table {
   }
 }
 
-///////////// search box
+///////////// search box and inputs
 
 .lm_add_search {
+  display:inline;
   .lm_search_box{
-    display: inline-block;
+    // display: inline-block;
+    display: inline;
   }
   @media print{display:none;}
 }
@@ -291,3 +390,33 @@ fieldset{
   border: 1px solid #ccc;
   border-radius: 2px;
 }
+input
+,select
+,textarea
+{
+  margin:0 .1em;
+  padding: .2em;
+  font-size: .9em;
+  box-sizing: border-box;
+  &:first-child{margin-left:0;}
+  &:last-child{margin-right:0;}
+}
+option{
+  // margin:0;
+  // padding:0;
+  // font-size: 1em;
+}
+
+///////////// pagination
+.lm_pagination{
+  text-align: center;
+  p{
+    display: inline-block;
+    margin: .2em 0 .1em;
+    padding: .2em;
+    border: 1px solid #ccc;
+    border-radius: 2px;
+    background-color: rgba(255,255,255,.8);
+  }
+}
+

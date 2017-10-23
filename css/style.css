@@ -8,7 +8,10 @@ body {
   margin: 0;
   padding: 0;
   font-family: Arial, Helvetica, sans-serif;
-  font-size: 16px; }
+  font-size: 16px;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed; }
   @media print {
     body {
       font-size: 11pt;
@@ -38,6 +41,12 @@ p {
   margin-left: auto;
   margin-right: auto;
   text-align: center; }
+
+.minus {
+  color: #8c0909; }
+
+.zero {
+  color: #ccc; }
 
 @page {
   size: A4;
@@ -72,31 +81,41 @@ header {
   background: #222;
   color: #efefef; }
   header h1 {
+    display: inline-block;
     font-size: 1.3em;
-    margin: .2em; }
+    line-height: 1.3em;
+    margin: 0;
+    padding: 0 .5em 0 0;
+    border-right: 4px dotted #ccc; }
   @media print {
     header {
       display: none; } }
 
-@media print {
-  nav {
-    display: none; } }
+nav {
+  display: inline; }
+  @media print {
+    nav {
+      display: none; } }
 
 table {
   border-spacing: 2px;
   border-collapse: separate; }
   table td, table th {
-    padding: 6px; }
-  table.lm_grid tr:nth-child(1) {
-    background: #C5C924; }
+    padding: 4px; }
   table th {
-    background: inherit;
+    background: #C5C924;
     color: #222; }
     table th a {
       color: #222;
       text-decoration: none; }
+    table th.col_edit {
+      width: 3em; }
+  table td.col_multi_value {
+    font-size: .8em; }
   table tr:nth-child(even) {
     background: #eee; }
+  table tr:nth-child(odd) {
+    background: #fefefe; }
   table tr.lm_active, table tr:hover {
     background: #c2e3ff; }
 
@@ -115,6 +134,7 @@ table {
 
 .button
 , .lm_button {
+  display: inline-block;
   padding: .5em;
   margin: 5px;
   border: 0;
@@ -130,6 +150,17 @@ table {
   , .lm_button:hover, .lm_button:focus {
     background-color: #1D90B7;
     text-decoration: none; }
+
+.icon {
+  display: inline-block;
+  height: 1em;
+  width: 1em;
+  padding: .1em;
+  border: 1px solid #222;
+  border-radius: 2px; }
+  .icon.lm_grid_edit_link {
+    overflow: hidden;
+    vertical-align: middle; }
 
 .delete_confirm {
   display: none; }
@@ -147,6 +178,7 @@ table {
     font-size: 1em;
     line-height: 1.4em;
     text-align: center;
+    vertical-align: middle;
     color: #fff;
     cursor: pointer; }
     .button_delete + label:hover, .button_delete + label:focus {
@@ -211,11 +243,13 @@ table {
   .lm_form_button_bar .button_delete:checked + label:after {
     line-height: 1.4em; }
 
-.lm_add_search .lm_search_box {
-  display: inline-block; }
-@media print {
-  .lm_add_search {
-    display: none; } }
+.lm_add_search {
+  display: inline; }
+  .lm_add_search .lm_search_box {
+    display: inline; }
+  @media print {
+    .lm_add_search {
+      display: none; } }
 
 .button_clear_search {
   margin: 0 10px 0 -20px;
@@ -227,5 +261,20 @@ fieldset {
   padding: .1em;
   border: 1px solid #ccc;
   border-radius: 2px; }
+
+input
+, select
+, textarea {
+  margin: 0 .1em;
+  padding: .2em;
+  font-size: .9em; }
+  input:first-child
+  , select:first-child
+  , textarea:first-child {
+    margin-left: 0; }
+  input:last-child
+  , select:last-child
+  , textarea:last-child {
+    margin-right: 0; }
 
 /*# sourceMappingURL=style.css.map */

@@ -36,7 +36,8 @@ $ee->config_from_ini();
 
 // automatic generation of grid_sql
 // needs some configuration in config file
-$ee->grid_sql = $ee->generate_grid_sql();
+// $ee->grid_sql = $ee->generate_grid_sql();
+
 
 $ee->form_sql = "
 SELECT
@@ -86,16 +87,20 @@ $ee->grid_output_control['file_02'] = '--image'; // image clickable
 $ee->grid_output_control['file_03'] = '--image'; // image clickable
 
 $ee->grid_output_control['gross_amount'] = '--number'; // 
+$ee->grid_output_control['sum'] = '--number'; // 
 
 // $ee->grid_input_control['notes_01'] = '--text';
 
-// echo "<pre><code style='font-size: .7em;'>";
-// print_r($ee->generate_grid_sql());
-// echo "\r\n";
-// print_r($ee->grid_sql_param);
-// echo "</pre></code>";
-
 // run eEKS/LM
 $ee->run();
+
+echo "<pre><code style='font-size: .7em;'>";
+/* print_r($ee->generate_grid_sql()); */
+print_r($ee->grid_sql);
+echo "\r\n";
+print_r($ee->grid_sql_param);
+echo "\r\n";
+print_r($ee->multi_column_on);
+echo "</pre></code>";
 
 ?>

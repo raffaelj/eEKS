@@ -55,7 +55,17 @@ coming soon
   * [x] multi from grid (without confirmation)
   * [x] from form
 * grid - set class names (or data attributes) for data types
-  * [x] number, date, datetime
+  * [x] get rid of javascript inside code
+  * [x] get rid of inline styles (nowrap, align...)
+  * [x] position of edit link, export link and searchbox should be defined in template file; div instead of table
+  * extra classes like
+      * [ ] with_rollup (last row bold)
+      * [x] positive/negative numbers (colors/backgrounds)
+      * [x] number (text-align:right)
+      * [x] number, date, datetime
+  * [ ] possibly HTML5 data attributes for easier evaluation with javascript
+  * nice to have:
+    * [ ] info about column on th:hover (or click?)
 * i18n number format (dot, comma)
   * [x] number_in()
   * [x] number_out()
@@ -66,8 +76,12 @@ coming soon
   * [x] i18n number format
   * [x] no inline styles
 * [x] no inline styles
-* [x] no javascript for basic usage
+* [ ] no javascript for basic usage
+  * [x] delete
+  * [x] back
+  * [ ] multi delete
 * [x] output via template file
+* [ ] CSV export needs i18n number_format
 
 ### pages
 
@@ -88,12 +102,12 @@ coming soon
 * [ ] income/costs
 * [x] value_date (from - to)
 * [x] vaoucher_date (from - to)
-* [ ] without value_date
+* [x] without value_date
 * [ ] type_of_costs
 * [ ] mode_of_employment
 * [ ] filter by custom category
 * [x] full text search
-* [ ] GROUP BY everything (except notes, files)
+* [ ] GROUP BY everything (except notes, files) --> see views->monthly sums
 
 ### views
 

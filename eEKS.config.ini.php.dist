@@ -23,6 +23,18 @@ demo = false
 ;; slogan
 slogan = "Don't worry, be happy ;-)"
 
+;; optional background image
+; background_image = "img/0020_raffael-jesche_cc-by-sa-3.jpg"
+
+
+;; active views
+views[] = no_date
+views[] = monthly
+views[] = eks
+
+;; turn multi-value column on
+multi_column_on = 1
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; lazy_mofo config
 
@@ -39,8 +51,12 @@ grid_limit = 50
 ;; max chars in cell
 grid_ellipse_at = 80
 
+;; interval of records to repeat header column titles at
+grid_repeat_header_at = 25
+
 ;; activate checkboxes for multiple deletions
 ;grid_multi_delete = true
+
 
 ;; column names of date filters in search box
 [date_filters]
@@ -86,11 +102,20 @@ table[] = file_01
 ; table[] = file_02
 ; table[] = file_03
 
+;; column names in this array are shown together in a multi-value column
+[multi_column]
+1 = invoice_number
+2 = account
+3 = cat_02
+4 = cat_03
+5 = notes_02
+
 
 ;; default sort order of default table
 [sort_order]
-value_date = DESC
-voucher_date = DESC
+1 = "value_date IS NULL DESC"
+2 = "value_date DESC"
+3 = "voucher_date DESC"
 
 
 ;; joins for sql query
