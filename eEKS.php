@@ -24,7 +24,7 @@ class eEKS extends lazy_mofo{
   // language for html lang attribute
   public $html_lang = "en";
   
-  public $multi_column_on = false;
+  public $multi_column_on = 0;
   
   /////////////// overwrite LM variables
   
@@ -151,7 +151,7 @@ class eEKS extends lazy_mofo{
     // monthly sums, grouped by type_of_costs or EKS-type_of_costs
     if($view == "monthly"){
       $this->grid_sql = $this->generate_grid_sql_monthly();
-      
+      $this->multi_column_on = 0;
     }
     
     // default: accounting with generate_grid_sql()
@@ -318,7 +318,7 @@ class eEKS extends lazy_mofo{
   }
   
   //////////////////////////////////////////////////////////////////////////////
-  function grid($error = '', $multi_column_on = 1){
+  function grid($error = ''){
     
     // purpose: function to list a table of records. aka data grid
     // returns: html
@@ -470,7 +470,7 @@ class eEKS extends lazy_mofo{
       $i++;
 
     }
-    if($multi_column_on == 1)
+    if($this->multi_column_on == 1)
       $head .= "<th>$this->multi_value_column_title</th>";
     $head .= "$edit_delete";
     $head .= "</tr>\n";
@@ -540,7 +540,7 @@ class eEKS extends lazy_mofo{
         
         
         // test with multi-value column
-        elseif(in_array($column_name, $this->eeks_config['multi_column']) && $multi_column_on == 1){
+        elseif(in_array($column_name, $this->eeks_config['multi_column']) && $this->multi_column_on == 1){
           $multi_column_content .= "<div>";
           if(mb_strlen($value) > 0) $multi_column_content .= "$title: ";
           $multi_column_content .= $this->get_output_control($column_name . '-' . $row[$this->identity_name], $value, '--text', 'grid') . "</div>";
@@ -566,7 +566,7 @@ class eEKS extends lazy_mofo{
         $i++; // column index
       }
       
-      if($multi_column_on == 1)
+      if($this->multi_column_on == 1)
         $html .= "<td class='col_multi_value'>$multi_column_content</td>";
       
       $multi_column_content = ""; // reset
@@ -735,6 +735,8 @@ class eEKS extends lazy_mofo{
     echo ", month_to: ";
     var_dump($month_to);
     
+    $months = 12;
+    
     $query = "";
     $query .= "SELECT\r\n";
     $query .= "t.ID\r\n";
@@ -750,7 +752,12 @@ class eEKS extends lazy_mofo{
     }
     // $query .= ",SUM( CASE WHEN extract(month from a.$date) = $month_from THEN a.gross_amount ELSE 0 END ) AS '1'\r\n";
     
+    // sum
     $query .= ",SUM(a.gross_amount) as sum\r\n";
+    
+    // average
+    $query .= ", FORMAT( COALESCE(SUM( a.gross_amount / $months ), 0), 2 ) AS average\r\n";
+    
     $query .= "FROM $this->table a\r\n";
     $query .= "RIGHT OUTER JOIN $group t\r\n";
     $query .= "ON a.$group = t.ID\r\n";
@@ -758,7 +765,7 @@ class eEKS extends lazy_mofo{
     $query .= "GROUP BY t.$group\r\n";
     $query .= "ORDER BY t.is_income DESC, t.sort_order ASC, t.ID ASC\r\n";
     
-    
+    $this->grid_output_control['average'] = '--number';
     
     return $query;
     
