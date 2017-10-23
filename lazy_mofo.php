@@ -1845,7 +1845,7 @@ class lazy_mofo{
             if(mb_strlen(@$_REQUEST[$var]) > 0)
                 $get .= "&amp;$var=" . urlencode($_REQUEST[$var]);
 
-        return ltrim($get, '&amp;');
+        return substr($get, 5);
 
     }
 
