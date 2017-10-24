@@ -19,6 +19,10 @@ The code is based on lazy_mofo/datagrid with a lot of additions.
 
 Don't use this software if you dont't know what's going on. Don't use it on a public available web server. It's in a very early state with no security features. I use it in a local environment with [XAMPP][4].
 
+## Demo database scheme with sample data
+
+coming soon
+
 ## Version and license
 
 coming soon
@@ -45,6 +49,10 @@ coming soon
 ## Notes
 
 * grid_multi_delete works, but has no confirmation message
+
+## Requirements and restrictions
+
+* y10k bug ;-)
 
 ## To do
 
@@ -108,7 +116,7 @@ coming soon
 * [ ] mode_of_employment
 * [ ] filter by custom category
 * [x] full text search
-* [ ] GROUP BY everything (except notes, files) --> see views->monthly sums
+* [ ] GROUP BY something (except notes, files) --> see views->monthly sums
 
 ### views
 
