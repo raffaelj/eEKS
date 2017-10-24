@@ -63,6 +63,12 @@ grid_repeat_header_at = 25
 0 = value_date
 1 = voucher_date
 
+;; column names of category filters in search box
+[category_filters]
+0 = type_of_costs
+1 = mode_of_employment
+; 2 = cat_01
+
 ;; column names for full text search in search box
 [search_in_columns]
 0 = from_to
@@ -84,9 +90,9 @@ table[] = object
 ; table[] = type_of_costs
 table[] = type_of_costs
 table[] = mode_of_employment
-; table[] = cat_01
+table[] = cat_01
 ; table[] = cat_02
-table[] = cat_03
+; table[] = cat_03
 ; table[] = cat_04
 ; table[] = cat_05
 table[] = notes_01
