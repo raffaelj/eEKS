@@ -57,11 +57,6 @@ SELECT
 , a.cat_03
 , a.cat_04
 /* , a.cat_05 */
-/* , a.cat_06 */
-/* , a.cat_07 */
-/* , a.cat_08 */
-/* , a.cat_09 */
-/* , a.cat_10 */
 , a.notes_01
 , a.notes_02
 /* , a.notes_03 */
@@ -76,7 +71,7 @@ WHERE a.ID = :ID
 
 $ee->form_sql_param[":$ee->identity_name"] = @$_REQUEST[$ee->identity_name]; 
 
-// should not be here
+// may not be here
 
 $ee->form_input_control['file_01'] = '--image';
 $ee->form_input_control['file_02'] = '--image';
@@ -87,7 +82,6 @@ $ee->grid_output_control['file_02'] = '--image'; // image clickable
 $ee->grid_output_control['file_03'] = '--image'; // image clickable
 
 $ee->grid_output_control['gross_amount'] = '--number'; // 
-$ee->grid_output_control['sum'] = '--number'; // 
 
 // $ee->grid_input_control['notes_01'] = '--text';
 
