@@ -89,8 +89,8 @@ $this->grid_search_box_clear = "Suche zurücksetzen";
 $this->grid_search_box_search = "Suche";
 
 // placeholders for date filters
-$this->date_filter_from = "from";
-$this->date_filter_to = "to";
+$this->date_filter_from = "von";
+$this->date_filter_to = "bis";
 
 // number format
 $this->decimals = 2;
@@ -120,11 +120,11 @@ $this->rename['cat_02'] = 'Projekt';
 $this->rename['cat_03'] = 'Fördermittelgeber_in';
 $this->rename['cat_04'] = 'Kategorie 4';
 $this->rename['cat_05'] = 'Kategorie 5';
-$this->rename['cat_06'] = 'Kategorie 6';
-$this->rename['cat_07'] = 'Kategorie 7';
-$this->rename['cat_08'] = 'Kategorie 8';
-$this->rename['cat_09'] = 'Kategorie 9';
-$this->rename['cat_10'] = 'Kategorie 10';
+// $this->rename['cat_06'] = 'Kategorie 6';
+// $this->rename['cat_07'] = 'Kategorie 7';
+// $this->rename['cat_08'] = 'Kategorie 8';
+// $this->rename['cat_09'] = 'Kategorie 9';
+// $this->rename['cat_10'] = 'Kategorie 10';
 $this->rename['notes_01'] = 'Notizen';
 $this->rename['notes_02'] = 'Garantie';
 $this->rename['notes_03'] = 'Notiz 3';
