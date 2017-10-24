@@ -672,6 +672,8 @@ class eEKS extends lazy_mofo{
     }
     
     // add AND clause for date filters
+    // if no dates are given, show all records
+    // and yes, I'm aware of the y10k bug but I don't care
     if(!empty($date_filter)){
       foreach($date_filter as $val){
         $query .= "AND a.$val BETWEEN COALESCE(NULLIF(:_from, ''), 0) AND COALESCE(NULLIF(:_to, ''), '9999-12-31')\r\n";
@@ -708,55 +710,72 @@ class eEKS extends lazy_mofo{
   //////////////////////////////////////////////////////////////////////////////
   function generate_grid_sql_monthly($date = "value_date", $group = "type_of_costs"){
     
-    // purpose: sql query for monthly sums, sorted by value_date
+    // purpose: sql query for monthly sums of amounts with $date, grouped by $group
     
-    // range
-    // default: this year
-    // can be adjusted with date filter
-    $from = "0";
-    $to = "9999-12-31";
-    if(isset($_GET['_from']))
-      $from = $this->date_in($_GET['_from']);
-    if(isset($_GET['_to']))
-      $to = $this->date_in($_GET['_to']);
+    // needs some more work to make it portable without joins or tables with different identity_names
     
-    echo "from: ";
-    print_r($from);
-    echo ", to: ";
-    print_r($to);
+    // expected default dates need some adjusting and/or user definable variables
     
-    $tmp = explode('-', $from);
-    $month_from = intval($tmp[1]);
-    echo ", month_from: ";
-    var_dump($month_from);
-    
-    $tmp = explode('-', $to);
-    $month_to = intval($tmp[1]);
-    echo ", month_to: ";
-    var_dump($month_to);
-    
-    $months = 12;
-    
+    // start query
     $query = "";
     $query .= "SELECT\r\n";
     $query .= "t.ID\r\n";
     $query .= ",t.$group\r\n";
-    // $query .= ",t.is_income\r\n";
     
-    // working solution if no fiscal year change
-    for($i = $month_from ; $i <= $month_to ; $i++){
-      
-      $this->grid_output_control[$i] = '--number';
-      
-      $query .= ",SUM( CASE WHEN extract(month from a.$date) = $i THEN a.gross_amount ELSE 0 END ) AS '$i'\r\n";
+    // take care of user input for _from and _to
+    if( isset($_GET['_from']) && isset($_GET['_to']) ){
+      // case: _from and _to given
+      // --> set first day of _from and last day of _to
+      $from = (new DateTime($this->date_in($_GET['_from'])))->modify('first day of this month')->format('Y-m-d');
+      $to = (new DateTime($this->date_in($_GET['_to'])))->modify('last day of this month')->format('Y-m-d');
     }
-    // $query .= ",SUM( CASE WHEN extract(month from a.$date) = $month_from THEN a.gross_amount ELSE 0 END ) AS '1'\r\n";
+    elseif( isset($_GET['_from']) ){
+      // case: _from given, _to = ""
+      // --> set first day of _from and _to = today
+      $from = (new DateTime($this->date_in($_GET['_from'])))->modify('first day of this month')->format('Y-m-d');
+      $to = (new DateTime())->format('Y-m-d');//today
+    }
+    elseif( isset($_GET['_to']) ){
+      // case: _to given, _from = ""
+      // --> set last day of _to and _from = first day of to-year
+      $to = $this->date_in($_GET['_to']);
+      $year = (new DateTime($to))->format('Y');
+      $from = (new DateTime())->format("$year-m-d");// first day of to-year
+    }
+    else{// no input, expect this year
+      $now = new DateTime();
+      $from = $now->modify('first day of Jan this year')->format('Y-m-d');
+      $to = $now->modify('last day of Dec this year')->format('Y-m-d');
+    }
+    
+    
+    
+    // add montly summed columns in sql query in date range
+    $start    = (new DateTime($from))->modify('first day of this month');
+    $end      = (new DateTime($to))->modify('first day of next month');
+    $interval = DateInterval::createFromDateString('1 month');
+    $period   = new DatePeriod($start, $interval, $end);
+    
+    $count_months = 0;
+    foreach ($period as $dt) {
+      
+      $month = $dt->format('m');
+      $year = $dt->format('Y');
+      $col = $dt->format('M (y)');
+      $query .= ",SUM( CASE WHEN extract(month from a.$date) = $month AND extract(year from a.$date) = $year THEN a.gross_amount ELSE 0 END ) AS '$col'\r\n";
+      
+      // grid output control
+      $this->grid_output_control[$col] = '--number';
+      $this->grid_output_control['sum'] = '--number';
+      
+      $count_months++;
+    }
     
     // sum
     $query .= ",SUM(a.gross_amount) as sum\r\n";
     
     // average
-    $query .= ", FORMAT( COALESCE(SUM( a.gross_amount / $months ), 0), 2 ) AS average\r\n";
+    $query .= ", FORMAT( COALESCE(SUM( a.gross_amount / $count_months ), 0), 2 ) AS average\r\n";
     
     $query .= "FROM $this->table a\r\n";
     $query .= "RIGHT OUTER JOIN $group t\r\n";
@@ -770,6 +789,7 @@ class eEKS extends lazy_mofo{
     return $query;
     
   }// end of generate_grid_sql_monthly()
+  
   
   
   //////////////////////////////////////////////////////////////////////////////
