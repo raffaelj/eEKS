@@ -664,12 +664,25 @@ class eEKS extends lazy_mofo{
         $i++;
       }
       
-      $query .= ")\r\n";
+    }
+    
+    $query .= ")\r\n";
       
-      // add grid_sql_param
-      $this->grid_sql_param[':_search'] = '%' . trim(@$_REQUEST['_search']) . '%';
+    // add AND clause for filter by category
+    
+    foreach($this->eeks_config['category_filters'] as $val){
+      if(!empty($_REQUEST["_$val"])){
+        $query .= "AND a.$val LIKE :_$val\r\n";
+        $this->grid_sql_param[":_$val"] = $this->clean_out(@$_REQUEST["_$val"]);
+      }
       
     }
+    
+    
+    // add grid_sql_param
+    $this->grid_sql_param[':_search'] = '%' . trim(@$_REQUEST['_search']) . '%';
+    
+    
     
     // add AND clause for date filters
     // if no dates are given, show all records
@@ -723,19 +736,19 @@ class eEKS extends lazy_mofo{
     $query .= ",t.$group\r\n";
     
     // take care of user input for _from and _to
-    if( isset($_GET['_from']) && isset($_GET['_to']) ){
+    if( !empty($_GET['_from']) && !empty($_GET['_to']) ){
       // case: _from and _to given
       // --> set first day of _from and last day of _to
       $from = (new DateTime($this->date_in($_GET['_from'])))->modify('first day of this month')->format('Y-m-d');
       $to = (new DateTime($this->date_in($_GET['_to'])))->modify('last day of this month')->format('Y-m-d');
     }
-    elseif( isset($_GET['_from']) ){
+    elseif( !empty($_GET['_from']) ){
       // case: _from given, _to = ""
       // --> set first day of _from and _to = today
       $from = (new DateTime($this->date_in($_GET['_from'])))->modify('first day of this month')->format('Y-m-d');
       $to = (new DateTime())->format('Y-m-d');//today
     }
-    elseif( isset($_GET['_to']) ){
+    elseif( !empty($_GET['_to']) ){
       // case: _to given, _from = ""
       // --> set last day of _to and _from = first day of to-year
       $to = $this->date_in($_GET['_to']);
@@ -799,6 +812,7 @@ class eEKS extends lazy_mofo{
     // output: html
     
     $date_filters = $this->eeks_config['date_filters'];
+    $category_filters = $this->eeks_config['category_filters'];
     
     $_from = $this->clean_out(@$_GET['_from']);
     $_to = $this->clean_out(@$_GET['_to']);
@@ -807,7 +821,7 @@ class eEKS extends lazy_mofo{
     
     // view filter
     
-    $html .= $this->view_list();
+    // $html .= $this->view_list();
     
     // date filter
     $count = count($date_filters);
@@ -836,18 +850,42 @@ class eEKS extends lazy_mofo{
       
     }
     
-      return $html;
+    // category filter
+    //
+    // needs better sorting
+    $count = count($category_filters);
+    if($count > 0){
+      $html .= "<fieldset>";
+      
+      foreach($category_filters as $cat){
+        $html .= "<select name='_$cat' id='$cat'>";
+        
+        $arr = $this->query("SELECT ID, $cat FROM $cat ORDER BY $cat");
+        
+        // empty field first
+        $html .= "<option value=''>".$this->rename[$cat]."</option>";
+        
+        foreach($arr as $key=>$val){
+          
+          $selected = "";
+          if(isset($_REQUEST["_$cat"]) && $val['ID'] == $_REQUEST["_$cat"])   $selected .= ' selected="selected"';
+          $html .= "<option class='' value='".$val['ID']."'$selected>" . $val[$cat]."</option>";
+          
+        }
+        
+        $html .= "</select>";
+      }
+      
+      $html .= "</fieldset>";
+      
+    }
+    
+    return $html;
     
   }
   
   
   //////////////////////////////////////////////////////////////////////////////
-  // custom search box
-    
-    // filter by income/costs
-    // filter by value date or voucher date
-    // filters by categories
-    
   function search_box(){
     
     // purpose: search_box as own function, not inside grid()
