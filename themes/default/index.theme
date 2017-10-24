@@ -23,7 +23,8 @@ $header = "<!DOCTYPE html>
 <body class='$class'>
   <header>
     <h1><a href='" . $this->get_uri_path() . "'>$this->name</a></h1>
-    <nav>" . $this->search_box() . "</nav>
+    <nav>" . $this->view_list() . "</nav>
+    " . $this->search_box() . "
   </header>
   <main$background_image>
 ";
