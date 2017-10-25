@@ -23,7 +23,9 @@ $header = "<!DOCTYPE html>
 <body class='$class'>
   <header>
     <h1><a href='" . $this->get_uri_path() . "'>$this->name</a></h1>
+    " . $this->add_button() . "
     <nav>" . $this->view_list() . "</nav>
+    " . $this->export_button() . "
     " . $this->search_box() . "
   </header>
   <main$background_image>

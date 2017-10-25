@@ -32,7 +32,8 @@ class eEKS extends lazy_mofo{
   public $identity_name = 'ID';    // identity / primary key for table
   
   // links on grid
-  public $grid_add_link    = "<a href='[script_name]action=edit&amp;[qs]' class='lm_button lm_grid_add_link'>Add a Record</a>";
+  public $grid_add_link_text    = "Add a Record";
+  public $grid_add_link    = "<a href='[script_name]action=edit&amp;[qs]' class='lm_button confirm lm_grid_add_link'>[grid_add_link_text]</a>";
   
   public $grid_edit_link_text   = "edit";
   public $grid_edit_link   = "<a href='[script_name]action=edit&amp;[identity_name]=[identity_id]&amp;[qs]' class='lm_button lm_icon lm_grid_edit_link' title='[grid_edit_link_text]'>[[grid_edit_link_text]]</a>";
@@ -62,10 +63,12 @@ class eEKS extends lazy_mofo{
   public $grid_search_box = "
   <form action='[script_name]' class='lm_search_box'>
     [filters]
-    <input type='text' name='_search' value='[_search]' size='20' class='lm_search_input'>
-    <a href='[script_name]' title='[grid_search_box_clear]' class='button_clear_search'>x</a>
-    <input type='submit' class='lm_button lm_search_button' value='[grid_search_box_search]'>
-    <input type='hidden' name='action' value='search'>[query_string_list]
+    <fieldset>
+      <input type='text' name='_search' value='[_search]' size='20' class='lm_search_input'>
+      <a href='[script_name]' title='[grid_search_box_clear]' class='button_clear_search'>x</a>
+      <input type='submit' class='lm_button lm_search_button' value='[grid_search_box_search]'>
+      <input type='hidden' name='action' value='search'>[query_string_list]
+    </fieldset>
   </form>";
   
   // placeholders for date filters
@@ -176,6 +179,25 @@ class eEKS extends lazy_mofo{
     
   }
   
+  //////////////////////////////////////////////////////////////////////////////
+  function add_button(){
+    $qs = $this->get_qs();
+    $uri_path = $this->get_uri_path();
+    $grid_add_link = $this->grid_add_link;
+    $grid_add_link = str_replace('[script_name]', $uri_path, $grid_add_link);
+    $grid_add_link = str_replace('[qs]', $qs, $grid_add_link);
+    $grid_add_link = str_replace('[grid_add_link_text]', $this->grid_add_link_text, $grid_add_link);
+    return $grid_add_link;
+  }
+  
+  function export_button(){
+    $qs = $this->get_qs();
+    $uri_path = $this->get_uri_path();
+    $grid_export_link = $this->grid_export_link;
+    $grid_export_link = str_replace('[script_name]', $uri_path, $grid_export_link);
+    $grid_export_link = str_replace('[qs]', $qs, $grid_export_link);
+    return $grid_export_link;
+  }
   //////////////////////////////////////////////////////////////////////////////
   function template($content){
     
@@ -826,27 +848,27 @@ class eEKS extends lazy_mofo{
     // date filter
     $count = count($date_filters);
     if($count > 0){
-      $html .= "<fieldset>";
+      $html .= "<fieldset>\r\n";
       
-      if($count == 1) // text
-        $html .= "<input type='hidden' name='_date_between' readonly='readonly' value='".$date_filters[0] . "'>" . $this->rename[$date_filters[0]] . ": ";
+      if($count == 1) // text with hidden input field
+        $html .= "  <input type='hidden' name='_date_between' readonly='readonly' value='".$date_filters[0] . "'>" . $this->rename[$date_filters[0]] . ": \r\n";
       else{ // select
-        $html .= "<select name='_date_between'>";
+        $html .= "  <select name='_date_between'>\r\n";
         
         foreach($date_filters as $val){
           $selected = "";
           if(isset($_GET["_date_between"]) && $val == $_GET["_date_between"]) 
             $selected .= ' selected="selected"';
-          $html .= "<option value='$val'$selected>".$this->rename[$val]."</option>";
+          $html .= "    <option value='$val'$selected>".$this->rename[$val]."</option>\r\n";
         }
-        $html .= "</select>";
+        $html .= "  </select>\r\n";
       }
       
       
       $html .= "<input type='date' name='_from' value='".$_from."' placeholder='$this->date_filter_from' size='10' class='lm_search_between_input'>";
       $html .= "<input type='date' name='_to' value='".$_to."' placeholder='$this->date_filter_to' size='10' class='lm_search_between_input'>";
       
-      $html .= "</fieldset>";
+      $html .= "</fieldset>\r\n";
       
     }
     
@@ -855,28 +877,28 @@ class eEKS extends lazy_mofo{
     // needs better sorting
     $count = count($category_filters);
     if($count > 0){
-      $html .= "<fieldset>";
+      $html .= "<fieldset>\r\n";
       
       foreach($category_filters as $cat){
-        $html .= "<select name='_$cat' id='$cat'>";
+        $html .= "  <select name='_$cat'>\r\n";
         
         $arr = $this->query("SELECT ID, $cat FROM $cat ORDER BY $cat");
         
         // empty field first
-        $html .= "<option value=''>".$this->rename[$cat]."</option>";
+        $html .= "    <option value=''>".$this->rename[$cat]."</option>\r\n";
         
         foreach($arr as $key=>$val){
           
           $selected = "";
           if(isset($_REQUEST["_$cat"]) && $val['ID'] == $_REQUEST["_$cat"])   $selected .= ' selected="selected"';
-          $html .= "<option class='' value='".$val['ID']."'$selected>" . $val[$cat]."</option>";
+          $html .= "    <option class='' value='".$val['ID']."'$selected>" . $val[$cat]."</option>\r\n";
           
         }
         
-        $html .= "</select>";
+        $html .= "  </select>\r\n";
       }
       
-      $html .= "</fieldset>";
+      $html .= "</fieldset>\r\n";
       
     }
     
@@ -895,15 +917,15 @@ class eEKS extends lazy_mofo{
     
     // get input
     $_search = $this->clean_out(@$_REQUEST['_search']);
-    $qs = $this->get_qs();
+    // $qs = $this->get_qs();
     
     // populate link placeholders    
-    $grid_add_link = $this->grid_add_link;
-    $grid_export_link = $this->grid_export_link;
-    $grid_add_link = str_replace('[script_name]', $uri_path, $grid_add_link);
-    $grid_add_link = str_replace('[qs]', $qs, $grid_add_link);
-    $grid_export_link = str_replace('[script_name]', $uri_path, $grid_export_link);
-    $grid_export_link = str_replace('[qs]', $qs, $grid_export_link);
+    // $grid_add_link = $this->grid_add_link;
+    // $grid_export_link = $this->grid_export_link;
+    // $grid_add_link = str_replace('[script_name]', $uri_path, $grid_add_link);
+    // $grid_add_link = str_replace('[qs]', $qs, $grid_add_link);
+    // $grid_export_link = str_replace('[script_name]', $uri_path, $grid_export_link);
+    // $grid_export_link = str_replace('[qs]', $qs, $grid_export_link);
     
     // search bar
     $search_box = '';
@@ -931,7 +953,8 @@ class eEKS extends lazy_mofo{
       $search_box = str_replace('[filters]', $this->search_box_filters(), $search_box);
     }
 
-    $add_record_search_bar = "<div class='lm_add_search'>$grid_add_link $grid_export_link $search_box</div>\r\n";
+    // $add_record_search_bar = "<div class='lm_add_search'>$grid_add_link $grid_export_link $search_box</div>\r\n";
+    $add_record_search_bar = "<div class='lm_add_search'>$search_box</div>\r\n";
     
     return $add_record_search_bar;
     

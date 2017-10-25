@@ -143,8 +143,8 @@ header{
 
 // navigation
 nav {
-  // display: inline-block;
-  display: inline;
+  display: inline-block;
+  // display: inline;
   @media print{display:none;}
 }
 
@@ -229,7 +229,7 @@ table {
 {
   display:inline-block;
   padding:.5em;
-  margin:5px;
+  margin:.2em;
   border: 0;
   border-radius:2px;
   background-color:$clr_main;
@@ -245,7 +245,8 @@ table {
     text-decoration:none;
       &.attention{background-color:$clr_confirm;}
       &.alarm{background-color:$clr_alarm_dark;color:$clr_white;}
-      &.confirm{background-color:$clr_main;}
+      // &.confirm{background-color:$clr_main;}
+      &.confirm{background-color:$clr_main_2;}
   }
   &.active{
     border: 2px solid $clr_white;
@@ -253,6 +254,13 @@ table {
   &.attention{background-color:$clr_attention;}
   &.alarm{background-color:$clr_alarm;}
   &.confirm{background-color:$clr_confirm;}
+  
+  &.grid_export_link{
+    // position: absolute;
+    // top: .7em;
+    // right: 1em;
+    // font-size: .8em;
+  }
 }
 
 .icon, .lm_icon{
@@ -378,7 +386,8 @@ table {
 ///////////// search box and inputs
 
 .lm_add_search {
-  display:inline;
+  // display:inline;
+  display:inline-block;
   .lm_search_box{
     // display: inline-block;
     display: inline;
@@ -391,10 +400,14 @@ table {
 }
 fieldset{
   display:inline-block;
-  margin: 0;
+  margin: .2em .1em;
   padding: .1em;
   border: 1px solid $clr_grey;
   border-radius: 2px;
+  .lm_button{
+    margin:0;
+    padding:.2em;
+  }
 }
 input
 ,select
@@ -422,5 +435,6 @@ option{
     border-radius: 2px;
     background-color: $clr_grey_tr;
   }
+  @media print{display:none;}
 }
 
