@@ -9,7 +9,7 @@ __e__ = easy, electronic... or in German: einfach, erledigt, elektronisch...
 
 This will be a complete rewrite of a "works for me" solution with some bugs in a private repo of mine.
 
-The original one grew over a view years after experimenting with Open Office Base, porting the database to SQLite and later to MySQL. Open Office Base doesn't work well, is complicated and I really don't like the visual experience. With [lazymofo/datagrid][3] I found an easy solution to insert and change my data and every time I needed a new feature I hacked a view new lines in the code, mixed up German and English variable names...
+The original one grew over a few years after experimenting with Open Office Base, porting the database to SQLite and later to MySQL. Open Office Base doesn't work well, is complicated and I really don't like the visual experience. With [lazymofo/datagrid][3] I found an easy solution to insert and change my data and every time I needed a new feature I hacked a view new lines in the code, mixed up German and English variable names...
 
 This time I try to have a cleaner coding style, avoid any German language in the source code and translate it later with a language file.
 
@@ -108,12 +108,17 @@ coming soon
 
 ### filters
 
+monthly view needs filters, too 
+
 * [ ] income/costs
+  * [x] default + no_date
+  * [ ] monthly view
 * [x] value_date (from - to)
 * [x] vaoucher_date (from - to)
 * [x] without value_date
-* [ ] type_of_costs
-* [ ] mode_of_employment
+* [x] type_of_costs
+* [x] mode_of_employment
+* [ ] account
 * [ ] filter by custom category
 * [x] full text search
 * [ ] GROUP BY something (except notes, files) --> see views->monthly sums

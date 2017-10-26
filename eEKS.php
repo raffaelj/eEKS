@@ -688,6 +688,9 @@ class eEKS extends lazy_mofo{
       
     }
     
+    // add grid_sql_param
+    $this->grid_sql_param[':_search'] = '%' . trim(@$_REQUEST['_search']) . '%';
+    
     $query .= ")\r\n";
       
     // add AND clause for filter by category
@@ -700,10 +703,14 @@ class eEKS extends lazy_mofo{
       
     }
     
-    
-    // add grid_sql_param
-    $this->grid_sql_param[':_search'] = '%' . trim(@$_REQUEST['_search']) . '%';
-    
+    // add AND clause for negative/positive amounts
+    $amount = "";
+    if(!empty($_GET["_amount"]))
+      $amount = $this->clean_out($_GET["_amount"]);
+    if($amount == "pos")
+      $query .= "AND a.gross_amount >= 0\r\n";
+    if($amount == "neg")
+      $query .= "AND a.gross_amount < 0\r\n";
     
     
     // add AND clause for date filters
@@ -844,6 +851,24 @@ class eEKS extends lazy_mofo{
     // view filter
     
     // $html .= $this->view_list();
+    
+    // pos/neg filter
+    
+    $html .= "<select name='_amount'>";
+    $selected = "";
+    if( !empty($_GET["_amount"]) && $_GET["_amount"] != "pos" && $_GET["_amount"] != "neg" )
+      $selected = " selected='selected'";
+    $html .= "<option value=''$selected>all</option>";
+    $selected = "";
+    if( !empty($_GET["_amount"]) && $_GET["_amount"] == "pos" )
+      $selected = " selected='selected'";
+    $html .= "<option value='pos'$selected>income</option>";
+    $selected = "";
+    if( !empty($_GET["_amount"]) && $_GET["_amount"] == "neg" )
+      $selected = " selected='selected'";
+    $html .= "<option value='neg'$selected>costs</option>";
+    $html .= "</select>";
+    
     
     // date filter
     $count = count($date_filters);
