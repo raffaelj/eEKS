@@ -78,38 +78,38 @@ $ee->form_input_control['file_01'] = '--image';
 $ee->form_input_control['file_02'] = '--image';
 $ee->form_input_control['file_03'] = '--image';
 
-$ee->form_input_control['type_of_costs'] = 'SELECT ID AS val, type_of_costs AS opt FROM type_of_costs;--select';
+$ee->form_input_control['type_of_costs'] = 'SELECT ID AS val, type_of_costs AS opt FROM type_of_costs ORDER BY is_income DESC, sort_order ASC, type_of_costs ASC;--select';
 $ee->form_input_control['mode_of_employment'] = 'SELECT ID, mode_of_employment FROM mode_of_employment;--select';
+$ee->form_input_control['account'] = 'SELECT NULL, "nicht angegeben" UNION SELECT "Girokonto", "Girokonto" UNION SELECT "Barkasse", "Barkasse"; --radio';
 
 $ee->grid_output_control['file_01'] = '--image'; // image clickable
 $ee->grid_output_control['file_02'] = '--image'; // image clickable
 $ee->grid_output_control['file_03'] = '--image'; // image clickable
 
-// $ee->grid_output_control['gross_amount'] = '--number'; // 
+$ee->grid_output_control['gross_amount'] = '--number'; // 
 
-$ee->grid_input_control['value_date'] = '--date';
-$ee->grid_input_control['voucher_date'] = '--date';
-$ee->grid_input_control['gross_amount'] = '--number';
-$ee->grid_input_control['account'] = '--text';
-$ee->grid_input_control['invoice_number'] = '--text';
-$ee->grid_input_control['from_to'] = '--text';
-$ee->grid_input_control['object'] = '--text';
-$ee->grid_input_control['type_of_costs'] = 'SELECT ID AS val, type_of_costs AS opt FROM type_of_costs;--select';
-$ee->grid_input_control['mode_of_employment'] = 'SELECT ID, mode_of_employment FROM mode_of_employment;--select';
-$ee->grid_input_control['cat_01'] = '--text';// area of operations
-$ee->grid_input_control['notes_01'] = '--text';
-$ee->grid_input_control['notes_02'] = '--text';
+// $ee->grid_input_control['value_date'] = '--date';
+// $ee->grid_input_control['voucher_date'] = '--date';
+// $ee->grid_input_control['gross_amount'] = '--number';
+// $ee->grid_input_control['account'] = 'SELECT NULL, "n.a." UNION SELECT "Girokonto", "Giro" UNION SELECT "Barkasse", "bar"; --radio';
+// $ee->grid_input_control['invoice_number'] = '--text';
+// $ee->grid_input_control['from_to'] = '--text';
+// $ee->grid_input_control['object'] = '--textarea';
+// $ee->grid_input_control['type_of_costs'] = 'SELECT ID AS val, type_of_costs AS opt FROM type_of_costs ORDER BY is_income DESC, sort_order ASC, type_of_costs ASC;--select';
+// $ee->grid_input_control['mode_of_employment'] = 'SELECT ID, mode_of_employment FROM mode_of_employment;--select';
+// $ee->grid_input_control['cat_01'] = '--text';// area of operations
+// $ee->grid_input_control['notes_01'] = '--textarea';
+// $ee->grid_input_control['notes_02'] = '--textarea';
 
 // run eEKS/LM
 $ee->run();
 
-echo "<pre><code style='font-size: .7em;'>";
-/* print_r($ee->generate_grid_sql()); */
-print_r($ee->grid_sql);
-echo "\r\n";
-print_r($ee->grid_sql_param);
-echo "\r\n";
-print_r($ee->multi_column_on);
-echo "</pre></code>";
+// echo "<pre><code style='font-size: .7em;'>";
+// print_r($ee->grid_sql);
+// echo "\r\n";
+// print_r($ee->grid_sql_param);
+// echo "\r\n";
+// print_r($ee->multi_column_on);
+// echo "</pre></code>";
 
 ?>

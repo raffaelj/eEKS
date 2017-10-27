@@ -82,7 +82,7 @@ class eEKS extends lazy_mofo{
   // custom category filters: _cat_01 ...
   
   // public $query_string_list = "_date_between,_from,_to,_moe,_toc,_amount,_view";
-  public $query_string_list = "_date_between,_from,_to,_view";
+  public $query_string_list = "_date_between,_from,_to,_view,_amount,_type_of_costs,_mode_of_employment,_edit_table";
   // public $query_string_list = "_view";
   public $query_string_list_post = '_view';     // comma delimited list of variable names to carry around in the URL for POST-search button
   
@@ -137,6 +137,22 @@ class eEKS extends lazy_mofo{
     
   }
   
+  function list_edit_tables(){
+    $html = "";
+    if( isset($_GET['_view']) && $_GET['_view'] == "edit" ){
+      $arr = $this->query("show tables");
+      
+      $html = "<ul class='list_of_tables'>";
+      foreach($arr as $value){
+        $html .= '<li><a href="?_view=edit&amp;_edit_table='.array_values($value)[0].'">'. array_values($value)[0] .'</a></li>';
+      }
+      $html .= '</ul>';
+    }
+
+    
+    return $html;
+  }
+  
   //////////////////////////////////////////////////////////////////////////////
   function get_grid_view(){
     
@@ -151,8 +167,29 @@ class eEKS extends lazy_mofo{
     // ...
     
     
+    
+    // edit tables
+    if($view == "edit"){
+      
+      $this->form_sql = "";
+      $this->grid_sql = "";
+      $this->table = isset($_REQUEST['_edit_table']) ? $this->clean_out(@$_REQUEST['_edit_table']) : "accounting";
+      
+      $this->form_input_control[$this->table] = "--text";// reset input control from accounting table
+      $this->form_input_control['is_income'] = "--checkbox";
+      $this->form_input_control['sort_order'] = "--integer";
+      $this->form_input_control['notes'] = "--textarea";
+      
+      $this->grid_input_control['is_income'] = "--checkbox";
+      $this->grid_input_control['sort_order'] = "--integer";
+      $this->grid_input_control['notes'] = "--textarea";
+      $this->grid_input_control[$this->table] = "--text";
+      
+    }
+    
+    
     // monthly sums, grouped by type_of_costs or EKS-type_of_costs
-    if($view == "monthly"){
+    elseif($view == "monthly"){
       $this->grid_sql = $this->generate_grid_sql_monthly();
       $this->multi_column_on = 0;
     }
@@ -308,7 +345,7 @@ class eEKS extends lazy_mofo{
   }
   
   //////////////////////////////////////////////////////////////////////////////
-  function number_out($str){
+  function number_out($str = "", $type = "float"){
     
     // purpose: convert database format to local format
     
@@ -317,18 +354,25 @@ class eEKS extends lazy_mofo{
     
     $str = $this->clean_out($str);
     
-    $str = number_format((float)$str, $this->decimals, $this->dec_point, $this->thousands_sep);
+    // if( (float) $str == $str )
+    if( $type == "float" )
+      $str = number_format((float)$str, $this->decimals, $this->dec_point, $this->thousands_sep);
+    else
+      $str = number_format((float)$str, 0, $this->dec_point, $this->thousands_sep);
+    
+    // else
+      // return intval($str);
     
     return $str;
     
   }
   
   
-  function html_number_output($str){
+  function html_number_output($str = "", $type = "float"){
     
     // purpose: set class names for different numbers
     
-    $str = $this->number_out($str);
+    $str = $this->number_out($str, $type);
     
     $class = "number";
     if ($str == 0) $class .= " zero";
@@ -486,7 +530,7 @@ class eEKS extends lazy_mofo{
       if($column_name == $this->identity_name && $i == ($column_count - 1))
         $edit_delete = "    <th class='col_edit'></th>\n"; // if identity is last column then this is the column with the edit and delete links
       elseif(!in_array($column_name, $this->eeks_config['multi_column']))
-        $head .= "    <th><a href='{$uri_path}_order_by=" . ($i + 1) . "&amp;_desc=$_desc_invert&amp;" . $this->get_qs() . "'>$title</a></th>\n";
+        $head .= "    <th><a href='{$uri_path}_order_by=" . ($i + 1) . "&amp;_desc=$_desc_invert&amp;" . $this->get_qs() . "' class='lm_$column_name'>$title</a></th>\n";
         // $head .= "    <th><a href='{$uri_path}_order_by=" . ($i + 1) . "&amp;_desc=$_desc_invert&amp;" . $this->get_qs('_search') . "'>$title</a></th>\n";
   
       $i++;
@@ -1312,6 +1356,8 @@ class eEKS extends lazy_mofo{
       return "<input type='text' name='$column_name' class='$class' value='" . $this->clean_out($value) . "' $max_length placeholder='$validate_placeholder'>$validate_error $validate_placeholder_alternative";
     elseif($cmd == 'password')
       return "<input type='password' name='$column_name' class='$class' value='" . $this->clean_out($value) . "' $max_length placeholder='$validate_placeholder'>$validate_error $validate_placeholder_alternative";
+    elseif($cmd == 'integer')
+      return "<input type='number' name='$column_name' class='$class $cmd' value='" . $this->number_out($value, "int") . "' $max_length placeholder='$validate_placeholder'>$validate_error $validate_placeholder_alternative";
     elseif($cmd == 'number')
       return "<input type='text' name='$column_name' class='$class $cmd' value='" . $this->number_out($value) . "' $max_length placeholder='$validate_placeholder'>$validate_error $validate_placeholder_alternative";
     elseif($cmd == 'date')
@@ -1377,6 +1423,8 @@ class eEKS extends lazy_mofo{
       return $this->html_image_output($value);
     elseif($cmd == 'html')
       return $this->html_html_output($value);
+    elseif($cmd == 'integer')
+      return $this->html_number_output($value, "int");
     elseif($cmd == 'number')
       return $this->html_number_output($value);
     elseif(is_callable($cmd))

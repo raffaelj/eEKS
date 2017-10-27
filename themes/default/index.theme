@@ -27,6 +27,7 @@ $header = "<!DOCTYPE html>
     <nav>" . $this->view_list() . "</nav>
     " . $this->export_button() . "
     " . $this->search_box() . "
+    " . $this->list_edit_tables() . "
   </header>
   <main$background_image>
 ";

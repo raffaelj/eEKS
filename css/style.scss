@@ -64,7 +64,7 @@ p{
 // custom classes for easier styling
 .text-right {text-align:right;}
 .text-left {text-align:left;}
-.number,.date,.datetime{display:block;text-align:right;}
+.number,.integer,.date,.datetime{display:block;text-align:right;}
 .center{margin-left:auto;margin-right:auto;text-align:center;}
 .hidden{display:none;}
 
@@ -120,6 +120,7 @@ footer{
   border-top: 4px solid $clr_grey;
   background: $clr_dark_grey;
   color: $clr_white;
+  clear:both;// float right from lm_save_changes_button
   @media print{display:none;}
 }
 
@@ -158,6 +159,7 @@ table {
   border: 1px solid $clr_grey;
   border-radius: 6px;
   font-size:14px;
+  clear:both;// float right from lm_save_changes_button
   td,th { 
     padding: 4px;
     border-bottom: 1px solid $clr_grey;
@@ -174,11 +176,15 @@ table {
     }
     &.col_edit{
       width:3em;
+      @media print{width:0;}
     }
   }
   td{
     &.col_multi_value{
       font-size:.8em;
+    }
+    input{
+      // margin:0 auto;
     }
   }
   tr {
@@ -193,6 +199,11 @@ table {
     // highlight hover and current row edited
     &.lm_active td, &:hover td {background: $clr_main_tr;}
   }
+}
+
+// eeks specific table layout
+th a.lm_account{
+  width:3.5em;
 }
 
 // images
@@ -261,6 +272,10 @@ table {
     // right: 1em;
     // font-size: .8em;
   }
+  &.lm_save_changes_button{
+    float:right;
+    @media print{display:none;}
+  }
 }
 
 .icon, .lm_icon{
@@ -277,6 +292,7 @@ table {
   vertical-align: middle;
   &.lm_grid_edit_link{// temporarily until icons are added
     overflow: hidden;
+    @media print{display:none;}
   }
 }
 
@@ -294,6 +310,7 @@ table {
       background-color:$clr_alarm_dark;
       color:$clr_white;
     }
+    @media print{display:none;}
   }
   &:checked{
     + label{
@@ -350,7 +367,7 @@ table {
   }
 }
 
-///////////// lm form
+///////////// forms
 
 .lm_form {
   margin: 0 auto;
@@ -383,6 +400,11 @@ table {
   padding-top: 1em;
 }
 
+
+input.integer{
+  width:5em;
+}
+
 ///////////// search box and inputs
 
 .lm_add_search {
@@ -391,6 +413,10 @@ table {
   .lm_search_box{
     // display: inline-block;
     display: inline;
+  }
+  input,select{
+    &:first-child{margin-left:0;}
+    &:last-child{margin-right:0;}
   }
   @media print{display:none;}
 }
@@ -417,12 +443,30 @@ input
   padding: .2em;
   font-size: .9em;
   box-sizing: border-box;
-  &:first-child{margin-left:0;}
-  &:last-child{margin-right:0;}
 }
+input[type="checkbox"], input[type="radio"]{
+  margin: -2px .2em 0 0;
+  vertical-align: middle;
+  width:auto;
+}
+
 option{
   
 }
+.lm_grid{
+  textarea{
+    width: 21em;
+    height: 3em;
+  }
+}
+label {
+  display: inline-block;
+  vertical-align: middle;
+  font-size: .9em;
+  line-height: 1em;
+  margin: 0 .2em 0 0;
+}
+
 
 ///////////// pagination
 .lm_pagination{

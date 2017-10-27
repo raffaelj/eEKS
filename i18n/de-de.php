@@ -133,3 +133,9 @@ $this->rename['notes_05'] = 'Notiz 5';
 $this->rename['file_01'] = 'Beleg';
 $this->rename['file_02'] = 'Datei 2';
 $this->rename['file_03'] = 'Datei 3';
+
+
+// rename fields from other tables
+$this->rename['is_income'] = 'ist Einnahme';
+$this->rename['sort_order'] = 'Sortierreihenfolge';
+$this->rename['notes'] = 'Notizen';

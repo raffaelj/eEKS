@@ -91,6 +91,9 @@ coming soon
   * [ ] multi delete
 * [x] output via template file
 * [ ] CSV export needs i18n number_format
+* experimental multi-value column
+  * [x] grid
+  * [ ] with grid_input_control
 
 ### pages
 
@@ -98,7 +101,7 @@ coming soon
 * [x] accounting (default page)
   * [ ] extra: records without value_date
 * [ ] options
-  * [ ] change content of tables
+  * [x] change content of tables
   * [ ] change (some) content of ini files
 
 ### searchbox
@@ -126,9 +129,9 @@ monthly view needs filters, too
 ### views
 
 * [ ] monthly sums
-  * [ ] type_of_costs = income
-  * [ ] type_of_costs = costs
-  * [ ] chart_of_accounts (EKS)
+  * [ ] only income
+  * [ ] only costs
+  * [ ] join chart_of_accounts (EKS)
   * [ ] cash basis accounting (German: EÜR)
 * [ ] EKS preview
 * [ ] charts --> maybe with javascript
