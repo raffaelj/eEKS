@@ -639,8 +639,18 @@ class eEKS extends lazy_mofo{
       if($i != 0)
         $query .= ", ";
       
-      if(array_key_exists($val, $this->eeks_config['sql_joins']))
-        $query .= $this->eeks_config['sql_joins'][$val]['alias'] . "." .$this->eeks_config['sql_joins'][$val]['column'] . "\r\n";
+      // set different aliases if sql joins are defined and
+      // if no grid_input_control for this column defined
+      $cmd = false;
+      if( isset($this->grid_input_control[$val]) ){
+        $cmd = $this->grid_input_control[$val];
+        if( mb_strstr($cmd, '--select') )
+          $cmd = 'select';
+      }
+      
+      if( array_key_exists($val, $this->eeks_config['sql_joins']) && $cmd != 'select' ){
+          $query .= $this->eeks_config['sql_joins'][$val]['alias'] . "." .$this->eeks_config['sql_joins'][$val]['column'] . "\r\n";
+      }
       else
         $query .= "a.$val\r\n";
         // $query .= $this->table . ".$val\r\n";
@@ -666,10 +676,23 @@ class eEKS extends lazy_mofo{
     // add FROM table with alias `a`
     $query .= "FROM $this->table a\r\n";
     
-    // add LEFT JOIN --> must be in the automation process !!!
+    // add LEFT JOIN
+    // if no grid_input_control for this column defined
     foreach($this->eeks_config['sql_joins'] as $key=>$val){
-      $query .= "LEFT JOIN ".$val['table']." ".$val['alias']."\r\n";
-      $query .= "ON a.$key = ".$val['alias'].".".$val['ID']."\r\n";
+      
+      $cmd = false;
+      if( isset($this->grid_input_control[$key]) ){
+        $cmd = $this->grid_input_control[$key];
+        if( mb_strstr($cmd, '--select') )
+          $cmd = 'select';
+      }
+      
+      if( array_key_exists($key, $this->eeks_config['sql_joins']) && $cmd != 'select' ){
+        
+        $query .= "LEFT JOIN ".$val['table']." ".$val['alias']."\r\n";
+        $query .= "ON a.$key = ".$val['alias'].".".$val['ID']."\r\n";
+      
+      }
     }
     
     

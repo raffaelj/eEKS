@@ -52,6 +52,7 @@ SELECT
 , a.posting_text
 , a.object
 , a.type_of_costs
+, a.mode_of_employment
 , a.cat_01
 , a.cat_02
 , a.cat_03
@@ -77,13 +78,27 @@ $ee->form_input_control['file_01'] = '--image';
 $ee->form_input_control['file_02'] = '--image';
 $ee->form_input_control['file_03'] = '--image';
 
+$ee->form_input_control['type_of_costs'] = 'SELECT ID AS val, type_of_costs AS opt FROM type_of_costs;--select';
+$ee->form_input_control['mode_of_employment'] = 'SELECT ID, mode_of_employment FROM mode_of_employment;--select';
+
 $ee->grid_output_control['file_01'] = '--image'; // image clickable
 $ee->grid_output_control['file_02'] = '--image'; // image clickable
 $ee->grid_output_control['file_03'] = '--image'; // image clickable
 
-$ee->grid_output_control['gross_amount'] = '--number'; // 
+// $ee->grid_output_control['gross_amount'] = '--number'; // 
 
-// $ee->grid_input_control['notes_01'] = '--text';
+$ee->grid_input_control['value_date'] = '--date';
+$ee->grid_input_control['voucher_date'] = '--date';
+$ee->grid_input_control['gross_amount'] = '--number';
+$ee->grid_input_control['account'] = '--text';
+$ee->grid_input_control['invoice_number'] = '--text';
+$ee->grid_input_control['from_to'] = '--text';
+$ee->grid_input_control['object'] = '--text';
+$ee->grid_input_control['type_of_costs'] = 'SELECT ID AS val, type_of_costs AS opt FROM type_of_costs;--select';
+$ee->grid_input_control['mode_of_employment'] = 'SELECT ID, mode_of_employment FROM mode_of_employment;--select';
+$ee->grid_input_control['cat_01'] = '--text';// area of operations
+$ee->grid_input_control['notes_01'] = '--text';
+$ee->grid_input_control['notes_02'] = '--text';
 
 // run eEKS/LM
 $ee->run();
