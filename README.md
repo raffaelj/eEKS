@@ -7,6 +7,8 @@ Alternative pronounciation ([IPA][2]): [iːks] ;-)
 __EKS__ = income from self-employment (German: Einkommen aus selbständiger Tätigkeit)  
 __e__ = easy, electronic... or in German: einfach, erledigt, elektronisch...
 
+Kindly excuse my clause grammar mistakes and some wrong vocabularies. I try my best. Feel free to file an issue or to send a pull request with corrections.
+
 This will be a complete rewrite of a "works for me" solution with some bugs in a private repo of mine.
 
 The original one grew over a few years after experimenting with Open Office Base, porting the database to SQLite and later to MySQL. Open Office Base doesn't work well, is complicated and I really don't like the visual experience. With [lazymofo/datagrid][3] I found an easy solution to insert and change my data and every time I needed a new feature I hacked a view new lines in the code, mixed up German and English variable names...
@@ -21,7 +23,44 @@ Don't use this software if you dont't know what's going on. Don't use it on a pu
 
 ## Demo database scheme with sample data
 
-coming soon
+You can import `sample_data.sql` with English column headers and German sample data.
+
+## installation/demo
+
+It's work in progress! There are no security features!
+
+instructions for installing on an [Uberspace](https://uberspace.de/):
+
+* only MYSQL 5.1 possible until they update to CentOS 7
+  * --> no `utf8mb4`
+  * --> no two auto timestamp columns for `date_created` and `date_last_changed`
+
+more info coming soon...
+
+* create a new database
+* import `sample_data.sql`
+* via console:
+
+```bash
+# go to web root
+cd /var/www/virtual/$USER/html;
+
+# clone repo
+git clone https://github.com/raffaelj/eEKS.git;
+
+# open folder
+cd eEKS;
+
+# copy config dist files
+cp eEKS.db.ini.php.dist eEKS.db.ini.php
+cp eEKS.config.ini.php.dist eEKS.config.ini.php
+
+# add your database credentials
+nano eEKS.db.ini.php
+```
+
+* updates: `git pull` and `cp eEKS.config.ini.php.dist eEKS.config.ini.php`
+* now eEKS should be available under `http://username.servername.uberspace.de/eEKS`
 
 ## Version and license
 
