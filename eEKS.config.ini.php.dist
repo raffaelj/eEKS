@@ -30,7 +30,8 @@ slogan = "Don't worry, be happy ;-)"
 ;; active views
 views[] = no_date
 views[] = monthly
-views[] = eks
+views[] = edit
+; views[] = eks
 
 ;; turn multi-value column on
 multi_column_on = 1
