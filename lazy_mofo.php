@@ -1841,11 +1841,15 @@ class lazy_mofo{
 
         $get = '';
         $arr = explode(',', trim($query_string_list, ','));
-        foreach($arr as $var)
+        foreach($arr as $var){
             if(mb_strlen(@$_REQUEST[$var]) > 0)
-                $get .= "&amp;$var=" . urlencode($_REQUEST[$var]);
+                $get .= "&$var=" . urlencode($_REQUEST[$var]);
+                // $get .= "&amp;$var=" . urlencode($_REQUEST[$var]);
+        }
 
-        return substr($get, 5);
+        // return mb_substr($get, 5);
+        // return substr($get, 5);
+        return ltrim($get, '&');
 
     }
 
