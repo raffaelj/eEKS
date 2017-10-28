@@ -210,11 +210,11 @@ class eEKS extends lazy_mofo{
   function eks(){
     
     // parse profile
-    $eks = parse_ini_file('/profiles/default.ini.php');
+    $eks = parse_ini_file('profiles/default.ini.php', true);
     
     // set date range
     if( empty($_GET['_from']) || empty($_GET['_to']) ){
-      $from = new DateTime( $this->date_in($eks['eks_start_date']) );
+      $from = new DateTime( $this->date_in($eks['eks']['eks_start_date']) );
     }
     else{
       $from = new DateTime( $this->date_in($_GET['_from']) );
@@ -225,7 +225,7 @@ class eEKS extends lazy_mofo{
     
     // set default mode_of_employment
     if( empty($_GET['_mode_of_employment']) )
-      $_GET['_mode_of_employment'] = $eks['default_mode_of_employment'];
+      $_GET['_mode_of_employment'] = $eks['eks']['default_mode_of_employment'];
     
     $this->grid_sql = $this->generate_grid_sql_monthly();
     $this->multi_column_on = 0;
