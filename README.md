@@ -59,7 +59,7 @@ cp eEKS.config.ini.php.dist eEKS.config.ini.php
 nano eEKS.db.ini.php
 ```
 
-* updates: `git pull` and `cp eEKS.config.ini.php.dist eEKS.config.ini.php`
+* updates: `git pull` and `cp eEKS.config.ini.php.dist eEKS.config.ini.php` and `cp profiles/default.ini.php.dist profiles/default.ini.php`
 * now eEKS should be available under `http://username.servername.uberspace.de/eEKS`
 
 ## Version and license
