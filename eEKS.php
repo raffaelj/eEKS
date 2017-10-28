@@ -165,11 +165,16 @@ class eEKS extends lazy_mofo{
     
     // EKS
     // ...
+    if($view == "eks"){
+      
+      $this->eks();
+      
+    }
     
     
     
     // edit tables
-    if($view == "edit"){
+    elseif($view == "edit"){
       
       $this->form_sql = "";
       $this->grid_sql = "";
@@ -198,6 +203,32 @@ class eEKS extends lazy_mofo{
     // else default, no_date, null
     else
       $this->grid_sql = $this->generate_grid_sql();
+    
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////
+  function eks(){
+    
+    // parse profile
+    $eks = parse_ini_file('/profiles/default.ini.php');
+    
+    // set date range
+    if( empty($_GET['_from']) || empty($_GET['_to']) ){
+      $from = new DateTime( $this->date_in($eks['eks_start_date']) );
+    }
+    else{
+      $from = new DateTime( $this->date_in($_GET['_from']) );
+    }
+    
+    $_GET['_from'] = $from->modify('first day of this month')->format('d.m.Y');
+    $_GET['_to'] = $from->modify('+ 6 months')->modify('last day of this month')->format('d.m.Y');
+    
+    // set default mode_of_employment
+    if( empty($_GET['_mode_of_employment']) )
+      $_GET['_mode_of_employment'] = $eks['default_mode_of_employment'];
+    
+    $this->grid_sql = $this->generate_grid_sql_monthly();
+    $this->multi_column_on = 0;
     
   }
   
@@ -530,8 +561,7 @@ class eEKS extends lazy_mofo{
       if($column_name == $this->identity_name && $i == ($column_count - 1))
         $edit_delete = "    <th class='col_edit'></th>\n"; // if identity is last column then this is the column with the edit and delete links
       elseif(!in_array($column_name, $this->eeks_config['multi_column']))
-        $head .= "    <th><a href='{$uri_path}_order_by=" . ($i + 1) . "&amp;_desc=$_desc_invert&amp;" . $this->get_qs() . "' class='lm_$column_name'>$title</a></th>\n";
-        // $head .= "    <th><a href='{$uri_path}_order_by=" . ($i + 1) . "&amp;_desc=$_desc_invert&amp;" . $this->get_qs('_search') . "'>$title</a></th>\n";
+        $head .= "    <th><a href='{$uri_path}_order_by=" . ($i + 1) . "&amp;_desc=$_desc_invert&amp;" . $this->get_qs('_search') . "' class='lm_$column_name'>$title</a></th>\n";
   
       $i++;
 
@@ -761,13 +791,11 @@ class eEKS extends lazy_mofo{
     $query .= ")\r\n";
       
     // add AND clause for filter by category
-    
     foreach($this->eeks_config['category_filters'] as $val){
       if(!empty($_REQUEST["_$val"])){
         $query .= "AND a.$val LIKE :_$val\r\n";
         $this->grid_sql_param[":_$val"] = $this->clean_out(@$_REQUEST["_$val"]);
       }
-      
     }
     
     // add AND clause for negative/positive amounts
@@ -881,7 +909,7 @@ class eEKS extends lazy_mofo{
     }
     
     // sum
-    $query .= ",SUM(a.gross_amount) as sum\r\n";
+    $query .= ",SUM(COALESCE(NULLIF(a.gross_amount, ''), 0)) as sum\r\n";
     
     // average
     $query .= ", FORMAT( COALESCE(SUM( a.gross_amount / $count_months ), 0), 2 ) AS average\r\n";
@@ -889,9 +917,21 @@ class eEKS extends lazy_mofo{
     $query .= "FROM $this->table a\r\n";
     $query .= "RIGHT OUTER JOIN $group t\r\n";
     $query .= "ON a.$group = t.ID\r\n";
+    
+    // add AND clause for filter by category
+    foreach($this->eeks_config['category_filters'] as $val){
+      if(!empty($_GET["_$val"])){
+        if( $val == 'type_of_costs' )
+          $query .= "WHERE( a.$val LIKE :_$val)\r\n";
+        else
+          $query .= "AND a.$val LIKE :_$val\r\n";
+        $this->grid_sql_param[":_$val"] = $this->clean_out(@$_GET["_$val"]);
+      }
+    }
+    
     $query .= "AND a.$date BETWEEN '$from' AND '$to'\r\n";
     $query .= "GROUP BY t.$group\r\n";
-    $query .= "ORDER BY t.is_income DESC, t.sort_order ASC, t.ID ASC\r\n";
+    $query .= "ORDER BY t.is_income DESC, t.sort_order ASC, t.$group ASC\r\n";
     
     $this->grid_output_control['average'] = '--number';
     
@@ -957,8 +997,8 @@ class eEKS extends lazy_mofo{
       }
       
       
-      $html .= "<input type='date' name='_from' value='".$_from."' placeholder='$this->date_filter_from' size='10' class='lm_search_between_input'>";
-      $html .= "<input type='date' name='_to' value='".$_to."' placeholder='$this->date_filter_to' size='10' class='lm_search_between_input'>";
+      $html .= "<input type='text' name='_from' value='".$_from."' placeholder='$this->date_filter_from' size='10' class='lm_search_between_input'>";
+      $html .= "<input type='text' name='_to' value='".$_to."' placeholder='$this->date_filter_to' size='10' class='lm_search_between_input'>";
       
       $html .= "</fieldset>\r\n";
       
@@ -982,7 +1022,9 @@ class eEKS extends lazy_mofo{
         foreach($arr as $key=>$val){
           
           $selected = "";
-          if(isset($_REQUEST["_$cat"]) && $val['ID'] == $_REQUEST["_$cat"])   $selected .= ' selected="selected"';
+          if(!empty($_GET["_$cat"]) && $val['ID'] == $_GET["_$cat"])
+            $selected .= ' selected="selected"';
+          
           $html .= "    <option class='' value='".$val['ID']."'$selected>" . $val[$cat]."</option>\r\n";
           
         }
