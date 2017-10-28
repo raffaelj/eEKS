@@ -1,0 +1,76 @@
+;<?php
+;die(); // For further security
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;/*
+;; don't change anything above this line
+;;
+
+;; EKS profile
+
+[eks]
+;; 1=freiberuflich, 3=gewerblich
+default_mode_of_employment = 1
+
+;; for possible future change
+eks_version = "Jobcenter-EKS.01.2017"
+
+;; start date for calculating date ranges
+eks_start_date = 01.06.2016
+
+;; default language
+language = de
+
+;;;;; page 1 / Seite 1
+
+; 1.  Persönliche Daten
+; 1.1  Meine persönlichen Daten
+[personal_data]
+title = Frau
+first_name = Amélie
+last_name = Poulain
+birthday = 05.06.1974
+bg_number = 09876//0012345
+
+; Ort vor Unterschrift
+[signature]
+location = Leipzig
+signature = Dieses Schreiben wurde maschinell erstellt und ist ohne Unterschrift gültig.
+; signature =
+
+;; 1.2  Persönliche Daten der Person in meiner Bedarfsgemeinschaft, auf die sich die Angaben dieser Anlage beziehen
+
+;; if empty use personal_data from above
+[personal_data]
+title = 
+first_name = 
+last_name = 
+birthday = 
+
+; 3.  Bewilligungszeitraum --> wird von eEKS eingetragen
+
+
+; 4.  Daten zur selbständigen Tätigkeit
+; 4.1  Allgemeine Daten zur selbständigen Tätigkeit
+[activity_data]
+activity = Kunst, Gestaltung, Phantasietraining
+start_date = 25.04.2001
+end_date = 
+Gewerbe_Ort = Kochstr. 90, 04277 Leipzig
+Rechtsform = Einzelunternehmerin
+
+;; 4.2  Personal
+[personnel]
+has_employees = 0
+number_of_employees = 0
+
+;;;;; page 2 / Seite 2
+
+;; 5.  Zuschüsse/Beihilfen
+
+;; 6.  Darlehen
+
+;; 7.  Angaben zu den Betriebsräumen
+
+
+;; don't change anything below this line
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;*/
+;?>
