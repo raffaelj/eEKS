@@ -26,6 +26,9 @@ class eEKS extends lazy_mofo{
   
   public $multi_column_on = 0;
   
+  // contains error message --> must be in template
+  public $error = "";
+  
   /////////////// overwrite LM variables
   
   public $table = 'accounting';    // table name for updates, inserts and deletes
@@ -1014,10 +1017,13 @@ class eEKS extends lazy_mofo{
       foreach($category_filters as $cat){
         $html .= "  <select name='_$cat'>\r\n";
         
-        $arr = $this->query("SELECT ID, $cat FROM $cat ORDER BY $cat");
+        if($cat == "type_of_costs")
+          $arr = $this->query("SELECT ID, $cat FROM $cat ORDER BY $cat.is_income DESC, COALESCE(NULLIF($cat.sort_order, ''), 99) ASC, $cat", array(), "search_box_filters()");
+        else
+          $arr = $this->query("SELECT ID, $cat FROM $cat ORDER BY COALESCE(NULLIF($cat.sort_order, ''), 99)  ASC, $cat", array(), "search_box_filters()");
         
         // empty field first
-        $html .= "    <option value=''>".$this->rename[$cat]."</option>\r\n";
+        $html .= "    <option value='' class='select_title'>".$this->rename[$cat]." (all)</option>\r\n";
         
         foreach($arr as $key=>$val){
           
@@ -1038,7 +1044,7 @@ class eEKS extends lazy_mofo{
     
     return $html;
     
-  }
+  }// end of search_box_filters()
   
   
   //////////////////////////////////////////////////////////////////////////////
@@ -1639,6 +1645,17 @@ class eEKS extends lazy_mofo{
     return $html;
 
   }// end of form()
+  
+  function display_error($error, $source_function){
+        
+    // purpose: display errors to user.
+
+    $msg = nl2br($this->clean_out("Error: $error\nSent From: $source_function"));
+    
+    $this->error = "<div class='lm_error'><p>$msg</p></div>" ;
+
+  }
+  
   
   
 }// end of class eEKS
