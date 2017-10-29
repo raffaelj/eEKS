@@ -139,3 +139,6 @@ $this->rename['file_03'] = 'Datei 3';
 $this->rename['is_income'] = 'ist Einnahme';
 $this->rename['sort_order'] = 'Sortierreihenfolge';
 $this->rename['notes'] = 'Notizen';
+
+$this->rename['sum'] = 'Summe';
+$this->rename['average'] = 'Ø';
