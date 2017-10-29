@@ -11,7 +11,7 @@ $background_image = "";
 if (mb_strlen($this->background_image) > 0)
   $background_image = " style='background-image:url($this->background_image)' ";
 
-$header = "<!DOCTYPE html>
+echo "<!DOCTYPE html>
 <html lang='$this->html_lang'>
 <head>
 	<meta charset='UTF-8'>
@@ -30,24 +30,19 @@ $header = "<!DOCTYPE html>
     " . $this->list_edit_tables() . "
   </header>
   <main$background_image>
-";
-
-// navigation
-
-// searchbox and add + export links
-
-// content of LM will be here
-
-$footer = '
+  " . $this->error . "
+  
+  $content
+  
   </main>
-    <footer class="center">
-    <p>' . $this->slogan . '</p>
-    <p><a href="https://github.com/raffaelj/eeks">Sourcecode on Github</a></p>
+    <footer class='center'>
+    <p>" . $this->slogan . "</p>
+    <p><a href='https://github.com/raffaelj/eeks'>Sourcecode on Github</a></p>
   </footer>
 </body>
-</html>';
+</html>";
 
-echo $header;
+// echo $header;
 // echo $this->search_box();
-echo $content;
-echo $footer;
+// echo $content;
+// echo $footer;
