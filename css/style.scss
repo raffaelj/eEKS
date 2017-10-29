@@ -11,9 +11,10 @@ $clr_black_tr: rgba(0,0,0,.1);
 $clr_black_tr_light: rgba(0,0,0,.02);
 $clr_black_tr_light_2: rgba(0,0,0,.12);
 $clr_black_tr_dark: rgba(0,0,0,.5);
-$clr_grey: #ccc;
-$clr_grey_tr: rgba(250,250,250,0.8);
-$clr_dark_grey: #222;
+$clr_grey_light: #ccc;
+$clr_grey_light_tr: rgba(250,250,250,0.8);
+$clr_grey: #666;
+$clr_grey_dark: #222;
 $clr_main: #1D90B7;//blue - rgb(29,144,183)
 $clr_main_tr: rgba(29,144,183,.5);//blue
 $clr_main_light: #29ABD7;//blue
@@ -70,7 +71,7 @@ p{
 
 // positive and negative numbers
 .minus{color: $clr_alarm_dark;}
-.zero{color:$clr_grey;}
+.zero{color:$clr_grey_light;}
 .plus{}
 
 // set page size and reset a view rules for printing
@@ -117,8 +118,8 @@ main{
 // footer
 footer{
   padding: .5em;
-  border-top: 4px solid $clr_grey;
-  background: $clr_dark_grey;
+  border-top: 4px solid $clr_grey_light;
+  background: $clr_grey_dark;
   color: $clr_white;
   clear:both;// float right from lm_save_changes_button
   @media print{display:none;}
@@ -128,8 +129,8 @@ footer{
 header{
   margin:0;
   padding: .5em;
-  border-bottom: 4px solid $clr_grey;
-  background: $clr_dark_grey;
+  border-bottom: 4px solid $clr_grey_light;
+  background: $clr_grey_dark;
   color: $clr_white;
   h1{
     display:inline-block;
@@ -137,7 +138,7 @@ header{
     line-height:1.3em;
     margin: 0;
     padding:0 .5em 0 0;
-    border-right: 4px dotted $clr_grey;
+    border-right: 4px dotted $clr_grey_light;
   }
   @media print{display:none;}
 }
@@ -156,23 +157,23 @@ table {
   border-spacing: 2px;
   border-collapse: separate;
   margin: .2em auto;
-  border: 1px solid $clr_grey;
+  border: 1px solid $clr_grey_light;
   border-radius: 6px;
   font-size:14px;
   clear:both;// float right from lm_save_changes_button
   td,th { 
     padding: 4px;
-    border-bottom: 1px solid $clr_grey;
+    border-bottom: 1px solid $clr_grey_light;
   }
   th {
     background: $clr_main_2;
-    color: $clr_dark_grey;
+    color: $clr_grey_dark;
     a {
       display: block;
       padding: .2em .1em .1em;
       text-decoration: none;
       font-size: 1.05em;;
-      color: $clr_dark_grey;
+      color: $clr_grey_dark;
     }
     &.col_edit{
       width:3em;
@@ -195,7 +196,7 @@ table {
     &:last-child td:last-child{border-bottom-right-radius:3px;}
     // different colors for even and odd rows
     &:nth-child(even) td {background-color: $clr_white_tr;}
-    &:nth-child(odd) td {background-color: $clr_grey_tr;}
+    &:nth-child(odd) td {background-color: $clr_grey_light_tr;}
     // highlight hover and current row edited
     &.lm_active td, &:hover td {background: $clr_main_tr;}
   }
@@ -218,14 +219,14 @@ th a.lm_account{
 ,.lm_error{
   margin: 0 auto;
   text-align: center;
-  color: $clr_dark_grey;
+  color: $clr_grey_dark;
   p{
     display:inline-block;
     padding: .5em;
     width: 50%;
     border: 2px solid $clr_attention;
     border-radius: 5px;
-    background-color:$clr_grey_tr;
+    background-color:$clr_grey_light_tr;
     font-weight: bold;
   }
 }
@@ -244,7 +245,7 @@ th a.lm_account{
   border: 0;
   border-radius:2px;
   background-color:$clr_main;
-  color: $clr_dark_grey;
+  color: $clr_grey_dark;
   font-family:inherit;
   font-size: 1em;
   font-weight: bold;
@@ -284,7 +285,7 @@ th a.lm_account{
   width: 1em;
   margin:0;
   padding: .1em;
-  border: 1px solid $clr_dark_grey;
+  border: 1px solid $clr_grey_dark;
   border-radius: 2px;
   text-align: center;
   line-height: 1em;
@@ -316,12 +317,12 @@ th a.lm_account{
     + label{
       &:hover,&:focus{
         background-color:$clr_alarm;
-        color:$clr_dark_grey;
+        color:$clr_grey_dark;
         &:after{
-          color: $clr_dark_grey;
+          color: $clr_grey_dark;
         }
         &:before{
-          color: $clr_dark_grey;
+          color: $clr_grey_dark;
         }
       }
       &:before{
@@ -344,9 +345,9 @@ th a.lm_account{
         margin-left: 154px;
         margin-top: -101px;
         line-height: 1.4em;
-        border: 1px solid $clr_grey;
+        border: 1px solid $clr_grey_light;
         border-radius: 50%;
-        color: $clr_grey;
+        color: $clr_grey_light;
         background-color: $clr_white;
       }
     }
@@ -372,7 +373,7 @@ th a.lm_account{
 .lm_form {
   margin: 0 auto;
   border-radius: 6px;
-  border: 1px solid $clr_grey;
+  border: 1px solid $clr_grey_light;
   width: 600px;
   max-width: 100%;
   td:first-child {
@@ -428,7 +429,7 @@ fieldset{
   display:inline-block;
   margin: .2em .1em;
   padding: .1em;
-  border: 1px solid $clr_grey;
+  border: 1px solid $clr_grey_light;
   border-radius: 2px;
   .lm_button{
     margin:0;
@@ -451,7 +452,10 @@ input[type="checkbox"], input[type="radio"]{
 }
 
 option{
-  
+  &.select_title{
+    font-style:italic;
+    color:$clr_grey;
+  }
 }
 .lm_grid{
   textarea{
@@ -475,9 +479,9 @@ label {
     display: inline-block;
     margin: .2em 0 .1em;
     padding: .2em;
-    border: 1px solid $clr_grey;
+    border: 1px solid $clr_grey_light;
     border-radius: 2px;
-    background-color: $clr_grey_tr;
+    background-color: $clr_grey_light_tr;
   }
   @media print{display:none;}
 }
