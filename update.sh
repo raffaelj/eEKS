@@ -10,6 +10,8 @@ then
   # grep dbname from `db.eEKS.ini.php`
   source <(grep ^dbname $FILE | sed 's/ *= */=/g')
   source <(grep ^username $FILE | sed 's/ *= */=/g')
+  
+  echo run update...
 
   ## grab all new fancy files
   git pull
