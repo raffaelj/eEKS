@@ -1,5 +1,8 @@
+--
+-- Tabellenstruktur für Tabelle `accounting`
+--
 
-
+DROP TABLE IF EXISTS `accounting`;
 CREATE TABLE IF NOT EXISTS `accounting` (
 `ID` int(10) unsigned NOT NULL,
   `date_created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
@@ -28,7 +31,11 @@ CREATE TABLE IF NOT EXISTS `accounting` (
   `file_01` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `file_02` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `file_03` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL
-) ENGINE=MyISAM AUTO_INCREMENT=62 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=65 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Daten für Tabelle `accounting`
+--
 
 INSERT INTO `accounting` (`ID`, `date_created`, `date_last_changed`, `value_date`, `voucher_date`, `gross_amount`, `tax_rate`, `account`, `invoice_number`, `from_to`, `posting_text`, `object`, `type_of_costs`, `mode_of_employment`, `cat_01`, `cat_02`, `cat_03`, `cat_04`, `cat_05`, `notes_01`, `notes_02`, `notes_03`, `notes_04`, `notes_05`, `file_01`, `file_02`, `file_03`) VALUES
 (1, '2017-10-20 19:56:05', '2017-10-27 11:55:12', '2016-06-15', '2016-06-29', '150.00', NULL, 'Girokonto', '16011', 'Barbara Baldrian', NULL, 'Website-Erstellung Nachbesserungen', 15, 1, 4, NULL, NULL, NULL, NULL, 'in Raten überwiesen', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
@@ -74,6 +81,9 @@ INSERT INTO `accounting` (`ID`, `date_created`, `date_last_changed`, `value_date
 (45, '2017-10-20 19:56:05', '2017-10-27 12:14:47', '2016-12-02', '2016-12-02', '-35.99', NULL, 'Barkasse', NULL, 'Elektronikladen  E. Erbsmann', NULL, 'SVGA-Kabel 10m', 4, 2, NULL, NULL, NULL, NULL, NULL, NULL, 'ja', NULL, NULL, NULL, NULL, NULL, NULL),
 (46, '2017-10-20 19:56:05', '2017-10-27 12:14:47', '2016-11-16', '2016-11-15', '-9.54', NULL, 'Girokonto', NULL, 'LABEL-Markt', NULL, 'Deko-Klebeband', 3, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (47, '2017-10-20 19:56:05', '2017-10-27 12:14:47', '2016-11-22', '2016-11-15', '-250.98', NULL, 'Girokonto', NULL, 'Engel-Musik GmbH', NULL, 'portable Musikanlage', 4, 2, NULL, NULL, NULL, NULL, NULL, NULL, '10 Jahre, außer auf Akku', NULL, NULL, NULL, NULL, NULL, NULL),
+(62, '2017-10-29 22:38:02', '2017-10-29 23:38:02', '2017-07-08', '2017-07-30', '200.00', NULL, 'Girokonto', NULL, 'Tanzende Kinder e. V.', NULL, 'Trainingsangebote 2. Quartal 2017', 17, 6, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(63, '2017-10-29 22:38:13', '2017-10-29 23:38:41', '2017-04-05', '2017-07-30', '160.00', NULL, 'Girokonto', NULL, 'Tanzende Kinder e. V.', NULL, 'Trainingsangebote 1. Quartal 2017', 17, 6, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(64, '2017-10-30 13:18:17', '2017-10-30 14:18:17', '2017-10-27', '2017-10-22', '-22.99', NULL, 'Girokonto', NULL, 'Einkaufsladen', NULL, 'Druckerpapier, Stifte, Notizzettel, Ordner', 2, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (49, '2017-10-20 19:56:05', '2017-10-27 12:14:47', '2016-11-02', '2016-11-01', '-55.99', NULL, 'Girokonto', NULL, 'Schumi Schuhmarkt', NULL, 'Schuhe und Schuhpflege', 22, 1, NULL, NULL, NULL, NULL, NULL, NULL, 'ja', NULL, NULL, NULL, NULL, NULL, NULL),
 (50, '2017-10-20 19:56:05', '2017-10-27 12:14:47', '2016-08-16', '2016-08-12', '-19.99', NULL, 'Girokonto', NULL, 'LEBE-Markt', NULL, 'Kochtopf', 12, 2, NULL, NULL, NULL, NULL, NULL, NULL, 'ja', NULL, NULL, NULL, NULL, NULL, NULL),
 (51, '2017-10-20 19:56:05', '2017-10-27 12:14:47', '2016-09-02', '2016-09-01', '-95.90', NULL, 'Girokonto', NULL, 'Elektronikmarkt El&Tron', NULL, 'Staubsauger', 12, 2, NULL, NULL, NULL, NULL, NULL, NULL, 'ja', NULL, NULL, NULL, NULL, NULL, NULL),
@@ -87,12 +97,23 @@ INSERT INTO `accounting` (`ID`, `date_created`, `date_last_changed`, `value_date
 (59, '2017-10-20 19:56:05', '2017-10-27 19:33:03', '2016-11-22', NULL, '-5.19', NULL, 'Girokonto', NULL, 'lowqualitiy24 (ebay)', NULL, 'USB-Maus', 12, 2, NULL, NULL, NULL, NULL, NULL, 'keine Rechnung, nur E-Mail-Bestätigung', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (60, '2017-10-20 19:56:05', '2017-10-27 18:11:09', '2016-11-22', '2016-11-22', '-20.55', NULL, NULL, NULL, 'Good Lack', NULL, 'Farben', 3, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `mode_of_employment`
+--
+
+DROP TABLE IF EXISTS `mode_of_employment`;
 CREATE TABLE IF NOT EXISTS `mode_of_employment` (
 `ID` int(11) NOT NULL,
   `mode_of_employment` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `sort_order` int(2) unsigned NOT NULL,
   `notes` varchar(255) CHARACTER SET utf8 NOT NULL
 ) ENGINE=MyISAM AUTO_INCREMENT=9 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Daten für Tabelle `mode_of_employment`
+--
 
 INSERT INTO `mode_of_employment` (`ID`, `mode_of_employment`, `sort_order`, `notes`) VALUES
 (1, 'freiberuflich', 1, ''),
@@ -104,6 +125,13 @@ INSERT INTO `mode_of_employment` (`ID`, `mode_of_employment`, `sort_order`, `not
 (7, 'sonstiges/extern', 7, ''),
 (8, 'Test HiHiHo', 0, '');
 
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `type_of_costs`
+--
+
+DROP TABLE IF EXISTS `type_of_costs`;
 CREATE TABLE IF NOT EXISTS `type_of_costs` (
 `ID` int(10) unsigned NOT NULL,
   `type_of_costs` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -111,6 +139,10 @@ CREATE TABLE IF NOT EXISTS `type_of_costs` (
   `sort_order` int(2) unsigned DEFAULT NULL,
   `notes` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL
 ) ENGINE=MyISAM AUTO_INCREMENT=24 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Daten für Tabelle `type_of_costs`
+--
 
 INSERT INTO `type_of_costs` (`ID`, `type_of_costs`, `is_income`, `sort_order`, `notes`) VALUES
 (1, 'noch nicht zugeordnet', NULL, NULL, NULL),
@@ -131,26 +163,50 @@ INSERT INTO `type_of_costs` (`ID`, `type_of_costs`, `is_income`, `sort_order`, `
 (16, 'Teilnahmebeiträge', 1, 2, NULL),
 (17, 'Aufwandsentschädigung', 1, 4, NULL),
 (18, 'Kunstverkauf', 1, 3, NULL),
-(19, 'kurzfristig beschäftigt', 1, NULL, NULL),
+(19, 'kurzfristig beschäftigt', 1, 5, NULL),
 (20, 'Bewirtungskosten', NULL, NULL, NULL),
 (21, 'Honorar (Ausgabe)', NULL, NULL, NULL),
 (22, 'Arbeitskleidung', NULL, NULL, NULL),
-(23, 'Gehalt', 1, 5, NULL);
+(23, 'Gehalt', 1, 6, NULL);
 
+--
+-- Indizes der exportierten Tabellen
+--
 
+--
+-- Indizes für die Tabelle `accounting`
+--
 ALTER TABLE `accounting`
  ADD PRIMARY KEY (`ID`);
 
+--
+-- Indizes für die Tabelle `mode_of_employment`
+--
 ALTER TABLE `mode_of_employment`
  ADD PRIMARY KEY (`ID`);
 
+--
+-- Indizes für die Tabelle `type_of_costs`
+--
 ALTER TABLE `type_of_costs`
  ADD PRIMARY KEY (`ID`);
 
+--
+-- AUTO_INCREMENT für exportierte Tabellen
+--
 
+--
+-- AUTO_INCREMENT für Tabelle `accounting`
+--
 ALTER TABLE `accounting`
-MODIFY `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=62;
+MODIFY `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=65;
+--
+-- AUTO_INCREMENT für Tabelle `mode_of_employment`
+--
 ALTER TABLE `mode_of_employment`
 MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=9;
+--
+-- AUTO_INCREMENT für Tabelle `type_of_costs`
+--
 ALTER TABLE `type_of_costs`
 MODIFY `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=24;
