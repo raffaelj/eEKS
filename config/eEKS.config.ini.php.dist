@@ -20,6 +20,10 @@ theme = default
 ;; change to true for demo data
 demo = false
 
+;; You don't like the name of this software?
+;; It remembers you to employment agency? - Change it!
+; name = "I <3 data"
+
 ;; slogan
 slogan = "Don't worry, be happy ;-)"
 

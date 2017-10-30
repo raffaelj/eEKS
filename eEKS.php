@@ -6,8 +6,6 @@ class eEKS extends lazy_mofo{
   
   /////////////// custom non-LM variables
   
-  public $eeks_config = array();
-  
   public $name = "eEKS";
   public $slogan = "";
   public $background_image = "";
@@ -89,8 +87,54 @@ class eEKS extends lazy_mofo{
   // public $query_string_list = "_view";
   public $query_string_list_post = '_view';     // comma delimited list of variable names to carry around in the URL for POST-search button
   
-  
+  // active views
+  // options: no_date, monthly, edit, eks
   public $views = array();
+  
+  // optional configuration via ini file
+  private $config = array();
+  
+  
+  //////////////////////////////////////////////////////////////////////////////
+  function __construct($dbh, $i18n = 'en-us', $ini = ''){
+
+    if(!$dbh)
+      die('Pass in a PDO object connected to the mysql database.');
+
+    if(!(get_magic_quotes_gpc() == 0) && (get_magic_quotes_runtime() == 0))
+      echo('Warning: lazy mofo requires magic_quotes be disabled.');
+
+    $this->dbh = $dbh; 
+
+    $timezone = @date_default_timezone_get();
+    if($timezone == '' || $timezone == 'UTC')
+      date_default_timezone_set($this->timezone);
+
+    // avoid notices for this noonce token
+    if(!isset($_SESSION['_csrf']))
+      $_SESSION['_csrf'] = '';
+
+    // load requested internationalization file, en-us is defined above, in this class
+    if(strlen($i18n) > 0 && $i18n != 'en-us'){
+      if(!file_exists("i18n/{$i18n}.php"))
+        die("Error: Requested i18n file ({$i18n}.php) does not exist.");
+      include("i18n/{$i18n}.php");    
+    }
+    
+    // load configuration from ini file
+    if(strlen($ini) > 0){
+      if(file_exists("config/{$ini}"))
+        $this->config = parse_ini_file("config/{$ini}", true);
+      elseif(file_exists("config/{$ini}.dist"))
+        $this->config = parse_ini_file("config/{$ini}.dist", true);
+      else
+        die("Error: Requested ini file ({$ini}) does not exist.");
+      
+      $this->config_from_ini();
+    }
+    
+  }
+  
   //////////////////////////////////////////////////////////////////////////////
   function run(){
 
@@ -274,8 +318,10 @@ class eEKS extends lazy_mofo{
     
     // purpose: use template file for HTML output
     
-    include('themes/'.$this->eeks_config['eeks']['theme'].'/index.theme');
-    
+    if(file_exists('themes/'.$this->config['eeks']['theme'].'/index.theme'))
+      include('themes/'.$this->config['eeks']['theme'].'/index.theme');
+    else
+      include('themes/default/index.theme');
   }
   
   //////////////////////////////////////////////////////////////////////////////
@@ -283,14 +329,18 @@ class eEKS extends lazy_mofo{
     
     // purpose: use ini file instead of overwriting variables in PHP
     
-    foreach($this->eeks_config['lm'] as $key => $val){
-      if(property_exists('eEKS', $key))
-        $this->$key = $val;
-    }
-    
-    foreach($this->eeks_config['eeks'] as $key => $val){
-      if(property_exists('eEKS', $key))
-        $this->$key = $val;
+    if(!empty($this->config)){
+      
+      foreach($this->config['lm'] as $key => $val){
+        if(property_exists('eEKS', $key))
+          $this->$key = $val;
+      }
+      
+      foreach($this->config['eeks'] as $key => $val){
+        if(property_exists('eEKS', $key))
+          $this->$key = $val;
+      }
+      
     }
     
   }
@@ -563,7 +613,7 @@ class eEKS extends lazy_mofo{
 
       if($column_name == $this->identity_name && $i == ($column_count - 1))
         $edit_delete = "    <th class='col_edit'></th>\n"; // if identity is last column then this is the column with the edit and delete links
-      elseif(!in_array($column_name, $this->eeks_config['multi_column']))
+      elseif(!in_array($column_name, $this->config['multi_column']))
         $head .= "    <th><a href='{$uri_path}_order_by=" . ($i + 1) . "&amp;_desc=$_desc_invert&amp;" . $this->get_qs('_search') . "' class='lm_$column_name'>$title</a></th>\n";
   
       $i++;
@@ -639,7 +689,7 @@ class eEKS extends lazy_mofo{
         
         
         // test with multi-value column
-        elseif(in_array($column_name, $this->eeks_config['multi_column']) && $this->multi_column_on == 1){
+        elseif(in_array($column_name, $this->config['multi_column']) && $this->multi_column_on == 1){
           $multi_column_content .= "<div>";
           if(mb_strlen($value) > 0) $multi_column_content .= "$title: ";
           $multi_column_content .= $this->get_output_control($column_name . '-' . $row[$this->identity_name], $value, '--text', 'grid') . "</div>";
@@ -699,8 +749,8 @@ class eEKS extends lazy_mofo{
     
     // purpose: generate sql query ($this->grid_sql) with defined filter options
     
-    $search_in_columns = $this->eeks_config['search_in_columns'];
-    $date_filters = $this->eeks_config['date_filters'];
+    $search_in_columns = $this->config['search_in_columns'];
+    $date_filters = $this->config['date_filters'];
     
     $query = "";
     $query .= "SELECT\r\n";
@@ -711,7 +761,7 @@ class eEKS extends lazy_mofo{
     
     // list active columns (defined in ini file)
     $i = 0;
-    foreach($this->eeks_config['active_columns']['table'] as $val){
+    foreach($this->config['active_columns']['table'] as $val){
       
       if($i != 0)
         $query .= ", ";
@@ -725,8 +775,8 @@ class eEKS extends lazy_mofo{
           $cmd = 'select';
       }
       
-      if( array_key_exists($val, $this->eeks_config['sql_joins']) && $cmd != 'select' ){
-          $query .= $this->eeks_config['sql_joins'][$val]['alias'] . "." .$this->eeks_config['sql_joins'][$val]['column'] . "\r\n";
+      if( array_key_exists($val, $this->config['sql_joins']) && $cmd != 'select' ){
+          $query .= $this->config['sql_joins'][$val]['alias'] . "." .$this->config['sql_joins'][$val]['column'] . "\r\n";
       }
       else
         $query .= "a.$val\r\n";
@@ -755,7 +805,7 @@ class eEKS extends lazy_mofo{
     
     // add LEFT JOIN
     // if no grid_input_control for this column defined
-    foreach($this->eeks_config['sql_joins'] as $key=>$val){
+    foreach($this->config['sql_joins'] as $key=>$val){
       
       $cmd = false;
       if( isset($this->grid_input_control[$key]) ){
@@ -764,7 +814,7 @@ class eEKS extends lazy_mofo{
           $cmd = 'select';
       }
       
-      if( array_key_exists($key, $this->eeks_config['sql_joins']) && $cmd != 'select' ){
+      if( array_key_exists($key, $this->config['sql_joins']) && $cmd != 'select' ){
         
         $query .= "LEFT JOIN ".$val['table']." ".$val['alias']."\r\n";
         $query .= "ON a.$key = ".$val['alias'].".".$val['ID']."\r\n";
@@ -794,7 +844,7 @@ class eEKS extends lazy_mofo{
     $query .= ")\r\n";
       
     // add AND clause for filter by category
-    foreach($this->eeks_config['category_filters'] as $val){
+    foreach($this->config['category_filters'] as $val){
       if(!empty($_REQUEST["_$val"])){
         $query .= "AND a.$val LIKE :_$val\r\n";
         $this->grid_sql_param[":_$val"] = $this->clean_out(@$_REQUEST["_$val"]);
@@ -829,13 +879,13 @@ class eEKS extends lazy_mofo{
       $query .= "AND (value_date IS NULL OR voucher_date IS NULL)";
     
     // add ORDER BY
-    $sort_order = $this->eeks_config['sort_order'];
+    $sort_order = $this->config['sort_order'];
     $count = count($sort_order);
     if($count > 0){
       $query .= "ORDER BY ";
       
       $i = 0;
-      foreach($this->eeks_config['sort_order'] as $val){
+      foreach($this->config['sort_order'] as $val){
         if($i >= 1)
           $query .= ", ";
         $query .= "a.$val";
@@ -922,7 +972,7 @@ class eEKS extends lazy_mofo{
     $query .= "ON a.$group = t.ID\r\n";
     
     // add AND clause for filter by category
-    foreach($this->eeks_config['category_filters'] as $val){
+    foreach($this->config['category_filters'] as $val){
       if(!empty($_GET["_$val"])){
         if( $val == 'type_of_costs' )
           $query .= "WHERE( a.$val LIKE :_$val)\r\n";
@@ -950,8 +1000,8 @@ class eEKS extends lazy_mofo{
     // purpose: more filters for searching
     // output: html
     
-    $date_filters = $this->eeks_config['date_filters'];
-    $category_filters = $this->eeks_config['category_filters'];
+    $date_filters = $this->config['date_filters'];
+    $category_filters = $this->config['category_filters'];
     
     $_from = $this->clean_out(@$_GET['_from']);
     $_to = $this->clean_out(@$_GET['_to']);

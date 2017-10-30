@@ -28,16 +28,7 @@ catch(PDOException $e) {
 }
 
 // create LM/eEKS object, pass in PDO connection and i18n code
-$ee = new eEKS($dbh, 'de-de');
-
-// user configuration --> could be in function __construct
-$ee->eeks_config = parse_ini_file('eEKS.config.ini.php', true);
-$ee->config_from_ini();
-
-// automatic generation of grid_sql
-// needs some configuration in config file
-// $ee->grid_sql = $ee->generate_grid_sql();
-
+$ee = new eEKS($dbh, 'de-de', 'eEKS.config.ini.php');
 
 $ee->form_sql = "
 SELECT
