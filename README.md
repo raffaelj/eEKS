@@ -59,8 +59,14 @@ cp eEKS.config.ini.php.dist eEKS.config.ini.php
 nano eEKS.db.ini.php
 ```
 
-* updates: `git pull` and `cp eEKS.config.ini.php.dist eEKS.config.ini.php` and `cp profiles/default.ini.php.dist profiles/default.ini.php`
-* now eEKS should be available under `http://username.servername.uberspace.de/eEKS`
+Now eEKS should be available under `http://username.servername.uberspace.de/eEKS`
+
+### Updating to newest development version with sample data
+
+* navigate to your eEKS directory for example: `cd /var/www/virtual/$USER/html/eEKS`
+* run `./update.sh`
+
+Now eEKS should be available under `http://username.servername.uberspace.de/eEKS`
 
 ## Version and license
 
