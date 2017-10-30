@@ -64,6 +64,7 @@ Now eEKS should be available under `http://username.servername.uberspace.de/eEKS
 ### Updating to newest development version with sample data
 
 * navigate to your eEKS directory for example: `cd /var/www/virtual/$USER/html/eEKS`
+* make `update.sh` executable `chmod 744 update.sh`
 * run `./update.sh`
 
 Now eEKS should be available under `http://username.servername.uberspace.de/eEKS`
