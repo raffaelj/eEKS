@@ -21,8 +21,9 @@ language = de
 
 ;;;;; page 1 / Seite 1
 
-; 1.  Persönliche Daten
-; 1.1  Meine persönlichen Daten
+;; personal data of applicant
+;; 1.  Persönliche Daten
+;; 1.1  Meine persönlichen Daten
 [personal_data]
 title = Frau
 first_name = Amélie
@@ -30,37 +31,47 @@ last_name = Poulain
 birthday = 05.06.1974
 bg_number = 09876//0012345
 
-; Ort vor Unterschrift
+
+;; location and signature
+;; Ort, Unterschrift
 [signature]
 location = Leipzig
 signature = Dieses Schreiben wurde maschinell erstellt und ist ohne Unterschrift gültig.
 ; signature =
 
-;; 1.2  Persönliche Daten der Person in meiner Bedarfsgemeinschaft, auf die sich die Angaben dieser Anlage beziehen
 
+;; personal data of person to whom the data of this attachment refers to
+;; 1.2  Persönliche Daten der Person in meiner Bedarfsgemeinschaft, auf die sich die Angaben dieser Anlage beziehen
 ;; if empty use personal_data from above
-[personal_data]
+[personal_data_refer]
 title = 
 first_name = 
 last_name = 
 birthday = 
 
-; 3.  Bewilligungszeitraum --> wird von eEKS eingetragen
+
+;; period for receipt of unemployment benefits
+;; 3.  Bewilligungszeitraum
+;; --> calculated by eEKS
 
 
-; 4.  Daten zur selbständigen Tätigkeit
-; 4.1  Allgemeine Daten zur selbständigen Tätigkeit
-[activity_data]
+;; company data
+;; 4.  Daten zur selbständigen Tätigkeit
+;; 4.1  Allgemeine Daten zur selbständigen Tätigkeit
+[company_data]
 activity = Kunst, Gestaltung, Phantasietraining
 start_date = 25.04.2001
 end_date = 
-Gewerbe_Ort = Kochstr. 90, 04277 Leipzig
-Rechtsform = Einzelunternehmerin
+company_location = Kochstr. 90, 04277 Leipzig
+legal_form = Einzelunternehmerin
 
+
+;; employees
 ;; 4.2  Personal
-[personnel]
+[employees]
 has_employees = 0
 number_of_employees = 0
+
 
 ;;;;; page 2 / Seite 2
 
