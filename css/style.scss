@@ -74,10 +74,10 @@ p{
 .zero{color:$clr_grey_light;}
 .plus{}
 
-// set page size and reset a view rules for printing
+// set page size and reset a few rules for printing
 
 // page size A4 - standard in Germany
-// Only a view browsers understand the CSS rule `size`.
+// Only a few browsers understand the CSS rule `size`.
 // Firefox ignores the rule. Opera, Google Chrome and
 // Internet Explorer have better results.
 // 
@@ -485,4 +485,185 @@ label {
   }
   @media print{display:none;}
 }
+
+
+///////////// EKS
+
+$zoom: 2.5;
+
+.portrait{
+  height:calc( 297px * #{$zoom} );
+   width:calc( 210px * #{$zoom} );
+  @media print{
+    // height:calc(297mm * 0.99);
+    // width:calc(210mm * 0.99);
+    height:297mm;
+    width:210mm;
+  }
+}
+
+.landscape{
+  height:calc( 210px * #{$zoom} );
+   width:calc( 297px * #{$zoom} );
+  @media print{
+    // height:calc(210mm * 0.99);
+    height:210mm;
+    // width:calc(297mm * 0.99);
+    width:297mm;
+  }
+}
+body.eks form.eks_form{
+  text-align:center;// centering inline-block pages
+  
+  *{text-align:left;}
+  
+  page{
+    display:inline-block;
+    position:relative;// for absolute positioning of input fields
+    margin: 1em;
+    padding:0;
+    background-repeat:no-repeat;
+    background-size:cover;
+    border:1px solid $clr_grey_light;
+    vertical-align: top;
+    @media print{
+      display:block;
+      margin:0;
+      padding:0;
+      border:none;
+    }
+    
+    fieldset{
+      margin: 0;
+      padding: 0;
+      border: none;
+    }
+    
+    input,textarea{
+      position:absolute;
+      background-color:$clr_main_tr;
+      margin:0;
+      padding: 0 3px;
+      border:none;
+      font-size: 14px;
+      @media print{
+        background-color:none;
+      }
+    }
+    input[type=checkbox],input[type=radio]{
+      width: calc(5px * #{$zoom});
+      height: calc(5px * #{$zoom});
+    }
+    
+    &#eks_page1{
+      background-image:url('../img/eks_1v6_print.png');
+      
+      input[name=title]{
+        bottom: calc(200px * #{$zoom});
+        left: calc(20px * #{$zoom});
+        width:18%;
+      }
+      input[name=first_name]{
+        bottom: calc(200px * #{$zoom});
+        left: calc(60px * #{$zoom});
+        width:38%;
+      }
+      input[name=last_name]{
+        bottom: calc(188px * #{$zoom});
+        left: calc(20px * #{$zoom});
+        width:37%;
+      }
+      input[name=birthday]{
+        bottom: calc(188px * #{$zoom});
+        left: calc(100px * #{$zoom});
+        width:19%;
+      }
+      input[name=bg_number]{
+        bottom: calc(176px * #{$zoom});
+        left: calc(20px * #{$zoom});
+        width:57%;
+      }
+      input[name=title_refer]{
+        bottom: calc(154px * #{$zoom});
+        left: calc(20px * #{$zoom});
+        width:18%;
+      }
+      input[name=first_name_refer]{
+        bottom: calc(154px * #{$zoom});
+        left: calc(60px * #{$zoom});
+        width:38%;
+      }
+      input[name=last_name_refer]{
+        bottom: calc(142px * #{$zoom});
+        left: calc(20px * #{$zoom});
+        width:37%;
+      }
+      input[name=birthday_refer]{
+        bottom: calc(142px * #{$zoom});
+        left: calc(100px * #{$zoom});
+        width:19%;
+      }
+      input[name=calculated]{
+        bottom: calc(124px * #{$zoom});
+        left: calc(77px * #{$zoom});
+      }
+      input[name=estimated]{
+        bottom: calc(124px * #{$zoom});
+        left: calc(21px * #{$zoom});
+      }
+      input[name=period]{
+        bottom: calc(104px * #{$zoom});
+        left: calc(26px * #{$zoom});
+        width:55%;
+      }
+      input[name=activity]{
+        bottom: calc(67px * #{$zoom});
+        left: calc(26px * #{$zoom});
+        width:55%;
+      }
+      input[name=activity]{
+        bottom: calc(67px * #{$zoom});
+        left: calc(26px * #{$zoom});
+        width:55%;
+      }
+      input[name=start_date]{
+        bottom: calc(55px * #{$zoom});
+        left: calc(26px * #{$zoom});
+        width:6em;
+      }
+      input[name=end_date]{
+        bottom: calc(55px * #{$zoom});
+        left: calc(26px * #{$zoom} + 8em);
+        width:6em;
+      }
+      input[name=company_location]{
+        bottom: calc(43px * #{$zoom});
+        left: calc(26px * #{$zoom});
+        width:55%;
+      }
+      input[name=legal_form]{
+        bottom: calc(31px * #{$zoom});
+        left: calc(26px * #{$zoom});
+        width:55%;
+      }
+      input[name=number_of_employees]{
+        bottom: calc(14px * #{$zoom});
+        left: calc(58px * #{$zoom});
+        width: 1.5em;
+        font-size:12px;
+      }
+      input[name=has_employees]{
+        bottom: calc(17px * #{$zoom});
+        left: calc(21px * #{$zoom});
+      }
+      
+    }
+    &#eks_page2{
+      background-image:url('../img/eks_2v6_print.png');
+    }
+  }
+
+}
+
+
 
