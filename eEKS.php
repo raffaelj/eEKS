@@ -144,14 +144,59 @@ class eEKS extends lazy_mofo{
     $this->get_grid_view();
 
     switch($this->get_action()){
-      case "edit":          $this->edit();        break;
+      case "edit":          $this->template($this->edit());        break;
       case "insert":        $this->insert();      break;
       case "update":        $this->update();      break;
       case "update_grid":   $this->update_grid(); break;
-      case "delete":        $this->delete();      break;
-      default:              $this->index();
+      case "delete":        $this->template($this->delete());      break;
+      case "eks":           $this->template($this->eks());         break;
+      case "settings":      $this->template($this->settings());    break;
+      default:              $this->template($this->index());
     }
 
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////
+  function settings(){
+    
+    // purpose: show settings page to user
+    
+    $html = "";
+    
+    // form(s) for editing config file(S)
+    
+    $html .= "<div class='lm_error'><p>Settings - coming soon</p></div>";
+    // $this->error = "Settings - coming soon";
+    
+    $html .= "<div class='center'>";
+
+    foreach($this->config as $group=>$arr){
+      $html .= "<h2>$group</h2>";
+      foreach($arr as $key=>$val){
+        
+        if( is_array($val) ){
+          
+          $html .= '<label for="'.htmlspecialchars($key).'">'.$key."</label>";
+          $html .= "<fieldset id='$key'>";
+          
+          foreach($val as $k=>$v){
+            $html .= '<p>'.$k.': <input type="text" value="'.htmlspecialchars($v).'" name="" size="50"></p>';
+          }
+          
+          $html .= "</fieldset>";
+        }
+        else{
+          $html .= '<p>'.$key.': <input type="text" value="'.htmlspecialchars($val).'" name="" size="50"></p>';
+        }
+      
+      }
+    }
+    $html .= "</div>";
+    
+    
+    // $this->template($html);
+    return $html;
+    
   }
   
   //////////////////////////////////////////////////////////////////////////////
@@ -277,6 +322,111 @@ class eEKS extends lazy_mofo{
     $this->grid_sql = $this->generate_grid_sql_monthly();
     $this->multi_column_on = 0;
     
+    $html = "";
+    
+    $html .= $this->eks_form($eks);
+    
+    $html .= $this->grid();
+    
+    // $this->template($html);
+    return $html;
+    
+    
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////
+  function eks_form($eks = array()){
+    
+    // purpose: 
+    
+    $uri_path = $this->get_uri_path();
+    $qs = $this->get_qs();
+    
+    $html = "";
+    
+    // $html .= "<h2>EKS</h2>";
+    $html .= "<div class='lm_error'><p>experimental - form doesn't work - coming soon</p>";
+    // $this->error = "experimental - form doesn't work - coming soon";
+    
+    $html .= "<form action='$uri_path$qs&amp;action=eks' method='post' class='eks_form'>";
+    
+    ///////////////// EKS page 1
+    $html .= "<page id='eks_page1' class='eks_page portrait'>";
+    
+    // 1.1 personal data of applicant
+    $html .= "<fieldset>";
+    foreach($eks['personal_data'] as $key=>$val){
+      $html .= '<input type="text" value="'.htmlspecialchars($val).'" name="'.htmlspecialchars($key).'">';
+    }
+    $html .= "</fieldset>";
+    
+    $html .= "<fieldset>";
+    // 1.2 personal data of person to whom the data of this attachment refers to
+    foreach($eks['personal_data_refer'] as $key=>$val){
+      if(mb_strlen($val) > 0)
+        $html .= '<input type="text" value="'.htmlspecialchars($val).'" name="'.htmlspecialchars($key).'_refer">';
+      else
+        $html .= '<input type="text" value="'.htmlspecialchars($eks['personal_data'][$key]).'" name="'.htmlspecialchars($key).'_refer">';
+    }
+    $html .= "</fieldset>";
+    
+    // 2. estimated or calculated data
+    $html .= "<fieldset>";
+    $html .= '<input type="radio" name="estimated" disabled="disabled" />';
+    $html .= '<input type="radio" name="calculated" checked="checked" />';
+    $html .= "</fieldset>";
+    
+    
+    // 3. period for receipt of unemployment benefits
+    $html .= "<fieldset>";
+    
+    $period = htmlspecialchars($_GET['_from']) . " - " . htmlspecialchars($_GET['_to']);
+    $html .= '<input type="text" value="'.$period.'" name="period" readonly="readonly">';
+    
+    $html .= "</fieldset>";
+    
+    // 4.1 company data
+    $html .= "<fieldset>";
+    foreach($eks['company_data'] as $key=>$val){
+      $html .= '<input type="text" value="'.htmlspecialchars($val).'" name="'.htmlspecialchars($key).'">';
+    }
+    
+    $html .= "</fieldset>";
+    
+    // 4.2 employees
+    $html .= "<fieldset>";
+    
+    $checked = "";
+    if( $eks['employees']['has_employees'] == 1 )
+      $checked = " checked='checked'";
+    
+    $html .= '<input type="checkbox" name="has_employees"'.$checked.' />';
+    $html .= '<input type="text" value="'.htmlspecialchars($eks['employees']['number_of_employees']).'" name="number_of_employees">';
+    $html .= "</fieldset>";
+    
+    
+    
+    $html .= "</page>";
+    
+    ///////////////// EKS page 2
+    $html .= "<page id='eks_page2' class='eks_page portrait'>";
+    
+    $html .= "</page>";
+
+    $html .= "</form>";
+    
+    return $html;
+    
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////
+  function eks_grid(){
+    
+    // purpose: 
+    
+    
+    
+    
   }
   
   //////////////////////////////////////////////////////////////////////////////
@@ -350,7 +500,8 @@ class eEKS extends lazy_mofo{
     
     // purpose: called from contoller to display form() and add or edit a record
     
-    $this->template($this->form($error));
+    // $this->template($this->form($error));
+    return $this->form($error);
     
   }
   
@@ -359,7 +510,8 @@ class eEKS extends lazy_mofo{
     
     // purpose: called from contoller to display update() data
     
-    $this->template($this->grid($error));
+    // $this->template($this->grid($error));
+    return $this->grid($error);
     
   }
   
