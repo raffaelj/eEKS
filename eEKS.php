@@ -345,7 +345,7 @@ class eEKS extends lazy_mofo{
     $html = "";
     
     // $html .= "<h2>EKS</h2>";
-    $html .= "<div class='lm_error'><p>experimental - form doesn't work - coming soon</p>";
+    $html .= "<div class='lm_error'><p>experimental - form doesn't work - coming soon</p></div>";
     // $this->error = "experimental - form doesn't work - coming soon";
     
     $html .= "<form action='$uri_path$qs&amp;action=eks' method='post' class='eks_form'>";
