@@ -44,8 +44,9 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 16px;  
   @media print{
-    font-size:11pt;
-    line-height:2em;
+    font-size:10pt;
+    // line-height:2em;
+    // margin:2cm;
   }
 }
 
@@ -91,12 +92,6 @@ p{
 }
 
 @media print{
-  html,body,main,page,.page{
-    margin:0;
-    padding:0;
-    border:none;
-    @include box-shadow(0);
-  }
   .no-print{display:none;}
 }
 
@@ -113,6 +108,11 @@ main{
   background-size: cover;
   background-repeat: no-repeat;
   background-attachment: fixed;
+  @media print{
+    padding:0;
+    // padding:20mm;
+    background-color:transparent;
+  }
 }
 
 // footer
@@ -146,7 +146,6 @@ header{
 // navigation
 nav {
   display: inline-block;
-  // display: inline;
   @media print{display:none;}
 }
 
@@ -156,18 +155,27 @@ nav {
 table {
   border-spacing: 2px;
   border-collapse: separate;
+  width:100%;
   margin: .2em auto;
   border: 1px solid $clr_grey_light;
   border-radius: 6px;
   font-size:14px;
   clear:both;// float right from lm_save_changes_button
+  @media print{
+    border-collapse: collapse;
+    margin:0;
+    page-break-inside:auto;
+  }
   td,th { 
     padding: 4px;
     border-bottom: 1px solid $clr_grey_light;
   }
   th {
-    background: $clr_main_2;
+    background-color: $clr_main_2;
     color: $clr_grey_dark;
+    // @media print{
+      // background-color:transparent;
+    // }
     a {
       display: block;
       padding: .2em .1em .1em;
@@ -177,12 +185,22 @@ table {
     }
     &.col_edit{
       width:3em;
-      @media print{width:0;}
+      @media print{
+        width:0;
+        padding:0;
+      }
     }
   }
   td{
     &.col_multi_value{
       font-size:.8em;
+      white-space:nowrap;
+    }
+    &[data-col=from_to]{
+      white-space:nowrap;
+    }
+    &[data-col^=notes]{
+      // white-space:nowrap;
     }
     input{
       // margin:0 auto;
@@ -199,6 +217,24 @@ table {
     &:nth-child(odd) td {background-color: $clr_grey_light_tr;}
     // highlight hover and current row edited
     &.lm_active td, &:hover td {background: $clr_main_tr;}
+    @media print{
+      page-break-inside:avoid;
+      page-break-after:auto;
+      &.grid_repeat_header{
+        display:none;
+      }
+      td,th{
+        background-color:transparent;
+        border-left: 1px solid $clr_grey_light;
+        &:first-child{border-left:none;}
+        &:last-child{border-left:none;}
+        &.col_edit{
+          display:none;
+        }
+      }
+      &:nth-child(even) td {background-color: transparent;}
+      &:nth-child(odd) td {background-color: transparent;}
+    }
   }
 }
 
@@ -410,10 +446,8 @@ input.integer{
 ///////////// search box and inputs
 
 .lm_add_search {
-  // display:inline;
   display:inline-block;
   .lm_search_box{
-    // display: inline-block;
     display: inline;
   }
   input,select{
