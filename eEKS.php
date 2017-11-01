@@ -837,7 +837,7 @@ class eEKS extends lazy_mofo{
 
         // edit & delete links
         if($column_name == $this->identity_name && $i == ($column_count - 1))
-          $edit_delete .= "    <td>" . str_replace('[identity_id]', $value, $links) . "</td>\n";
+          $edit_delete .= "    <td class='col_edit'>" . str_replace('[identity_id]', $value, $links) . "</td>\n";
         
         
         // test with multi-value column
@@ -853,16 +853,16 @@ class eEKS extends lazy_mofo{
         elseif(array_key_exists($column_name, $this->grid_input_control)){
           if(mb_strlen($error) > 0 && $_posted == 1) // repopulate from previous post when validation error is displayed
               $value = $_POST[$column_name . '-' . $row[$this->identity_name]];
-          $html .= '    <td>' . $this->get_input_control($column_name . '-' . $row[$this->identity_name], $value,  $this->grid_input_control[$column_name], 'grid') . "</td>\n";
+          $html .= '    <td data-coltitle="'.htmlspecialchars($title).'" data-col="'.htmlspecialchars($column_name).'">' . $this->get_input_control($column_name . '-' . $row[$this->identity_name], $value,  $this->grid_input_control[$column_name], 'grid') . "</td>\n";
         }
 
         // output
         elseif(array_key_exists($column_name, $this->grid_output_control))
-          $html .= '    <td>' . $this->get_output_control($column_name . '-' . $row[$this->identity_name], $value, $this->grid_output_control[$column_name], 'grid') . "</td>\n";
+          $html .= '    <td data-coltitle="'.htmlspecialchars($title).'" data-col="'.htmlspecialchars($column_name).'">' . $this->get_output_control($column_name . '-' . $row[$this->identity_name], $value, $this->grid_output_control[$column_name], 'grid') . "</td>\n";
 
         // anything else
         else
-          $html .= '    <td>' . $this->get_output_control($column_name . '-' . $row[$this->identity_name], $value, '--text', 'grid') . "</td>\n";
+          $html .= '    <td data-coltitle="'.htmlspecialchars($title).'" data-col="'.htmlspecialchars($column_name).'">' . $this->get_output_control($column_name . '-' . $row[$this->identity_name], $value, '--text', 'grid') . "</td>\n";
 
         $i++; // column index
       }
@@ -878,7 +878,7 @@ class eEKS extends lazy_mofo{
       // repeat header
       if($this->grid_repeat_header_at > 0)
         if($j % $this->grid_repeat_header_at == 0 && $j < $count && $j > 0)
-          $html .= $head;
+          $html .= str_replace('<tr', '<tr class="grid_repeat_header"',$head);
           
       // row counter    
       $j++;
