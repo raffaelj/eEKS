@@ -45,8 +45,6 @@ body {
   font-size: 16px;  
   @media print{
     font-size:10pt;
-    // line-height:2em;
-    // margin:2cm;
   }
 }
 
@@ -110,7 +108,7 @@ main{
   background-attachment: fixed;
   @media print{
     padding:0;
-    // padding:20mm;
+    // padding:20mm;// for printing but EKS needs 0mm for background image
     background-color:transparent;
   }
 }
@@ -530,8 +528,8 @@ $fontsize_screen: 14px;
 $fontsize_print: 18px;
 
 .portrait{
-  height:calc( 297px * #{$zoom} );
-   width:calc( 210px * #{$zoom} );
+  height:$zoom *  297px;
+   width:$zoom *  210px;
   @media print{
     // height:calc(297mm * 0.99);
     // width:calc(210mm * 0.99);
@@ -541,8 +539,8 @@ $fontsize_print: 18px;
 }
 
 .landscape{
-  height:calc( 210px * #{$zoom} );
-   width:calc( 297px * #{$zoom} );
+  height:$zoom *  210px;
+   width:$zoom *  297px;
   @media print{
     // height:calc(210mm * 0.99);
     height:210mm;
@@ -590,110 +588,112 @@ body.eks form.eks_form{
       }
     }
     input[type=checkbox],input[type=radio]{
-      width: calc(5px * #{$zoom});
-      height: calc(5px * #{$zoom});
+      // width: calc(5px * #{$zoom});
+      // height: calc(5px * #{$zoom});
+      width: $zoom * 5px;
+      height: $zoom * 5px;
     }
     
     &#eks_page1{
       background-image:url('../img/eks_1v6_print.png');
       
       input[name=title]{
-        bottom: calc(200px * #{$zoom});
-        left: calc(20px * #{$zoom});
+        bottom: $zoom * 200px;
+        left: $zoom * 20px;
         width:18%;
       }
       input[name=first_name]{
-        bottom: calc(200px * #{$zoom});
-        left: calc(60px * #{$zoom});
+        bottom: $zoom * 200px;
+        left: $zoom * 60px;
         width:38%;
       }
       input[name=last_name]{
-        bottom: calc(188px * #{$zoom});
-        left: calc(20px * #{$zoom});
+        bottom: $zoom * 188px;
+        left: $zoom * 20px;
         width:37%;
       }
       input[name=birthday]{
-        bottom: calc(188px * #{$zoom});
-        left: calc(100px * #{$zoom});
+        bottom: $zoom * 188px;
+        left: $zoom * 100px;
         width:19%;
       }
       input[name=bg_number]{
-        bottom: calc(176px * #{$zoom});
-        left: calc(20px * #{$zoom});
+        bottom: $zoom * 176px;
+        left: $zoom * 20px;
         width:57%;
       }
       input[name=title_refer]{
-        bottom: calc(154px * #{$zoom});
-        left: calc(20px * #{$zoom});
+        bottom: $zoom * 154px;
+        left: $zoom * 20px;
         width:18%;
       }
       input[name=first_name_refer]{
-        bottom: calc(154px * #{$zoom});
-        left: calc(60px * #{$zoom});
+        bottom: $zoom * 154px;
+        left: $zoom * 60px;
         width:38%;
       }
       input[name=last_name_refer]{
-        bottom: calc(142px * #{$zoom});
-        left: calc(20px * #{$zoom});
+        bottom: $zoom * 142px;
+        left: $zoom * 20px;
         width:37%;
       }
       input[name=birthday_refer]{
-        bottom: calc(142px * #{$zoom});
-        left: calc(100px * #{$zoom});
+        bottom: $zoom * 142px;
+        left: $zoom * 100px;
         width:19%;
       }
       input[name=calculated]{
-        bottom: calc(124px * #{$zoom});
-        left: calc(77px * #{$zoom});
+        bottom: $zoom * 124px;
+        left: $zoom * 77px;
       }
       input[name=estimated]{
-        bottom: calc(124px * #{$zoom});
-        left: calc(21px * #{$zoom});
+        bottom: $zoom * 124px;
+        left: $zoom * 21px;
       }
       input[name=period]{
-        bottom: calc(104px * #{$zoom});
-        left: calc(26px * #{$zoom});
+        bottom: $zoom * 104px;
+        left: $zoom * 26px;
         width:55%;
       }
       input[name=activity]{
-        bottom: calc(67px * #{$zoom});
-        left: calc(26px * #{$zoom});
+        bottom: $zoom * 67px;
+        left: $zoom * 26px;
         width:55%;
       }
       input[name=activity]{
-        bottom: calc(67px * #{$zoom});
-        left: calc(26px * #{$zoom});
+        bottom: $zoom * 67px;
+        left: $zoom * 26px;
         width:55%;
       }
       input[name=start_date]{
-        bottom: calc(55px * #{$zoom});
-        left: calc(26px * #{$zoom});
+        bottom: $zoom * 55px;
+        left: $zoom * 26px;
         width:6em;
       }
       input[name=end_date]{
-        bottom: calc(55px * #{$zoom});
-        left: calc(26px * #{$zoom} + 8em);
+        bottom: $zoom * 55px;
+        left: $zoom * 26px + 112px;
         width:6em;
       }
       input[name=company_location]{
-        bottom: calc(43px * #{$zoom});
-        left: calc(26px * #{$zoom});
+        bottom: $zoom * 43px;
+        left: $zoom * 26px;
         width:55%;
       }
       input[name=legal_form]{
-        bottom: calc(31px * #{$zoom});
-        left: calc(26px * #{$zoom});
+        bottom: $zoom * 31px;
+        left: $zoom * 26px;
         width:55%;
       }
       input[name=number_of_employees]{
-        bottom: calc(15px * #{$zoom});
-        left: calc(58px * #{$zoom});
+        bottom: $zoom * 15px;
+        left: $zoom * 58px;
         width: 1.5em;
         font-size:12px;
       }
       input[name=has_employees]{
-        bottom: calc(17px * #{$zoom});
-        left: calc(21px * #{$zoom});
+        bottom: $zoom * 17px;
+        left: $zoom * 21px;
       }
       @media print{
       
@@ -701,92 +701,92 @@ body.eks form.eks_form{
           // font-size: 18px;
         // }
         input[type=checkbox],input[type=radio]{
-          width: calc(5px * #{$zoom_print});
-          height: calc(5px * #{$zoom_print});
+          width: $zoom_print * 5px;
+          height: $zoom_print * 5px;
         }
        
           
         input[name=title]{
-          bottom: calc(200px * #{$zoom_print});
-          left: calc(20px * #{$zoom_print});
+          bottom: $zoom_print * 200px;
+          left: $zoom_print * 20px;
         }
         input[name=first_name]{
-          bottom: calc(200px * #{$zoom_print});
-          left: calc(60px * #{$zoom_print});
+          bottom: $zoom_print * 200px;
+          left: $zoom_print * 60px;
         }
         input[name=last_name]{
-          bottom: calc(188px * #{$zoom_print});
-          left: calc(20px * #{$zoom_print});
+          bottom: $zoom_print * 188px;
+          left: $zoom_print * 20px;
         }
         input[name=birthday]{
-          bottom: calc(188px * #{$zoom_print});
-          left: calc(100px * #{$zoom_print});
+          bottom: $zoom_print * 188px;
+          left: $zoom_print * 100px;
         }
         input[name=bg_number]{
-          bottom: calc(176px * #{$zoom_print});
-          left: calc(20px * #{$zoom_print});
+          bottom: $zoom_print * 176px;
+          left: $zoom_print * 20px;
         }
         input[name=title_refer]{
-          bottom: calc(154px * #{$zoom_print});
-          left: calc(20px * #{$zoom_print});
+          bottom: $zoom_print * 154px;
+          left: $zoom_print * 20px;
         }
         input[name=first_name_refer]{
-          bottom: calc(154px * #{$zoom_print});
-          left: calc(60px * #{$zoom_print});
+          bottom: $zoom_print * 154px;
+          left: $zoom_print * 60px;
         }
         input[name=last_name_refer]{
-          bottom: calc(142px * #{$zoom_print});
-          left: calc(20px * #{$zoom_print});
+          bottom: $zoom_print * 142px;
+          left: $zoom_print * 20px;
         }
         input[name=birthday_refer]{
-          bottom: calc(142px * #{$zoom_print});
-          left: calc(100px * #{$zoom_print});
+          bottom: $zoom_print * 142px;
+          left: $zoom_print * 100px;
         }
         input[name=calculated]{
-          bottom: calc(124px * #{$zoom_print});
-          left: calc(77px * #{$zoom_print});
+          bottom: $zoom_print * 124px;
+          left: $zoom_print * 77px;
         }
         input[name=estimated]{
-          bottom: calc(124px * #{$zoom_print});
-          left: calc(21px * #{$zoom_print});
+          bottom: $zoom_print * 124px;
+          left: $zoom_print * 21px;
         }
         input[name=period]{
-          bottom: calc(104px * #{$zoom_print});
-          left: calc(26px * #{$zoom_print});
+          bottom: $zoom_print * 104px;
+          left: $zoom_print * 26px;
         }
         input[name=activity]{
-          bottom: calc(67px * #{$zoom_print});
-          left: calc(26px * #{$zoom_print});
+          bottom: $zoom_print * 67px;
+          left: $zoom_print * 26px;
         }
         input[name=activity]{
-          bottom: calc(67px * #{$zoom_print});
-          left: calc(26px * #{$zoom_print});
+          bottom: $zoom_print * 67px;
+          left: $zoom_print * 26px;
         }
         input[name=start_date]{
-          bottom: calc(55px * #{$zoom_print});
-          left: calc(26px * #{$zoom_print});
+          bottom: $zoom_print * 55px;
+          left: $zoom_print * 26px;
         }
         input[name=end_date]{
-          bottom: calc(55px * #{$zoom_print});
-          left: calc(26px * #{$zoom_print} + 8em);
+          bottom: $zoom_print * 55px;
+          left: $zoom_print * 26px + 112px
         }
         input[name=company_location]{
-          bottom: calc(43px * #{$zoom_print});
-          left: calc(26px * #{$zoom_print});
+          bottom: $zoom_print * 43px;
+          left: $zoom_print * 26px;
         }
         input[name=legal_form]{
-          bottom: calc(31px * #{$zoom_print});
-          left: calc(26px * #{$zoom_print});
+          bottom: $zoom_print * 31px;
+          left: $zoom_print * 26px;
         }
         input[name=number_of_employees]{
-          bottom: calc(15px * #{$zoom_print});
-          left: calc(58px * #{$zoom_print});
+          bottom: $zoom_print * 15px;
+          left: $zoom_print * 58px;
           width: 1.5em;
           font-size:$fontsize_print;
         }
         input[name=has_employees]{
-          bottom: calc(17px * #{$zoom_print});
-          left: calc(21px * #{$zoom_print});
+          bottom: $zoom_print * 17px;
+          left: $zoom_print * 21px;
         }
       }
     }
