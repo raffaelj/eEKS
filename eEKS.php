@@ -124,9 +124,9 @@ class eEKS extends lazy_mofo{
     // load configuration from ini file
     if(strlen($ini) > 0){
       if(file_exists("config/{$ini}"))
-        $this->config = parse_ini_file("config/{$ini}", true);
+        $this->config = parse_ini_file("config/{$ini}", true, INI_SCANNER_TYPED);
       elseif(file_exists("config/{$ini}.dist"))
-        $this->config = parse_ini_file("config/{$ini}.dist", true);
+        $this->config = parse_ini_file("config/{$ini}.dist", true, INI_SCANNER_TYPED);
       else
         die("Error: Requested ini file ({$ini}) does not exist.");
       
@@ -169,8 +169,11 @@ class eEKS extends lazy_mofo{
     // $this->error = "Settings - coming soon";
     
     $html .= "<div class='center'>";
+    
+    // var_dump($this->config);
 
     foreach($this->config as $group=>$arr){
+      $html .= "<div style='display:inline-block;vertical-align:top;border:1px solid #ccc;height:300px;margin:5px;padding:5px;overflow:auto;'>";
       $html .= "<h2>$group</h2>";
       foreach($arr as $key=>$val){
         
@@ -180,16 +183,30 @@ class eEKS extends lazy_mofo{
           $html .= "<fieldset id='$key'>";
           
           foreach($val as $k=>$v){
-            $html .= '<p>'.$k.': <input type="text" value="'.htmlspecialchars($v).'" name="" size="50"></p>';
+            
+            if( is_bool($v) ){
+              $v ? $checked = ' checked="checked"' : $checked = '';
+              $html .= '<p>'.$k.': <input type="checkbox" name="'.$k.'"'.$checked.'></p>';
+            }
+              
+            else
+              $html .= '<p>'.$k.': <input type="text" value="'.htmlspecialchars($v).'" name="'.$k.'"></p>';
           }
           
           $html .= "</fieldset>";
         }
         else{
-          $html .= '<p>'.$key.': <input type="text" value="'.htmlspecialchars($val).'" name="" size="50"></p>';
+          
+          if( is_bool($val) ){
+              $val ? $checked = ' checked="checked"' : $checked = '';
+              $html .= '<p>'.$key.': <input type="checkbox" name="'.$key.'"'.$checked.'></p>';
+            }
+          else
+            $html .= '<p>'.$key.': <input type="text" value="'.htmlspecialchars($val).'" name="'.$key.'"></p>';
         }
       
       }
+      $html .= "</div>";
     }
     $html .= "</div>";
     
@@ -302,7 +319,7 @@ class eEKS extends lazy_mofo{
   function eks(){
     
     // parse profile
-    $eks = parse_ini_file('profiles/default.ini.php', true);
+    $eks = parse_ini_file('profiles/default.ini.php', true, INI_SCANNER_TYPED);
     
     // set date range
     if( empty($_GET['_from']) || empty($_GET['_to']) ){
@@ -765,13 +782,17 @@ class eEKS extends lazy_mofo{
 
       if($column_name == $this->identity_name && $i == ($column_count - 1))
         $edit_delete = "    <th class='col_edit'></th>\n"; // if identity is last column then this is the column with the edit and delete links
-      elseif(!in_array($column_name, $this->config['multi_column']))
+      elseif( $this->multi_column_on ){ // experimental multi-value column active
+        if( !in_array($column_name, $this->config['multi_column']) )
+          $head .= "    <th><a href='{$uri_path}_order_by=" . ($i + 1) . "&amp;_desc=$_desc_invert&amp;" . $this->get_qs('_search') . "' class='lm_$column_name'>$title</a></th>\n";
+      }
+      else
         $head .= "    <th><a href='{$uri_path}_order_by=" . ($i + 1) . "&amp;_desc=$_desc_invert&amp;" . $this->get_qs('_search') . "' class='lm_$column_name'>$title</a></th>\n";
   
       $i++;
 
     }
-    if($this->multi_column_on == 1)
+    if($this->multi_column_on)
       $head .= "<th>$this->multi_value_column_title</th>";
     $head .= "$edit_delete";
     $head .= "</tr>\n";
@@ -841,7 +862,7 @@ class eEKS extends lazy_mofo{
         
         
         // test with multi-value column
-        elseif(in_array($column_name, $this->config['multi_column']) && $this->multi_column_on == 1){
+        elseif(in_array($column_name, $this->config['multi_column']) && $this->multi_column_on){
           $multi_column_content .= "<div>";
           if(mb_strlen($value) > 0) $multi_column_content .= "$title: ";
           $multi_column_content .= $this->get_output_control($column_name . '-' . $row[$this->identity_name], $value, '--text', 'grid') . "</div>";
@@ -867,7 +888,7 @@ class eEKS extends lazy_mofo{
         $i++; // column index
       }
       
-      if($this->multi_column_on == 1)
+      if($this->multi_column_on)
         $html .= "<td class='col_multi_value'>$multi_column_content</td>";
       
       $multi_column_content = ""; // reset
