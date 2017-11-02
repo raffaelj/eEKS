@@ -414,7 +414,7 @@ class eEKS extends lazy_mofo{
     $html .= "<fieldset>";
     
     $checked = "";
-    if( $eks['employees']['has_employees'] == 1 )
+    if( $eks['employees']['has_employees'] )
       $checked = " checked='checked'";
     
     $html .= '<input type="checkbox" name="has_employees"'.$checked.' />';
@@ -427,6 +427,93 @@ class eEKS extends lazy_mofo{
     
     ///////////////// EKS page 2
     $html .= "<page id='eks_page2' class='eks_page portrait'>";
+    
+    
+    // 5. subsidies
+    $html .= "<fieldset>";
+    foreach($eks['subsidies'] as $key=>$val){
+      if( is_bool($val) ){
+          $val ? $checked = ' checked="checked"' : $checked = '';
+          $html .= '<input type="checkbox" name="subsidies_'.$key.'"'.$checked.'>';
+        }
+      else
+        $html .= '<input type="text" value="'.htmlspecialchars($val).'" name="subsidies_'.$key.'">';
+    }
+    
+    $html .= "</fieldset>";
+    
+    
+    // signature
+    $html .= "<fieldset>";
+    
+    $today = $this->date_out(date('Y-m-d'));
+    
+    $html .= '<textarea name="location">'.htmlspecialchars($eks['signature']['location']).', '.$today.'</textarea>';
+    $html .= '<textarea name="signature">'.htmlspecialchars($eks['signature']['signature']).'</textarea>';
+    
+    $html .= "</fieldset>";
+    
+    
+    $html .= "</page>";
+    
+    ///////////////// EKS page 3
+    $html .= "<page id='eks_page3' class='eks_page landscape'>";
+    
+    $html .= "<fieldset>";
+    
+    // get name
+    $name = "";
+    if(mb_strlen($eks['personal_data_refer']['last_name']) > 0)
+      $name .= htmlspecialchars($eks['personal_data_refer']['last_name']);
+    else
+      $name .= htmlspecialchars($eks['personal_data']['last_name']);
+    $name .= ", ";
+    if(mb_strlen($eks['personal_data_refer']['first_name']) > 0)
+      $name .= htmlspecialchars($eks['personal_data_refer']['first_name']);
+    else
+      $name .= htmlspecialchars($eks['personal_data']['first_name']);
+    
+    $html .= '<input type="text" value="'.$name.'" name="last_first_name">';
+    $html .= '<input type="text" value="'.htmlspecialchars($eks['personal_data']['bg_number']).'" name="page3_bg_number">';
+    
+    $html .= "</fieldset>";
+    
+    // estimated or calculated data
+    $html .= "<fieldset>";
+    $html .= '<input type="radio" name="page3_estimated" disabled="disabled" />';
+    $html .= '<input type="radio" name="page3_calculated" checked="checked" />';
+    $html .= "</fieldset>";
+    
+    // small business / Kleinunternehmer/in (§ 19 UStG)
+    $html .= "<fieldset>";
+    $eks['eks']['small_business'] ? $checked = " checked='checked'" : $checked = "";
+    $html .= '<input type="checkbox" name="small_business"'.$checked.' />';
+    $html .= "</fieldset>";
+    
+    $html .= "</page>";
+    
+    ///////////////// EKS page 4
+    $html .= "<page id='eks_page4' class='eks_page landscape'>";
+    
+    
+    $html .= "</page>";
+    
+    ///////////////// EKS page 5
+    $html .= "<page id='eks_page5' class='eks_page landscape'>";
+    
+    
+    $html .= "</page>";
+    
+    ///////////////// EKS page 6
+    $html .= "<page id='eks_page6' class='eks_page landscape'>";
+    
+    // signature
+    $html .= "<fieldset>";
+    
+    $html .= '<textarea name="location">'.htmlspecialchars($eks['signature']['location']).', '.$today.'</textarea>';
+    $html .= '<textarea name="signature">'.htmlspecialchars($eks['signature']['signature']).'</textarea>';
+    
+    $html .= "</fieldset>";
     
     $html .= "</page>";
 
