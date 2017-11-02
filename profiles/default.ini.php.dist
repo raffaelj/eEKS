@@ -14,10 +14,14 @@ default_mode_of_employment = 1
 eks_version = "Jobcenter-EKS.01.2017"
 
 ;; start date for calculating date ranges
-eks_start_date = 01.06.2016
+eks_start_date = "01.06.2016"
+
+;; small business
+;; Kleinunternehmer/in (§ 19 UStG)
+small_business = true
 
 ;; default language
-language = de
+language = "de"
 
 ;;;;; page 1 / Seite 1
 
@@ -25,18 +29,18 @@ language = de
 ;; 1.  Persönliche Daten
 ;; 1.1  Meine persönlichen Daten
 [personal_data]
-title = Frau
-first_name = Amélie
-last_name = Poulain
-birthday = 05.06.1974
-bg_number = 09876//0012345
+title = "Frau"
+first_name = "Amélie"
+last_name = "Poulain"
+birthday = "05.06.1974"
+bg_number = "09876//0012345"
 
 
 ;; location and signature
 ;; Ort, Unterschrift
 [signature]
-location = Leipzig
-signature = Dieses Schreiben wurde maschinell erstellt und ist ohne Unterschrift gültig.
+location = "Leipzig"
+signature = "Dieses Schreiben wurde maschinell erstellt und ist ohne Unterschrift gültig."
 ; signature =
 
 
@@ -59,28 +63,54 @@ birthday =
 ;; 4.  Daten zur selbständigen Tätigkeit
 ;; 4.1  Allgemeine Daten zur selbständigen Tätigkeit
 [company_data]
-activity = Kunst, Gestaltung, Phantasietraining
-start_date = 25.04.2001
+activity = "Kunst, Gestaltung, Phantasietraining"
+start_date = "25.04.2001"
 end_date = 
-company_location = Unter dem Regenbogen 42, 04567 Leipzig
-legal_form = Einzelunternehmerin
+company_location = "Unter dem Regenbogen 42, 04567 Leipzig"
+legal_form = "Einzelunternehmerin"
 
 
 ;; employees
 ;; 4.2  Personal
 [employees]
-has_employees = 0
+has_employees = false
 number_of_employees = 0
 
 
 ;;;;; page 2 / Seite 2
 
+;; subsidies
 ;; 5.  Zuschüsse/Beihilfen
+[subsidies]
+; has_subsidies = false
+has_subsidies = false
+payer = 
+start_date = 
+end_date = 
+monthly_amount = 
 
+applied_subsidies = false
+applied_payer = 
+apply_date = 
+apply_start_date = 
+
+;; loan
 ;; 6.  Darlehen
+[loan]
+has_loan = false
+amount = 
+value_date = 
+date_refund = 
+monthly_repayment_rate = 
+financed_type_of_costs = 
+financed_amount_of_costs = 
 
+;; operations rooms
 ;; 7.  Angaben zu den Betriebsräumen
-
+[operations_rooms_in_flat]
+has_operations_rooms = true
+quantity = 1
+square_meter = "12,32"
 
 ;; don't change anything below this line
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;*/
