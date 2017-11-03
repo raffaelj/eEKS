@@ -1140,13 +1140,13 @@ class eEKS extends lazy_mofo{
       $this->carryover = "";
       foreach($this->column_sums as $column_name=>$value)
         $this->carryover .= '    <td data-coltitle="'.htmlspecialchars($column_name).'" data-col="'.htmlspecialchars($column_name).'">' . $this->get_output_control($column_name . '-' . $row[$this->identity_name], $value, '--number', 'grid') . "</td>\r\n";
+      
+      // add empty cells
       if($this->multi_column_on)
         $this->carryover .= "    <td></td>\r\n";
-      print_r($columns[count($columns) -1]);
       if($columns[count($columns) -1] == $this->identity_name)
         $this->carryover .= "    <td class='col_edit'></td>\r\n";
-      // reset $column_sums
-      // $this->column_sums = array();
+      
       $html .= $this->carryover;
       
       $html .= '</tr>';
