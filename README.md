@@ -123,7 +123,7 @@ coming soon
 * i18n number format (dot, comma)
   * [x] number_in()
   * [x] number_out()
-  * [ ] Bug: int output as float, should be int
+  * [x] Bug: int output as float, should be int
 * [x] custom search box
 * [x] filter functions (for search box)
 * [x] custom function cast_value (i18n number format)
@@ -135,6 +135,7 @@ coming soon
   * [x] delete
   * [x] back
   * [ ] multi delete
+  * [ ] go button on giant datasets
 * [x] output via template file
 * [ ] CSV export needs i18n number_format
 * experimental multi-value column
