@@ -96,11 +96,13 @@ $ee->grid_output_control['gross_amount'] = '--number'; //
 $ee->run();
 
 // echo "<pre><code style='font-size: .7em;'>";
+// print_r($ee->get_action());
+// echo "\r\n";
 // print_r($ee->grid_sql);
 // echo "\r\n";
 // print_r($ee->grid_sql_param);
 // echo "\r\n";
-// print_r($ee->multi_column_on);
+// print_r($ee->column_sums);
 // echo "</pre></code>";
 
 ?>

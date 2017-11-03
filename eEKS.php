@@ -27,8 +27,6 @@ class eEKS extends lazy_mofo{
   // contains error message --> must be in template
   public $error = "";
   
-  // optional sums in last row (monthly view)
-  public $with_rollup = false;
   
   
   /////////////// overwrite LM variables
@@ -72,7 +70,17 @@ class eEKS extends lazy_mofo{
       <input type='text' name='_search' value='[_search]' size='20' class='lm_search_input'>
       <a href='[script_name]' title='[grid_search_box_clear]' class='button_clear_search'>x</a>
       <input type='submit' class='lm_button lm_search_button' value='[grid_search_box_search]'>
-      <input type='hidden' name='action' value='search'>[query_string_list]
+      <input type='hidden' name='' value=''>[query_string_list]
+    </fieldset>
+  </form>";
+  public $eks_search_box = "
+  <form action='[script_name]' class='lm_search_box'>
+    [filters]
+    <fieldset>
+      <input type='text' name='_search' value='[_search]' size='20' class='lm_search_input'>
+      <a href='[script_name]' title='[grid_search_box_clear]' class='button_clear_search'>x</a>
+      <input type='submit' class='lm_button lm_search_button' value='[grid_search_box_search]'>
+      <input type='hidden' name='' value=''>[query_string_list]
     </fieldset>
   </form>";
   
@@ -97,6 +105,14 @@ class eEKS extends lazy_mofo{
   
   // optional configuration via ini file
   private $config = array();
+  
+  
+  // optional sums in last row (monthly view)
+  public $grid_show_column_sums = false;
+  // automated sums in grid
+  public $column_sums = array();
+  public $carryover = "";
+  public $grid_show_carryover = false;
   
   
   //////////////////////////////////////////////////////////////////////////////
@@ -225,7 +241,8 @@ class eEKS extends lazy_mofo{
     
     // purpose: buttons/navigation with different views
     
-    $active_view = @$_GET['_view'];
+    // $active_view = @$_GET['_view'];
+    $active_view = @$_REQUEST['_view'];
     
     $class = "";
     if($active_view == "default" || $active_view == null)
@@ -280,6 +297,7 @@ class eEKS extends lazy_mofo{
     // ...
     if($view == "eks"){
       
+      $_POST['action'] = "eks";
       $this->eks();
       
     }
@@ -356,12 +374,13 @@ class eEKS extends lazy_mofo{
     // reset some grid features
     $this->multi_column_on = false;
     $this->grid_repeat_header_at = false;
+    // $this->grid_search_box = "";
     
     $html = "";
     
     $html .= $this->eks_form($eks);
     
-    $html .= $this->grid();
+    // $html .= $this->grid();
     
     // $this->template($html);
     return $html;
@@ -372,10 +391,21 @@ class eEKS extends lazy_mofo{
   //////////////////////////////////////////////////////////////////////////////
   function eks_form($eks = array()){
     
-    // purpose: 
+    // purpose: show form with prefilled data to user (attachment EKS)
     
     $uri_path = $this->get_uri_path();
     $qs = $this->get_qs();
+    
+    // show only one/some pages
+    // --> hacky fix for PDF with mixed orientations
+    // --> UX --> don't show two much content
+    // --> set page filter for grids
+    $eks_pages = array(1,2,3,4,5,6);
+    if( !empty($_REQUEST['_eks_pages']) )
+      $eks_pages = $_REQUEST['_eks_pages'];
+    
+    // get current date for signatures
+    $today = $this->date_out(date('Y-m-d'));
     
     $html = "";
     
@@ -386,154 +416,217 @@ class eEKS extends lazy_mofo{
     $html .= "<form action='$uri_path$qs&amp;action=eks' method='post' class='eks_form'>";
     
     ///////////////// EKS page 1
-    $html .= "<page id='eks_page1' class='eks_page portrait'>";
-    
-    // 1.1 personal data of applicant
-    $html .= "<fieldset>";
-    foreach($eks['personal_data'] as $key=>$val){
-      $html .= '<input type="text" value="'.htmlspecialchars($val).'" name="'.htmlspecialchars($key).'">';
+    if(in_array(1, $eks_pages)){
+      $html .= "<page id='eks_page1' class='eks_page portrait'>";
+      
+      // 1.1 personal data of applicant
+      $html .= "<fieldset>";
+      foreach($eks['personal_data'] as $key=>$val){
+        $html .= '<input type="text" value="'.htmlspecialchars($val).'" name="'.htmlspecialchars($key).'">';
+      }
+      $html .= "</fieldset>";
+      
+      $html .= "<fieldset>";
+      // 1.2 personal data of person to whom the data of this attachment refers to
+      foreach($eks['personal_data_refer'] as $key=>$val){
+        if(mb_strlen($val) > 0)
+          $html .= '<input type="text" value="'.htmlspecialchars($val).'" name="'.htmlspecialchars($key).'_refer">';
+        else
+          $html .= '<input type="text" value="'.htmlspecialchars($eks['personal_data'][$key]).'" name="'.htmlspecialchars($key).'_refer">';
+      }
+      $html .= "</fieldset>";
+      
+      // 2. estimated or calculated data
+      $html .= "<fieldset>";
+      $html .= '<input type="radio" name="estimated" disabled="disabled" />';
+      $html .= '<input type="radio" name="calculated" checked="checked" />';
+      $html .= "</fieldset>";
+      
+      
+      // 3. period for receipt of unemployment benefits
+      $html .= "<fieldset>";
+      
+      $period = htmlspecialchars($_GET['_from']) . " - " . htmlspecialchars($_GET['_to']);
+      $html .= '<input type="text" value="'.$period.'" name="period" readonly="readonly">';
+      
+      $html .= "</fieldset>";
+      
+      // 4.1 company data
+      $html .= "<fieldset>";
+      foreach($eks['company_data'] as $key=>$val){
+        $html .= '<input type="text" value="'.htmlspecialchars($val).'" name="'.htmlspecialchars($key).'">';
+      }
+      
+      $html .= "</fieldset>";
+      
+      // 4.2 employees
+      $html .= "<fieldset>";
+      
+      $checked = "";
+      if( $eks['employees']['has_employees'] )
+        $checked = " checked='checked'";
+      
+      $html .= '<input type="checkbox" name="has_employees"'.$checked.' />';
+      $html .= '<input type="text" value="'.htmlspecialchars($eks['employees']['number_of_employees']).'" name="number_of_employees">';
+      $html .= "</fieldset>";
+      
+      
+      
+      $html .= "</page>";
+
     }
-    $html .= "</fieldset>";
-    
-    $html .= "<fieldset>";
-    // 1.2 personal data of person to whom the data of this attachment refers to
-    foreach($eks['personal_data_refer'] as $key=>$val){
-      if(mb_strlen($val) > 0)
-        $html .= '<input type="text" value="'.htmlspecialchars($val).'" name="'.htmlspecialchars($key).'_refer">';
-      else
-        $html .= '<input type="text" value="'.htmlspecialchars($eks['personal_data'][$key]).'" name="'.htmlspecialchars($key).'_refer">';
-    }
-    $html .= "</fieldset>";
-    
-    // 2. estimated or calculated data
-    $html .= "<fieldset>";
-    $html .= '<input type="radio" name="estimated" disabled="disabled" />';
-    $html .= '<input type="radio" name="calculated" checked="checked" />';
-    $html .= "</fieldset>";
-    
-    
-    // 3. period for receipt of unemployment benefits
-    $html .= "<fieldset>";
-    
-    $period = htmlspecialchars($_GET['_from']) . " - " . htmlspecialchars($_GET['_to']);
-    $html .= '<input type="text" value="'.$period.'" name="period" readonly="readonly">';
-    
-    $html .= "</fieldset>";
-    
-    // 4.1 company data
-    $html .= "<fieldset>";
-    foreach($eks['company_data'] as $key=>$val){
-      $html .= '<input type="text" value="'.htmlspecialchars($val).'" name="'.htmlspecialchars($key).'">';
-    }
-    
-    $html .= "</fieldset>";
-    
-    // 4.2 employees
-    $html .= "<fieldset>";
-    
-    $checked = "";
-    if( $eks['employees']['has_employees'] )
-      $checked = " checked='checked'";
-    
-    $html .= '<input type="checkbox" name="has_employees"'.$checked.' />';
-    $html .= '<input type="text" value="'.htmlspecialchars($eks['employees']['number_of_employees']).'" name="number_of_employees">';
-    $html .= "</fieldset>";
-    
-    
-    
-    $html .= "</page>";
     
     ///////////////// EKS page 2
-    $html .= "<page id='eks_page2' class='eks_page portrait'>";
-    
-    
-    // 5. subsidies
-    $html .= "<fieldset>";
-    foreach($eks['subsidies'] as $key=>$val){
-      if( is_bool($val) ){
-          $val ? $checked = ' checked="checked"' : $checked = '';
-          $html .= '<input type="checkbox" name="subsidies_'.$key.'"'.$checked.'>';
-        }
-      else
-        $html .= '<input type="text" value="'.htmlspecialchars($val).'" name="subsidies_'.$key.'">';
+    if(in_array(2, $eks_pages)){
+      $html .= "<page id='eks_page2' class='eks_page portrait'>";
+      
+      
+      // 5. subsidies
+      $html .= "<fieldset>";
+      foreach($eks['subsidies'] as $key=>$val){
+        if( is_bool($val) ){
+            $val ? $checked = ' checked="checked"' : $checked = '';
+            $html .= '<input type="checkbox" name="subsidies_'.$key.'"'.$checked.'>';
+          }
+        else
+          $html .= '<input type="text" value="'.htmlspecialchars($val).'" name="subsidies_'.$key.'">';
+      }
+      
+      $html .= "</fieldset>";
+      
+      
+      // signature
+      $html .= "<fieldset>";
+      
+      $html .= '<textarea name="location">'.htmlspecialchars($eks['signature']['location']).', '.$today.'</textarea>';
+      $html .= '<textarea name="signature">'.htmlspecialchars($eks['signature']['signature']).'</textarea>';
+      
+      $html .= "</fieldset>";
+      
+      
+      $html .= "</page>";
+
     }
     
-    $html .= "</fieldset>";
-    
-    
-    // signature
-    $html .= "<fieldset>";
-    
-    $today = $this->date_out(date('Y-m-d'));
-    
-    $html .= '<textarea name="location">'.htmlspecialchars($eks['signature']['location']).', '.$today.'</textarea>';
-    $html .= '<textarea name="signature">'.htmlspecialchars($eks['signature']['signature']).'</textarea>';
-    
-    $html .= "</fieldset>";
-    
-    
-    $html .= "</page>";
-    
     ///////////////// EKS page 3
-    $html .= "<page id='eks_page3' class='eks_page landscape'>";
-    
-    $html .= "<fieldset>";
-    
-    // get name
-    $name = "";
-    if(mb_strlen($eks['personal_data_refer']['last_name']) > 0)
-      $name .= htmlspecialchars($eks['personal_data_refer']['last_name']);
-    else
-      $name .= htmlspecialchars($eks['personal_data']['last_name']);
-    $name .= ", ";
-    if(mb_strlen($eks['personal_data_refer']['first_name']) > 0)
-      $name .= htmlspecialchars($eks['personal_data_refer']['first_name']);
-    else
-      $name .= htmlspecialchars($eks['personal_data']['first_name']);
-    
-    $html .= '<input type="text" value="'.$name.'" name="last_first_name">';
-    $html .= '<input type="text" value="'.htmlspecialchars($eks['personal_data']['bg_number']).'" name="page3_bg_number">';
-    
-    $html .= "</fieldset>";
-    
-    // estimated or calculated data
-    $html .= "<fieldset>";
-    $html .= '<input type="radio" name="page3_estimated" disabled="disabled" />';
-    $html .= '<input type="radio" name="page3_calculated" checked="checked" />';
-    $html .= "</fieldset>";
-    
-    // small business / Kleinunternehmer/in (§ 19 UStG)
-    $html .= "<fieldset>";
-    $eks['eks']['small_business'] ? $checked = " checked='checked'" : $checked = "";
-    $html .= '<input type="checkbox" name="small_business"'.$checked.' />';
-    $html .= "</fieldset>";
-    
-    $html .= "</page>";
+    if(in_array(3, $eks_pages)){
+      $html .= "<page id='eks_page3' class='eks_page landscape'>";
+      
+      $html .= "<fieldset>";
+      
+      // get name
+      $name = "";
+      if(mb_strlen($eks['personal_data_refer']['last_name']) > 0)
+        $name .= htmlspecialchars($eks['personal_data_refer']['last_name']);
+      else
+        $name .= htmlspecialchars($eks['personal_data']['last_name']);
+      $name .= ", ";
+      if(mb_strlen($eks['personal_data_refer']['first_name']) > 0)
+        $name .= htmlspecialchars($eks['personal_data_refer']['first_name']);
+      else
+        $name .= htmlspecialchars($eks['personal_data']['first_name']);
+      
+      $html .= '<input type="text" value="'.$name.'" name="last_first_name">';
+      $html .= '<input type="text" value="'.htmlspecialchars($eks['personal_data']['bg_number']).'" name="page3_bg_number">';
+      
+      $html .= "</fieldset>";
+      
+      // estimated or calculated data
+      $html .= "<fieldset>";
+      $html .= '<input type="radio" name="page3_estimated" disabled="disabled" />';
+      $html .= '<input type="radio" name="page3_calculated" checked="checked" />';
+      $html .= "</fieldset>";
+      
+      // small business / Kleinunternehmer/in (§ 19 UStG)
+      $html .= "<fieldset>";
+      $eks['eks']['small_business'] ? $checked = " checked='checked'" : $checked = "";
+      $html .= '<input type="checkbox" name="small_business"'.$checked.' />';
+      $html .= "</fieldset>";
+      
+      // reset $this->column_sums
+      $this->column_sums = array();
+      
+      // grid
+      $this->grid_sql = $this->generate_grid_sql_eks(3);
+      $html .= $this->grid('', true);
+      
+      // store $this->column_sums for carryover
+      $sum['page3'] = $this->column_sums;
+      // reset $this->column_sums
+      $this->column_sums = array();
+      
+      $html .= "</page>";
+
+    }
     
     ///////////////// EKS page 4
-    $html .= "<page id='eks_page4' class='eks_page landscape'>";
-    
-    
-    $html .= "</page>";
+    if(in_array(4, $eks_pages)){
+      $html .= "<page id='eks_page4' class='eks_page landscape'>";
+      
+      // grid
+      $this->grid_sql = $this->generate_grid_sql_eks(4);
+      $html .= $this->grid('', true);
+      
+      // store $this->column_sums for carryover
+      $sum['page4'] = $this->column_sums;
+      // reset $this->column_sums
+      // $this->column_sums = array();
+      
+      $html .= "</page>";
+
+    }
     
     ///////////////// EKS page 5
-    $html .= "<page id='eks_page5' class='eks_page landscape'>";
-    
-    
-    $html .= "</page>";
+    if(in_array(5, $eks_pages)){
+      $html .= "<page id='eks_page5' class='eks_page landscape'>";
+      
+      // carryover
+      // $html .= "<table class='eks_carryover'>";
+      // $html .= "<tr>";
+      // foreach($this->column_sums as $column_name=>$value)
+        // $html .= '    <td data-coltitle="'.htmlspecialchars($column_name).'" data-col="'.htmlspecialchars($column_name).'">' . $this->get_output_control($column_name . '-0', $value, '--number', 'grid') . "</td>\r\n";
+      // $html .= "</tr>";
+      // $html .= "</table>";
+      
+      // set carryover
+      $this->grid_show_carryover = true;
+      
+      // sum pages
+      $this->column_sums = $sum['page3'];
+      
+      // grid
+      $this->grid_sql = $this->generate_grid_sql_eks(5);
+      $html .= $this->grid('', true);
+      
+      // unset carryover
+      $this->grid_show_carryover = false;
+      
+      // store $this->column_sums for carryover
+      // $sum['page5'] = $this->column_sums;
+      // reset $this->column_sums
+      // $this->column_sums = array();
+      
+      $html .= "</page>";
+    }
     
     ///////////////// EKS page 6
-    $html .= "<page id='eks_page6' class='eks_page landscape'>";
-    
-    // signature
-    $html .= "<fieldset>";
-    
-    $html .= '<textarea name="location">'.htmlspecialchars($eks['signature']['location']).', '.$today.'</textarea>';
-    $html .= '<textarea name="signature">'.htmlspecialchars($eks['signature']['signature']).'</textarea>';
-    
-    $html .= "</fieldset>";
-    
-    $html .= "</page>";
+    if(in_array(6, $eks_pages)){
+      $html .= "<page id='eks_page6' class='eks_page landscape'>";
+      
+      // grid
+      $this->grid_sql = $this->generate_grid_sql_eks(6);
+      $html .= $this->grid('', true);
+      
+      // signature
+      $html .= "<fieldset>";
+      
+      $html .= '<textarea name="location">'.htmlspecialchars($eks['signature']['location']).', '.$today.'</textarea>';
+      $html .= '<textarea name="signature">'.htmlspecialchars($eks['signature']['signature']).'</textarea>';
+      
+      $html .= "</fieldset>";
+      
+      $html .= "</page>";
+    }
 
     $html .= "</form>";
     
@@ -742,7 +835,7 @@ class eEKS extends lazy_mofo{
   }
   
   //////////////////////////////////////////////////////////////////////////////
-  function grid($error = ''){
+  function grid($error = '', $no_form = false){
     
     // purpose: function to list a table of records. aka data grid
     // returns: html
@@ -903,23 +996,31 @@ class eEKS extends lazy_mofo{
     $head .= "</tr>\n";
           
     // start generating output //
-    $html = "<div class='lm'>\n";
+    $html = "";
+    // $html .= "<div class='lm'>\n";
 
     if(mb_strlen($success) > 0)
       $html .= "<div class='lm_success'><p>$success</p></div>\n";
     if(mb_strlen($error) > 0)
       $html .= "<div class='lm_error'><p>$error</p></div>\n";
     
-    $html .= "<form action='$uri_path$qs&amp;action=update_grid' method='post' enctype='multipart/form-data'>\n";
-    $html .= "<input type='hidden' name='_posted' value='1'>\n";
-    $html .= "<input type='hidden' name='_csrf' value='$_SESSION[_csrf]'>\n";
+    if(!$no_form){
+      $html .= "<form action='$uri_path$qs&amp;action=update_grid' method='post' enctype='multipart/form-data'>\n";
+      $html .= "<input type='hidden' name='_posted' value='1'>\n";
+      $html .= "<input type='hidden' name='_csrf' value='$_SESSION[_csrf]'>\n";
+    }
+      
     
     // save changes button on top to avoid wrong submit button on pressing `Enter`
     $html .= $button;
 
     // quit if there's no data
     if($count <= 0){
-      $html .= "<div class='lm_error'><p>$this->grid_text_no_records_found</p></div></form></div>\n";
+      if(!$no_form)
+        $html .= "<div class='lm_error'><p>$this->grid_text_no_records_found</p></div></form>\n";
+      else
+        $html .= "<div class='lm_error'><p>$this->grid_text_no_records_found</p></div>\n";
+      
       return $html;    
     }
 
@@ -927,9 +1028,12 @@ class eEKS extends lazy_mofo{
     if($count > 30)
       $html .= $pagination_button_bar;
 
-    $html .= "<table class='lm_grid'>\n";
+    $html .= "<table class='lm_grid'>\r\n";
     $html .= $head;
     
+    // optional carryover
+    if($this->grid_show_carryover && mb_strlen($this->carryover) > 0)
+      $html .= "<tr class='carryover'>".$this->carryover."</tr>\r\n";
 
     // print rows
     $j = 0;
@@ -938,14 +1042,14 @@ class eEKS extends lazy_mofo{
       // highlight last updated or inserted row
       $shaded = '';
       if(@$_GET[$this->identity_name] == @$row[$this->identity_name] && mb_strlen(@$_GET[$this->identity_name]) > 0)
-        $shaded = "class='lm_active'";
-
+        $shaded = " class='lm_active'";
+      
       // print a row
-      $html .= "<tr $shaded>\n";
+      $html .= "<tr$shaded>\r\n";
 
       // delete selection checkbox
       if($this->grid_multi_delete){
-        $html .= "<td><label><input type='checkbox' name='_delete[]' value='{$row[$this->identity_name]}'></label></td>\n";
+        $html .= "<td><label><input type='checkbox' name='_delete[]' value='{$row[$this->identity_name]}'></label></td>\r\n";
       }
       
       
@@ -960,6 +1064,25 @@ class eEKS extends lazy_mofo{
         $title = $this->format_title($column_name, @$this->rename[$column_name]);
 
         $value = $row[$column_name];
+        
+        // column sums
+        if($this->grid_show_column_sums){
+          
+          if(!$this->multi_column_on || ( $this->multi_column_on && !in_array($column_name, $this->config['multi_column']) ) ){
+            // set sums
+            if( !isset($this->column_sums[$column_name]) ){
+              if( is_numeric($value) && $column_name != $this->identity_name )
+                $this->column_sums[$column_name] = $value;
+              else
+                $this->column_sums[$column_name] = "";
+            }
+            else{
+              if( is_numeric($value) && $column_name != $this->identity_name )
+                $this->column_sums[$column_name] = $this->column_sums[$column_name] + $value;
+            }
+          }
+          
+        }
 
         // edit & delete links
         if($column_name == $this->identity_name && $i == ($column_count - 1))
@@ -1009,14 +1132,34 @@ class eEKS extends lazy_mofo{
       // row counter    
       $j++;
     }
+    
+    // column sums
+    if($this->grid_show_column_sums){
+      $html .= '<tr class="column_sums">';
+      
+      $this->carryover = "";
+      foreach($this->column_sums as $column_name=>$value)
+        $this->carryover .= '    <td data-coltitle="'.htmlspecialchars($column_name).'" data-col="'.htmlspecialchars($column_name).'">' . $this->get_output_control($column_name . '-' . $row[$this->identity_name], $value, '--number', 'grid') . "</td>\r\n";
+      if($this->multi_column_on)
+        $this->carryover .= "    <td></td>\r\n";
+      print_r($columns[count($columns) -1]);
+      if($columns[count($columns) -1] == $this->identity_name)
+        $this->carryover .= "    <td class='col_edit'></td>\r\n";
+      // reset $column_sums
+      // $this->column_sums = array();
+      $html .= $this->carryover;
+      
+      $html .= '</tr>';
+    }
 
     $html .= "</table>\n";
 
     // buttons & pagination, close form
     $html .= $pagination_button_bar;
     $html .= $button;
-    $html .= "</form>\n";
-    $html .= "</div>\n";
+    if(!$no_form)
+      $html .= "</form>\n";
+    // $html .= "</div>\n";
 
     return $html;
 
@@ -1186,6 +1329,7 @@ class eEKS extends lazy_mofo{
     
     // start query
     $query = "";
+    
     $query .= "SELECT\r\n";
     $query .= "t.ID\r\n";
     $query .= ",t.$group\r\n";
@@ -1262,6 +1406,7 @@ class eEKS extends lazy_mofo{
     
     $query .= "AND a.$date BETWEEN '$from' AND '$to'\r\n";
     $query .= "GROUP BY t.$group\r\n";
+    
     $query .= "ORDER BY t.is_income DESC, t.sort_order ASC, t.$group ASC\r\n";
     
     $this->grid_output_control['average'] = '--number';
@@ -1273,17 +1418,13 @@ class eEKS extends lazy_mofo{
   
   
   //////////////////////////////////////////////////////////////////////////////
-  function generate_grid_sql_eks(){
+  function generate_grid_sql_eks($pages = "1,2,3,4,5,6"){
     
     $date = "value_date";
     
     $query = "";
     
-    if($this->with_rollup)
-      $query .= "SELECT * FROM (\r\n";
-    
-    $query .= "
-    SELECT\r\n";
+    $query .= "SELECT\r\n";
     $query .= "c.ID, c.type_of_costs\r\n";
     
     $from = (new DateTime($this->date_in($_GET['_from'])))->modify('first day of this month')->format('Y-m-d');
@@ -1327,18 +1468,20 @@ LEFT JOIN accounting a
   ON a.type_of_costs = t.ID
 AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
     $query .= "AND a.$date BETWEEN '$from' AND '$to'\r\n";
+    
+    // get specific page
+    $query .= "WHERE c.page IN ($pages)\r\n";
+    
 // AND a.value_date BETWEEN '2016-06-01' AND '2016-12-31'
     $query .= "GROUP BY c.type_of_costs\r\n";
     
-    if($this->with_rollup)
-      $query .= "with rollup ) R\r\n";
-    
-    $query .= "ORDER BY (type_of_costs IS NULL) ASC, ID\r\n";
+    $query .= "ORDER BY ID\r\n";
     
     $this->grid_sql_param[":_mode_of_employment"] = $this->clean_out(@$_GET["_mode_of_employment"]);
     
     return $query;
-  }
+    
+  }// end of generate_grid_sql_eks()
   //////////////////////////////////////////////////////////////////////////////
   function search_box_filters(){
     

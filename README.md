@@ -141,6 +141,7 @@ coming soon
 * experimental multi-value column
   * [x] grid
   * [ ] with grid_input_control
+  * [x] with column sums
 
 ### pages
 

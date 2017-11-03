@@ -30,7 +30,7 @@ echo "<!DOCTYPE html>
   <header>
     <h1><a href='$uri'>".htmlspecialchars($this->name)."</a></h1>
     " . $this->add_button() . "
-    <nav>" . $this->view_list() . "<a href='{$uri}action=settings' class='lm_button'>Settings</a><a href='{$uri}action=eks&amp;_view=eks' class='lm_button'>EKS</a></nav>
+    <nav>" . $this->view_list() . "<a href='{$uri}action=settings' class='lm_button'>Settings</a></nav>
     " . $this->export_button() . "
     " . $this->search_box() . "
     " . $this->list_edit_tables() . "

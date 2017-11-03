@@ -22,7 +22,8 @@ $clr_main_2: #A4BA1E;//green
 $clr_alarm: #FF6347;//red (tomato)
 $clr_alarm_dark: #8c0909;//dark red
 $clr_attention: #ffc435;//orange
-$clr_confirm: #C5C924;//green
+$clr_confirm: #C5C924;//green - rgb(197,201,36)
+$clr_confirm_tr: rgba(197,201,36,.8);//green
 
 // fonts
 $font: Arial, Helvetica, sans-serif;
@@ -216,7 +217,14 @@ table {
     &:nth-child(even) td {background-color: $clr_white_tr;}
     &:nth-child(odd) td {background-color: $clr_grey_light_tr;}
     // highlight hover and current row edited
-    &.lm_active td, &:hover td {background: $clr_main_tr;}
+    &.lm_active td, &:hover td {background: $clr_confirm_tr;}
+    &.column_sums td{
+      font-weight:bold;
+      border-top:1px solid $clr_grey_dark;
+      &:last-child{// one column less (no edit col)
+        // ?
+      }
+    }
     @media print{
       page-break-inside:avoid;
       page-break-after:auto;
@@ -549,9 +557,10 @@ $fontsize_print: 18px;
 body.eks form.eks_form{
   text-align:center;// centering inline-block pages
   
-  *{text-align:left;}
+  // *{text-align:left;}
   
   page{
+    text-align:left;
     display:inline-block;
     position:relative;// for absolute positioning of input fields
     margin: 1em;
@@ -859,6 +868,51 @@ body.eks form.eks_form{
         padding: 2px;
       }
     }
+    
+    // reset table styles
+    &#eks_page3,&#eks_page4,&#eks_page5,&#eks_page6{
+    .lm_pagination{display:none;}
+      table{
+        border-collapse:collapse;
+        position:absolute;
+        left:$zoom * 8px;
+        right:$zoom * 8.4px;
+      }
+      table,tr,td,th{
+        margin:0;
+        padding:0;
+        border:none;
+        border-radius:0;
+        // background:transparent;
+        font-size:12px;
+        // line-height:$font;
+        box-sizing:border-box;
+      }
+      th{
+        background-color:$clr_main_tr;
+      }
+      tr.column_sums td{
+        border-top:1px solid $clr_grey;
+      }
+      td,th{
+        padding:2px;
+        height:1em;
+        line-height:1em;
+        &:nth-child(1){display:none;}//ID
+        &:nth-child(2){//type_of_costs
+          width:23%;
+          font-size:.7em;
+        }
+        &:nth-child(n+3):nth-child(-n+8){width: 8.56%;}//months
+        &:nth-child(9){//sum
+          width:9.3%;
+          font-weight:bold;
+          border-left:1px solid $clr_grey;
+        }
+      }
+    }
+    
+    
     &#eks_page3{
       background-image:url('../img/eks_3v6_print.png');
       
@@ -884,12 +938,30 @@ body.eks form.eks_form{
         bottom: $zoom * 121.2px;
         left: $zoom * 8.8px;
       }
+      
+      table{
+        bottom:$zoom * 16px;
+        height: 37.3%;
+      }
+      td,th{
+        &:nth-child(9){//sum
+          width:11.8%;
+        }
+      }
     }
     &#eks_page4{
       background-image:url('../img/eks_4v6_print.png');
+      table{
+        bottom:$zoom * 16.8px;
+        height: 84.5%;
+      }
     }
     &#eks_page5{
       background-image:url('../img/eks_5v6_print.png');
+      table{
+        bottom:$zoom * 21.6px;
+        height: 81%;
+      }
     }
     &#eks_page6{
       background-image:url('../img/eks_6v6_print.png');

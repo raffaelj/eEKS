@@ -29,6 +29,7 @@ slogan = "Don't worry, be happy ;-)"
 
 ;; optional background image
 ; background_image = "img/0020_raffael-jesche_cc-by-sa-3.jpg"
+background_image = ""
 
 
 ;; active views
@@ -42,7 +43,10 @@ multi_column_on = true
 ; multi_column_on = false
 
 ;; optional sums in last row (monthly view)
-with_rollup = true
+grid_show_column_sums = true
+
+;; for multiple grids in one page its possible to use the carryover from the last grid
+grid_show_carryover = false
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; lazy_mofo config
@@ -64,7 +68,17 @@ grid_ellipse_at = 80
 grid_repeat_header_at = 25
 
 ;; activate checkboxes for multiple deletions
-; grid_multi_delete = true
+grid_multi_delete = false
+
+;; dashboard
+[dashboard]
+;; unpaid invoices
+0 = no_value_date_income
+;; sums for last months, this year, maybe comparison with last year
+1 = sums
+;; notices about assessment basis, lose of small business state etc.
+2 = notices
+3 = graphs
 
 
 ;; column names of date filters in search box
