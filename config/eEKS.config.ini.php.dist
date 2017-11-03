@@ -38,7 +38,11 @@ views[] = edit
 views[] = eks
 
 ;; turn multi-value column on
-multi_column_on = 1
+multi_column_on = true
+; multi_column_on = false
+
+;; optional sums in last row (monthly view)
+with_rollup = true
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; lazy_mofo config
@@ -60,7 +64,7 @@ grid_ellipse_at = 80
 grid_repeat_header_at = 25
 
 ;; activate checkboxes for multiple deletions
-;grid_multi_delete = true
+; grid_multi_delete = true
 
 
 ;; column names of date filters in search box
