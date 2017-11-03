@@ -27,6 +27,10 @@ class eEKS extends lazy_mofo{
   // contains error message --> must be in template
   public $error = "";
   
+  // optional sums in last row (monthly view)
+  public $with_rollup = false;
+  
+  
   /////////////// overwrite LM variables
   
   public $table = 'accounting';    // table name for updates, inserts and deletes
@@ -285,6 +289,9 @@ class eEKS extends lazy_mofo{
     // edit tables
     elseif($view == "edit"){
       
+      // disable multi-value column
+      $this->multi_column_on = false;
+      
       $this->form_sql = "";
       $this->grid_sql = "";
       $this->table = isset($_REQUEST['_edit_table']) ? $this->clean_out(@$_REQUEST['_edit_table']) : "accounting";
@@ -298,6 +305,9 @@ class eEKS extends lazy_mofo{
       $this->grid_input_control['sort_order'] = "--integer";
       $this->grid_input_control['notes'] = "--textarea";
       $this->grid_input_control[$this->table] = "--text";
+      
+      $this->grid_input_control['coa_jobcenter_eks_01_2017'] = 'SELECT ID AS val, type_of_costs AS opt FROM coa_jobcenter_eks_01_2017 ORDER BY ID ASC;--select';
+      // $this->grid_input_control['coa_jobcenter_eks_01_2017'] = 'SELECT ID AS val, ID AS opt FROM coa_jobcenter_eks_01_2017 ORDER BY ID ASC;--select';
       
     }
     
@@ -329,15 +339,23 @@ class eEKS extends lazy_mofo{
       $from = new DateTime( $this->date_in($_GET['_from']) );
     }
     
+    
+    // temporary  - set dates in $_GET
     $_GET['_from'] = $from->modify('first day of this month')->format('d.m.Y');
-    $_GET['_to'] = $from->modify('+ 6 months')->modify('last day of this month')->format('d.m.Y');
+    $_GET['_to'] = $from->modify('+ 5 months')->modify('last day of this month')->format('d.m.Y');
+    
+    
     
     // set default mode_of_employment
     if( empty($_GET['_mode_of_employment']) )
       $_GET['_mode_of_employment'] = $eks['eks']['default_mode_of_employment'];
     
-    $this->grid_sql = $this->generate_grid_sql_monthly();
-    $this->multi_column_on = 0;
+    // $this->grid_sql = $this->generate_grid_sql_monthly();
+    $this->grid_sql = $this->generate_grid_sql_eks();
+    
+    // reset some grid features
+    $this->multi_column_on = false;
+    $this->grid_repeat_header_at = false;
     
     $html = "";
     
@@ -1254,6 +1272,73 @@ class eEKS extends lazy_mofo{
   
   
   
+  //////////////////////////////////////////////////////////////////////////////
+  function generate_grid_sql_eks(){
+    
+    $date = "value_date";
+    
+    $query = "";
+    
+    if($this->with_rollup)
+      $query .= "SELECT * FROM (\r\n";
+    
+    $query .= "
+    SELECT\r\n";
+    $query .= "c.ID, c.type_of_costs\r\n";
+    
+    $from = (new DateTime($this->date_in($_GET['_from'])))->modify('first day of this month')->format('Y-m-d');
+    $to = (new DateTime($this->date_in($_GET['_to'])))->modify('last day of this month')->format('Y-m-d');
+    
+    // add montly summed columns in sql query in date range
+    $start    = (new DateTime($from))->modify('first day of this month');
+    $end      = (new DateTime($to))->modify('first day of next month');
+    $interval = DateInterval::createFromDateString('1 month');
+    $period   = new DatePeriod($start, $interval, $end);
+    
+    $count_months = 0;
+    foreach ($period as $dt) {
+      
+      $month = $dt->format('m');
+      $year = $dt->format('Y');
+      $col = $dt->format('M (y)');
+      $query .= ",SUM( CASE WHEN extract(month from a.$date) = $month AND extract(year from a.$date) = $year THEN a.gross_amount ELSE 0 END ) AS '$col'\r\n";
+      
+      // grid output control
+      $this->grid_output_control[$col] = '--number';
+      $this->grid_output_control['sum'] = '--number';
+      
+      $count_months++;
+    }
+    
+    // sum
+    $query .= ",SUM(COALESCE(NULLIF(a.gross_amount, ''), 0)) as sum\r\n";
+    
+    // average
+    $query .= ", FORMAT( COALESCE(SUM( a.gross_amount / $count_months ), 0), 2 ) AS average\r\n";
+    
+    $this->grid_output_control['average'] = '--number';
+    
+    
+    
+    $query .= "FROM type_of_costs t
+RIGHT JOIN coa_jobcenter_eks_01_2017 c
+  ON t.coa_jobcenter_eks_01_2017 = c.ID
+LEFT JOIN accounting a
+  ON a.type_of_costs = t.ID
+AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
+    $query .= "AND a.$date BETWEEN '$from' AND '$to'\r\n";
+// AND a.value_date BETWEEN '2016-06-01' AND '2016-12-31'
+    $query .= "GROUP BY c.type_of_costs\r\n";
+    
+    if($this->with_rollup)
+      $query .= "with rollup ) R\r\n";
+    
+    $query .= "ORDER BY (type_of_costs IS NULL) ASC, ID\r\n";
+    
+    $this->grid_sql_param[":_mode_of_employment"] = $this->clean_out(@$_GET["_mode_of_employment"]);
+    
+    return $query;
+  }
   //////////////////////////////////////////////////////////////////////////////
   function search_box_filters(){
     
