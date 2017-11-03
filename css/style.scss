@@ -693,14 +693,13 @@ body.eks form.eks_form{
       }
       @media print{
       
-        // input,textarea{
-          // font-size: 18px;
-        // }
+        // transform: rotate(-90deg) translate(-210mm, 0);
+        // transform-origin: 0 0;
+        
         input[type=checkbox],input[type=radio]{
           width: $zoom_print * 5px;
           height: $zoom_print * 5px;
         }
-       
           
         input[name=title]{
           bottom: $zoom_print * 200px;
