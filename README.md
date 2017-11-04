@@ -72,6 +72,25 @@ coming soon
 
 ## To do
 
+### top priority
+
+* invoices (needs customer database)
+* concluded EKS
+* custom filters in search bar for EKS
+* estimated EKS
+* discuss porting features to lm
+
+### lower priority
+
+* customer database
+* dashboard
+* better GUI (navigation, search bar, settings)
+* icons
+* translate GUI
+* translate everything
+* driver's log
+* print CSS for (large) tables
+
 ### revise lm code and features
 
 * delete dataset without javascript
@@ -83,11 +102,11 @@ coming soon
   * [x] get rid of inline styles (nowrap, align...)
   * [x] position of edit link, export link and searchbox should be defined in template file; div instead of table
   * extra classes like
-      * [ ] with_rollup (last row bold)
+      * [x] <del>with_rollup</del> optional column with sums (last row bold)
       * [x] positive/negative numbers (colors/backgrounds)
       * [x] number (text-align:right)
       * [x] number, date, datetime
-  * [ ] possibly HTML5 data attributes for easier evaluation with javascript
+  * [x] HTML5 data attributes for easier evaluation with javascript or styling for small screens
   * nice to have:
     * [ ] info about column on th:hover (or click?)
 * i18n number format (dot, comma)
@@ -107,24 +126,28 @@ coming soon
   * [ ] multi delete
   * [ ] go button on giant datasets
 * [x] output via template file
-* [ ] CSV export needs i18n number_format
+* CSV export
+  * [ ] needs i18n number_format
+  * [ ] doesn't work with multiple grids (chooses first grid)
+  * [ ] trigger for export should be outside of grid
 * experimental multi-value column
   * [x] grid
   * [ ] with grid_input_control
   * [x] with column sums
-* [ ] Export to CSV doesn't work with multiple grids
 * [x] PDF export
-  * [ ] mixed landscape/portrait (EKS)
+  * [ ] trigger for export must be outside of grid
+  * [x] mixed landscape/portrait (EKS)
   * [ ] user should choose if landscape or portrait
   * [ ] use different margins for EKS and all other pages
+  * [ ] doesn't recognize changed input fields, expected: output same as screen, should submit form data to querystring 
 
 ### pages
 
 * [ ] dashboard (with views)
 * [x] accounting (default page)
   * [ ] extra: records without value_date
-* [ ] options
-  * [x] change content of tables
+* [ ] settings
+  * [x] change content of tables (as view with table name via $_GET and some input controls)
   * [ ] change (some) content of ini files
 
 ### searchbox
@@ -140,7 +163,7 @@ monthly view needs filters, too
   * [x] default + no_date
   * [ ] monthly view
 * [x] value_date (from - to)
-* [x] vaoucher_date (from - to)
+* [x] voucher_date (from - to)
 * [x] without value_date
 * [x] type_of_costs
 * [x] mode_of_employment
@@ -161,18 +184,22 @@ monthly view needs filters, too
 
 ### EKS preview
 
-* [ ] configuration file for not changing/ personal data
+* [x] configuration file for not changing/ personal data
+* [ ] choose profiles
+* [ ] edit profiles in form
 * [ ] concluded
 * [ ] estimated
   * [ ] automated sums on every page
   * [ ] save estimated data for comparing in the future
-* because browsers dont't understand mixed page sizes (landscape and portrait) in print CSS
-  * [ ] page 1-2
-  * [ ] page 3-6
+* [x] rotate landscape pages for printing and PDF export
+* [x] show only one/some pages
+  * [ ] table pages require variables from page before (sum, carryover)
 
 
+### GUI
 
-
+* [ ] CSS for small(er) screens
+* [ ] all select boxes need titles
 
 
 
