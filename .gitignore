@@ -2,6 +2,7 @@
 thumbs
 uploads
 tests
+exports
 
 # Windows image file caches
 Thumbs.db
