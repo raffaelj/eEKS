@@ -241,8 +241,6 @@ class eEKS extends lazy_mofo{
     }
     $html .= "</div>";
     
-    
-    // $this->template($html);
     return $html;
     
   }
@@ -379,7 +377,6 @@ class eEKS extends lazy_mofo{
     if( empty($_GET['_mode_of_employment']) )
       $_GET['_mode_of_employment'] = $eks['eks']['default_mode_of_employment'];
     
-    // $this->grid_sql = $this->generate_grid_sql_monthly();
     $this->grid_sql = $this->generate_grid_sql_eks();
     
     // reset some grid features
@@ -391,9 +388,6 @@ class eEKS extends lazy_mofo{
     
     $html .= $this->eks_form($eks);
     
-    // $html .= $this->grid();
-    
-    // $this->template($html);
     return $html;
     
     
@@ -408,7 +402,6 @@ class eEKS extends lazy_mofo{
     $qs = $this->get_qs();
     
     // show only one/some pages
-    // --> hacky fix for PDF with mixed orientations
     // --> UX --> don't show two much content
     // --> set page filter for grids
     $eks_pages = array(1,2,3,4,5,6);
@@ -420,9 +413,7 @@ class eEKS extends lazy_mofo{
     
     $html = "";
     
-    // $html .= "<h2>EKS</h2>";
     $html .= "<div class='lm_error'><p>experimental - form doesn't work - coming soon</p></div>";
-    // $this->error = "experimental - form doesn't work - coming soon";
     
     $html .= "<form action='$uri_path$qs&amp;action=eks' method='post' class='eks_form'>";
     
@@ -449,8 +440,10 @@ class eEKS extends lazy_mofo{
       
       // 2. estimated or calculated data
       $html .= "<fieldset>";
-      $html .= '<input type="radio" name="estimated" disabled="disabled" />';
-      $html .= '<input type="radio" name="calculated" checked="checked" />';
+      $html .= '<input type="radio" id="estimated" name="estimated" disabled="disabled" />';
+      $html .= '<label for="estimated"></label>';
+      $html .= '<input type="radio" id="calculated" name="calculated" checked="checked" />';
+      $html .= '<label for="calculated"></label>';
       $html .= "</fieldset>";
       
       
@@ -477,7 +470,8 @@ class eEKS extends lazy_mofo{
       if( $eks['employees']['has_employees'] )
         $checked = " checked='checked'";
       
-      $html .= '<input type="checkbox" name="has_employees"'.$checked.' />';
+      $html .= '<input type="checkbox" id="has_employees" name="has_employees"'.$checked.' />';
+      $html .= '<label for="has_employees"></label>';
       $html .= '<input type="text" value="'.htmlspecialchars($eks['employees']['number_of_employees']).'" name="number_of_employees">';
       $html .= "</fieldset>";
       
@@ -497,7 +491,8 @@ class eEKS extends lazy_mofo{
       foreach($eks['subsidies'] as $key=>$val){
         if( is_bool($val) ){
             $val ? $checked = ' checked="checked"' : $checked = '';
-            $html .= '<input type="checkbox" name="subsidies_'.$key.'"'.$checked.'>';
+            $html .= '<input type="checkbox" id="subsidies_'.$key.'" name="subsidies_'.$key.'"'.$checked.'>';
+            $html .= '<label for="subsidies_'.$key.'"></label>';
           }
         else
           $html .= '<input type="text" value="'.htmlspecialchars($val).'" name="subsidies_'.$key.'">';
@@ -544,14 +539,17 @@ class eEKS extends lazy_mofo{
       
       // estimated or calculated data
       $html .= "<fieldset>";
-      $html .= '<input type="radio" name="page3_estimated" disabled="disabled" />';
-      $html .= '<input type="radio" name="page3_calculated" checked="checked" />';
+      $html .= '<input type="radio" id="page3_estimated" name="page3_estimated" disabled="disabled" />';
+      $html .= '<label for="page3_estimated"></label>';
+      $html .= '<input type="radio" id="page3_calculated" name="page3_calculated" checked="checked" />';
+      $html .= '<label for="page3_calculated"></label>';
       $html .= "</fieldset>";
       
       // small business / Kleinunternehmer/in (§ 19 UStG)
       $html .= "<fieldset>";
       $eks['eks']['small_business'] ? $checked = " checked='checked'" : $checked = "";
-      $html .= '<input type="checkbox" name="small_business"'.$checked.' />';
+      $html .= '<input type="checkbox" id="small_business" name="small_business"'.$checked.' />';
+      $html .= '<label for="small_business"></label>';
       $html .= "</fieldset>";
       
       // reset $this->column_sums
@@ -2341,12 +2339,23 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
       
       $url = $protocol.$host.$port.$url;
       
+      // set params
+      $param = "";
+      $param .= " --print-media-type";            // use print CSS
+      $param .= " -L 0 -R 0 -B 0 -T 0";           // set margins to 0 for full size background images
+      $param .= " -d 300";                        // dpi
+      $param .= " --disable-smart-shrinking";     // Disable to make WebKit pixel/dpi ratio constant
+      if( empty($_GET['_portrait']) && @$_GET['_portrait'] != 1 ) // wkhtmltopdf default: portrait
+        $param .= " -O Landscape";                // orientation landscape as default for printing tables
+        
       
-      // to do: if _view = eks --> pass pages separate for correct rotation in landscape
-      
+      // use different params for EKS view
+      if( !empty($_GET['_view']) && $_GET['_view'] == "eks" ){
+        $param = " --print-media-type -L 0 -R 0 -B 0 -T 0 -d 300 --disable-smart-shrinking";
+      }
       
       // execute wkhtmltopdf
-      exec($path.' --print-media-type -L 0 -R 0 -B 0 -T 0 -d 300 --disable-smart-shrinking "'.$url.'" '.$file);
+      exec($path.$param.' "'.$url.'" '.$file);
       
       // pass pdf as download to user
       $fileinfo = pathinfo($file);
