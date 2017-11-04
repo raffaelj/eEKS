@@ -48,6 +48,12 @@ grid_show_column_sums = true
 ;; for multiple grids in one page its possible to use the carryover from the last grid
 grid_show_carryover = false
 
+;; use renamed column names for CSV export
+rename_csv_headers = true
+
+;; set path to wkhtmltopdf for PDF export
+wkhtmltopdf_path = "/home/$USER/bin/wkhtmltopdf"
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; lazy_mofo config
 

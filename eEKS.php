@@ -119,6 +119,12 @@ class eEKS extends lazy_mofo{
   // folder for pdf creation
   public $pdf_path = "exports";
   
+  // for PDF export wkhtmltopdf must be installed
+  // you have to define the full path of the wkhtmltopdf executable
+  // Example on Uberspace: '/home/$USER/bin/wkhtmltopdf';
+  // more info in `docs/install.md` (coming soon)
+  public $wkhtmltopdf_path = 'wkhtmltopdf';
+  
   
   //////////////////////////////////////////////////////////////////////////////
   function __construct($dbh, $i18n = 'en-us', $ini = ''){
@@ -901,8 +907,6 @@ class eEKS extends lazy_mofo{
       $success = $this->grid_text_changes_saved;
     elseif($success == 3)
       $success = $this->grid_text_record_deleted;
-    elseif($success == 4)
-      $success = "wkhtmltopdf si not installed";
     else
       $success = '';
 
@@ -2288,12 +2292,19 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
     
     // purpose: generate PDF
     // requires wkhtmltopdf: https://wkhtmltopdf.org/downloads.html
+    // see installation instructions in `docs/install.md`
     
-    // check if wkhtmltopdf is installed
-    if( !mb_substr(exec('wkhtmltopdf --version'), 0, 11) == "wkhtmltopdf" ){
-      // $url = $this->get_uri_path() . "_success=4&" . $this->get_qs();
-      // $this->redirect($url);
-      $error = "wkhtmltopdf is not installed";
+    $path = "wkhtmltopdf";
+    
+    // try if wkhtmltopdf is installed and path is known
+    if( !mb_substr(exec($path.' --version'), 0, 11) == "wkhtmltopdf" ){
+      
+      // set path to user defined path
+      $path = $this->wkhtmltopdf_path;
+    }
+    // try with explicit path to wkhtmltopdf
+    if( !mb_substr(exec($path.' --version'), 0, 11) == "wkhtmltopf" ){
+      $error = 'wkhtmltopdf is not installed or the path '.$this->wkhtmltopdf_path.' is incorrect';
       $this->display_error($error, 'generate_pdf()');
       return;
     }
@@ -2335,7 +2346,7 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
       
       
       // execute wkhtmltopdf
-      exec('wkhtmltopdf --print-media-type -L 0 -R 0 -B 0 -T 0 -d 300 --disable-smart-shrinking "'.$url.'" '.$file);
+      exec($path.' --print-media-type -L 0 -R 0 -B 0 -T 0 -d 300 --disable-smart-shrinking "'.$url.'" '.$file);
       
       // pass pdf as download to user
       $fileinfo = pathinfo($file);
