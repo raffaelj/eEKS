@@ -28,9 +28,9 @@ catch(PDOException $e) {
 }
 
 // create LM/eEKS object, pass in PDO connection and i18n code
-$ee = new eEKS($dbh, 'de-de', 'eEKS.config.ini.php');
+$eeks = new eEKS($dbh, 'de-de', 'eEKS.config.ini.php');
 
-$ee->form_sql = "
+$eeks->form_sql = "
 SELECT
   a.ID
 , a.value_date
@@ -61,48 +61,48 @@ FROM accounting a
 WHERE a.ID = :ID
 ";
 
-$ee->form_sql_param[":$ee->identity_name"] = @$_REQUEST[$ee->identity_name]; 
+$eeks->form_sql_param[":$eeks->identity_name"] = @$_REQUEST[$eeks->identity_name]; 
 
 // may not be here
 
-$ee->form_input_control['file_01'] = '--image';
-$ee->form_input_control['file_02'] = '--image';
-$ee->form_input_control['file_03'] = '--image';
+$eeks->form_input_control['file_01'] = '--image';
+$eeks->form_input_control['file_02'] = '--image';
+$eeks->form_input_control['file_03'] = '--image';
 
-$ee->form_input_control['type_of_costs'] = 'SELECT ID AS val, type_of_costs AS opt FROM type_of_costs ORDER BY is_income DESC, sort_order ASC, type_of_costs ASC;--select';
-$ee->form_input_control['mode_of_employment'] = 'SELECT ID, mode_of_employment FROM mode_of_employment;--select';
-$ee->form_input_control['account'] = 'SELECT NULL, "nicht angegeben" UNION SELECT "Girokonto", "Girokonto" UNION SELECT "Barkasse", "Barkasse"; --radio';
+$eeks->form_input_control['type_of_costs'] = 'SELECT ID AS val, type_of_costs AS opt FROM type_of_costs ORDER BY is_income DESC, sort_order ASC, type_of_costs ASC;--select';
+$eeks->form_input_control['mode_of_employment'] = 'SELECT ID, mode_of_employment FROM mode_of_employment;--select';
+$eeks->form_input_control['account'] = 'SELECT NULL, "nicht angegeben" UNION SELECT "Girokonto", "Girokonto" UNION SELECT "Barkasse", "Barkasse"; --radio';
 
-$ee->grid_output_control['file_01'] = '--image'; // image clickable
-$ee->grid_output_control['file_02'] = '--image'; // image clickable
-$ee->grid_output_control['file_03'] = '--image'; // image clickable
+$eeks->grid_output_control['file_01'] = '--image'; // image clickable
+$eeks->grid_output_control['file_02'] = '--image'; // image clickable
+$eeks->grid_output_control['file_03'] = '--image'; // image clickable
 
-$ee->grid_output_control['gross_amount'] = '--number'; // 
+$eeks->grid_output_control['gross_amount'] = '--number'; // 
 
-// $ee->grid_input_control['value_date'] = '--date';
-// $ee->grid_input_control['voucher_date'] = '--date';
-// $ee->grid_input_control['gross_amount'] = '--number';
-// $ee->grid_input_control['account'] = 'SELECT NULL, "n.a." UNION SELECT "Girokonto", "Giro" UNION SELECT "Barkasse", "bar"; --radio';
-// $ee->grid_input_control['invoice_number'] = '--text';
-// $ee->grid_input_control['from_to'] = '--text';
-// $ee->grid_input_control['object'] = '--textarea';
-// $ee->grid_input_control['type_of_costs'] = 'SELECT ID AS val, type_of_costs AS opt FROM type_of_costs ORDER BY is_income DESC, sort_order ASC, type_of_costs ASC;--select';
-// $ee->grid_input_control['mode_of_employment'] = 'SELECT ID, mode_of_employment FROM mode_of_employment;--select';
-// $ee->grid_input_control['cat_01'] = '--text';// area of operations
-// $ee->grid_input_control['notes_01'] = '--textarea';
-// $ee->grid_input_control['notes_02'] = '--textarea';
+// $eeks->grid_input_control['value_date'] = '--date';
+// $eeks->grid_input_control['voucher_date'] = '--date';
+// $eeks->grid_input_control['gross_amount'] = '--number';
+// $eeks->grid_input_control['account'] = 'SELECT NULL, "n.a." UNION SELECT "Girokonto", "Giro" UNION SELECT "Barkasse", "bar"; --radio';
+// $eeks->grid_input_control['invoice_number'] = '--text';
+// $eeks->grid_input_control['from_to'] = '--text';
+// $eeks->grid_input_control['object'] = '--textarea';
+// $eeks->grid_input_control['type_of_costs'] = 'SELECT ID AS val, type_of_costs AS opt FROM type_of_costs ORDER BY is_income DESC, sort_order ASC, type_of_costs ASC;--select';
+// $eeks->grid_input_control['mode_of_employment'] = 'SELECT ID, mode_of_employment FROM mode_of_employment;--select';
+// $eeks->grid_input_control['cat_01'] = '--text';// area of operations
+// $eeks->grid_input_control['notes_01'] = '--textarea';
+// $eeks->grid_input_control['notes_02'] = '--textarea';
 
 // run eEKS/LM
-$ee->run();
+$eeks->run();
 
 // echo "<pre><code style='font-size: .7em;'>";
-// print_r($ee->get_action());
+// print_r($eeks->get_action());
 // echo "\r\n";
-// print_r($ee->grid_sql);
+// print_r($eeks->grid_sql);
 // echo "\r\n";
-// print_r($ee->grid_sql_param);
+// print_r($eeks->grid_sql_param);
 // echo "\r\n";
-// print_r($ee->column_sums);
+// print_r($eeks->column_sums);
 // echo "</pre></code>";
 
 ?>
