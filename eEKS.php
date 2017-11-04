@@ -114,6 +114,11 @@ class eEKS extends lazy_mofo{
   public $carryover = "";
   public $grid_show_carryover = false;
   
+  public $rename_csv_headers = false;
+  
+  // folder for pdf creation
+  public $pdf_path = "exports";
+  
   
   //////////////////////////////////////////////////////////////////////////////
   function __construct($dbh, $i18n = 'en-us', $ini = ''){
@@ -161,7 +166,7 @@ class eEKS extends lazy_mofo{
     // purpose: built-in controller 
     
     // set commands and grid_sql
-    $this->get_grid_view();
+    $this->grid_view();
 
     switch($this->get_action()){
       case "edit":          $this->template($this->edit());        break;
@@ -284,7 +289,7 @@ class eEKS extends lazy_mofo{
   }
   
   //////////////////////////////////////////////////////////////////////////////
-  function get_grid_view(){
+  function grid_view(){
     
     // purpose: show different views with different grids, forms and searchboxes
     
@@ -630,6 +635,9 @@ class eEKS extends lazy_mofo{
 
     $html .= "</form>";
     
+    // reset $this->grid_sql to all pages (for export)
+    // $this->grid_sql = $this->generate_grid_sql_eks("1,2,3,4,5,6");
+    
     return $html;
     
   }
@@ -865,7 +873,7 @@ class eEKS extends lazy_mofo{
     if(mb_strlen($sql) == 0)
       $sql = "select *, `$this->identity_name` from `$this->table` order by $default_order_by";
 
-    // inject funciton for counting
+    // inject function for counting
     $sql = preg_replace('/^select/i', 'select sql_calc_found_rows', $sql);
 
     // get input
@@ -875,7 +883,8 @@ class eEKS extends lazy_mofo{
     $_order_by = abs(intval(@$_REQUEST['_order_by'])); // order by is numeric index to column
     $_desc = abs(intval(@$_REQUEST['_desc']));         // descending order flag
     $_offset = abs(intval(@$_REQUEST['_offset']));     // pagination offset
-    $_export = intval(@$_REQUEST['_export']); 
+    $_export = intval(@$_REQUEST['_export']);
+    $_pdf = intval(@$_REQUEST['_pdf']);
     
     $qs = $this->get_qs();
 
@@ -892,6 +901,8 @@ class eEKS extends lazy_mofo{
       $success = $this->grid_text_changes_saved;
     elseif($success == 3)
       $success = $this->grid_text_record_deleted;
+    elseif($success == 4)
+      $success = "wkhtmltopdf si not installed";
     else
       $success = '';
 
@@ -938,11 +949,18 @@ class eEKS extends lazy_mofo{
     $result_count = $this->query($sql);
     foreach($result_count as $row)
       $count = $row['cnt'];
-
+    
     // export data to CSV and quit 
     if($_export == 1 && $count > 0){
       $this->export($result, $columns);
-      return;    
+      return;
+    }
+    
+    // export page to PDF and quit 
+    if($_pdf == 1){
+      $url = $this->get_uri_path() . $this->get_qs();
+      $this->generate_pdf($url);
+      return;
     }
 
     // populate link placeholders
@@ -2193,6 +2211,166 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
     $this->error = "<div class='lm_error'><p>$msg</p></div>" ;
 
   }
+  
+  //////////////////////////////////////////////////////////////////////////////
+  function export(&$result, $columns){
+
+    // purpose: send database result in CSV format to browser. 
+
+    if(mb_strlen($this->export_csv_file_name) > 0)
+      $file_name = $this->export_csv_file_name;
+    elseif(mb_strlen($this->table) > 0)
+      $file_name = $this->clean_file_name($this->table . '.csv');
+    else
+      $file_name = 'download.csv';
+
+    // output buffering required
+    $level = 0;
+    $arr = ob_get_status(true);
+    if($arr)
+      $level = count($arr);
+
+    if($level <= 0){
+      $error = "ob_start() or ob_start('ob_gzhandler') must be called at the beginning of the script to use CSV Export.";
+      $this->display_error($error, 'export()');
+      return;
+    }
+
+    // erase any existing buffers
+    while($level >= 1 ){
+      ob_end_clean();
+      $level--;
+    }
+
+    if(!ob_start('ob_gzhandler'))
+      ob_start();
+
+    header("Cache-Control: maxage=1");
+    header("Pragma: public");
+    header("Content-Type: application/csv");
+    header("Content-Disposition: attachment; filename=$file_name");
+
+    // remove last column if last column is the identity that holds the [edit] and [delete] links
+    if(end($columns) == $this->identity_name)
+       array_pop($columns);
+       
+    // header row    
+    $column_index = 0;
+    foreach($columns as $key => $val){
+      if($this->rename_csv_headers && isset($this->rename[$val]) && mb_strlen($this->rename[$val]) > 0)
+        $val = $this->rename[$val];
+      echo $this->export_escape($val, $column_index++);
+    }
+
+    echo "\r\n";
+
+    // loop thru data
+    $row_index = 0;
+    foreach($result as $row){
+
+      $column_index = 0;
+      foreach($columns as $val)
+        echo $this->export_escape($row[$val], $column_index++);
+      
+      $row_index++;
+
+      echo "\r\n";
+      
+    }
+
+    ob_end_flush();
+    die();
+
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////
+  function generate_pdf($url = ""){
+    
+    // purpose: generate PDF
+    // requires wkhtmltopdf: https://wkhtmltopdf.org/downloads.html
+    
+    // check if wkhtmltopdf is installed
+    if( !mb_substr(exec('wkhtmltopdf --version'), 0, 11) == "wkhtmltopdf" ){
+      // $url = $this->get_uri_path() . "_success=4&" . $this->get_qs();
+      // $this->redirect($url);
+      $error = "wkhtmltopdf is not installed";
+      $this->display_error($error, 'generate_pdf()');
+      return;
+    }
+    else{
+      
+      // create folder if not exist
+      if(!file_exists($this->pdf_path) && mb_strlen($this->pdf_path) > 0){
+        mkdir($this->pdf_path, 0755);
+        usleep(500);
+      }
+      
+      
+      // set page name as file name
+      $filename = trim(strtolower($this->get_page_name()));
+      
+      // escape unwanted characters
+      $filename = preg_replace('/[^A-Za-z0-9_\-]/', '_', $filename);
+      
+      // rename if file exists
+      $filename = $this->upload_rename_if_exists($this->pdf_path, $filename);
+      
+      $ext = ".pdf";
+      
+      $file = $this->pdf_path ."/". $filename . $ext;
+      
+      // get complete url
+      $port = '';
+      $host = preg_replace('/:[0-9]+$/', '', $_SERVER['HTTP_HOST']); // host without port number
+      $protocol = 'http://';
+      if(@$_SERVER['HTTPS'] != '' && @$_SERVER['HTTPS'] != 'off')
+        $protocol = 'https://';
+      if(!($_SERVER['SERVER_PORT'] == '80' || $_SERVER['SERVER_PORT'] == '443'))
+        $port = ':' . $_SERVER['SERVER_PORT'];
+      
+      $url = $protocol.$host.$port.$url;
+      
+      
+      // to do: if _view = eks --> pass pages separate for correct rotation in landscape
+      
+      
+      // execute wkhtmltopdf
+      exec('wkhtmltopdf --print-media-type -L 0 -R 0 -B 0 -T 0 -d 300 --disable-smart-shrinking "'.$url.'" '.$file);
+      
+      // pass pdf as download to user
+      $fileinfo = pathinfo($file);
+      $sendname = $fileinfo['filename'] . '.' . strtoupper($fileinfo['extension']);
+      
+      header('Content-Type: application/pdf');
+      header("Content-Disposition: attachment; filename=\"$sendname\"");
+      header('Content-Length: ' . filesize($file));
+      readfile($file);
+      die();
+    }
+    
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////
+  function get_page_name(){
+    
+    // purpose: get a page name from action and view
+    
+    $title = "";
+    if (mb_strlen($this->get_action()) > 0 )
+      $title .= $this->get_action();
+    if( !empty($_GET['_view']) && in_array($_GET['_view'], $this->views) ){
+      if(mb_strlen($title) > 0)
+        $title .= " - ";
+      $title .= $_GET['_view'];
+    }
+      
+    if(mb_strlen($title) == 0)
+      $title = $this->name;
+      
+    return htmlspecialchars($title);
+    
+  }
+  
   
   
   
