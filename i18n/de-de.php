@@ -32,7 +32,7 @@ $this->form_text_record_added = 'Eintrag hinzugefügt';
 // links on grid
 $this->grid_add_link_text    = "Neuer Eintrag";
 $this->grid_edit_link_text   = "ändern";
-$this->grid_export_link = "<a href='[script_name]_export=1&amp;[qs]' title='CSV herunterladen' class='lm_button grid_export_link'>Exportieren</a>";
+$this->grid_export_link = "<a href='[script_name]_export=1&amp;[qs]' title='CSV herunterladen' class='lm_button grid_export_link'>CSV</a>";
 
 // search box
 // $this->grid_search_box = "
@@ -142,3 +142,7 @@ $this->rename['notes'] = 'Notizen';
 
 $this->rename['sum'] = 'Summe';
 $this->rename['average'] = 'Ø';
+
+$this->rename['topic'] = 'Oberthema';
+$this->rename['page'] = 'Seite';
+$this->rename['coa_jobcenter_eks_01_2017'] = 'Kontenrahmen Jobcenter-EKS.01.2017';
