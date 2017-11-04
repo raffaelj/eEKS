@@ -142,6 +142,11 @@ coming soon
   * [x] grid
   * [ ] with grid_input_control
   * [x] with column sums
+* [ ] Export to CSV doesn't work with multiple grids
+* [x] PDF export
+  * [ ] mixed landscape/portrait (EKS)
+  * [ ] user should choose if landscape or portrait
+  * [ ] use different margins for EKS and all other pages
 
 ### pages
 
