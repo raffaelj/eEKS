@@ -25,49 +25,12 @@ Don't use this software if you dont't know what's going on. Don't use it on a pu
 
 You can import `sample_data.sql` with English column headers and German sample data.
 
-## installation/demo
+## installation demo and update
 
 It's work in progress! There are no security features!
 
-instructions for installing on an [Uberspace](https://uberspace.de/):
+If you want to try the dev version have a look at [docs/install.md](docs/install.md).
 
-* only MYSQL 5.1 possible until they update to CentOS 7
-  * --> no `utf8mb4`
-  * --> no two auto timestamp columns for `date_created` and `date_last_changed`
-
-more info coming soon...
-
-* create a new database
-* import `sample_data.sql`
-* via console:
-
-```bash
-# go to web root
-cd /var/www/virtual/$USER/html;
-
-# clone repo
-git clone https://github.com/raffaelj/eEKS.git;
-
-# open folder
-cd eEKS;
-
-# copy config dist files
-cp eEKS.db.ini.php.dist eEKS.db.ini.php
-cp eEKS.config.ini.php.dist eEKS.config.ini.php
-
-# add your database credentials
-nano eEKS.db.ini.php
-```
-
-Now eEKS should be available under `http://username.servername.uberspace.de/eEKS`
-
-### Updating to newest development version with sample data
-
-* navigate to your eEKS directory for example: `cd /var/www/virtual/$USER/html/eEKS`
-* make `update.sh` executable `chmod 744 update.sh`
-* run `./update.sh`
-
-Now eEKS should be available under `http://username.servername.uberspace.de/eEKS`
 
 ## Version and license
 
@@ -98,6 +61,13 @@ coming soon
 
 ## Requirements and restrictions
 
+* based on [lazy_mofo/datagrid][3], which requires
+  * PHP 5+ and MySQL 5
+  * Magic Quotes should be turned off
+  * PDO MySQL module installed for PHP
+  * Database table must have a primary key identity
+  * Multibyte Support / mbstring must be enabled
+* PDF export requires [wkhtmltopdf](https://wkhtmltopdf.org/downloads.html)
 * y10k bug ;-)
 
 ## To do
