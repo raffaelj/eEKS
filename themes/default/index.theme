@@ -42,6 +42,7 @@ echo "<!DOCTYPE html>
     <footer class='center'>
     <p>" . htmlspecialchars($this->slogan) . "</p>
     <p><a href='https://github.com/raffaelj/eeks'>Sourcecode on Github</a></p>
+    <p>" . $this->version() . "</p>
   </footer>
 </body>
 </html>";

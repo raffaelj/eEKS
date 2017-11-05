@@ -3,6 +3,7 @@ thumbs
 uploads
 tests
 exports
+last_commit.txt
 
 # Windows image file caches
 Thumbs.db

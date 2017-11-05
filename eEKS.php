@@ -2391,6 +2391,22 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
     
   }
   
+  //////////////////////////////////////////////////////////////////////////////
+  function version(){
+    
+    // purpose: until I don't have versioning show date of last commit
+    // `last_commit.txt` will be created while `update.sh` runs
+    // or as git hook
+    
+    if( file_exists('last_commit.txt') ){
+      $arr = explode(",", file_get_contents('last_commit.txt'));
+      return "<a href='https://github.com/raffaelj/eEKS/commit/$arr[1]'>last commit:</a> ". $this->date_out($arr[0], true);
+    }
+    else
+      return "no version available";
+    
+  }
+  
   
   
   

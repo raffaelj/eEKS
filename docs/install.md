@@ -1,4 +1,4 @@
-# installation
+# Installation
 
 instructions for installing on an [Uberspace](https://uberspace.de/):
 
@@ -44,10 +44,11 @@ The PDF export requires [wkhtmltopdf](https://wkhtmltopdf.org/downloads.html).
   
 
 
-### Updating to newest development version with sample data
+## Update
 
 * navigate to your eEKS directory for example: `cd /var/www/virtual/$USER/html/eEKS`
 * make `update.sh` executable `chmod 744 update.sh`
-* run `./update.sh`
+* run `./update.sh` with optional arguments `ini` and `sql`
+* `./update.sh ini sql` renews config files and database with sample data
 
 Now eEKS should be available under `http://username.servername.uberspace.de/eEKS`

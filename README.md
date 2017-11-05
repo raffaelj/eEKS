@@ -29,7 +29,11 @@ You can import `sample_data.sql` with English column headers and German sample d
 
 It's work in progress! There are no security features!
 
+demo: coming soon
+
 If you want to try the dev version have a look at [docs/install.md](docs/install.md).
+
+updating to newest dev version: run `update.sh ini sql` (renews data, config files and database)
 
 
 ## Version and license
@@ -86,6 +90,7 @@ coming soon
 * dashboard
 * better GUI (navigation, search bar, settings)
 * icons
+* save user authentication
 * translate GUI
 * translate everything
 * driver's log

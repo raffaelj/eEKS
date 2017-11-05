@@ -15,15 +15,24 @@ then
 
   ## grab all new fancy files
   git pull
-
-  ## optional: copy config file
-  cp config/eEKS.config.ini.php.dist config/eEKS.config.ini.php
-
-  ## optional: copy EKS profile
-  cp profiles/default.ini.php.dist profiles/default.ini.php
+  
+  ## set `last_commit.txt` for temporary versioning
+  git log -1 --date=format:%c --pretty=format:%cd,%H>last_commit.txt
+  
+  ## optional: copy config file and EKS profile
+  if [[ $1 = ini  ]] || [[ $2 = ini ]]
+  then
+    cp config/eEKS.config.ini.php.dist config/eEKS.config.ini.php
+    cp profiles/default.ini.php.dist profiles/default.ini.php
+    echo config files updated
+  fi
 
   ## optional: insert new sample data in mysql database
-  mysql $dbname < sample_data.sql
+  if [[ $1 = sql  ]] || [[ $2 = sql ]]
+  then
+    mysql $dbname < sample_data.sql
+    echo database reset with sample data
+  fi
   
   echo Update successful
 
