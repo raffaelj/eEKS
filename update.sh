@@ -17,7 +17,7 @@ then
   git pull
   
   ## set `last_commit.txt` for temporary versioning
-  git log -1 --date=format:%c --pretty=format:%cd,%H>last_commit.txt
+  git log -1 --date=format:"%Y-%m-%d %H:%M:%S" --pretty=format:%cd,%H>last_commit.txt
   
   ## optional: copy config file and EKS profile
   if [[ $1 = ini  ]] || [[ $2 = ini ]]
