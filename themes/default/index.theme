@@ -26,10 +26,12 @@ echo "<!DOCTYPE html>
     <h1><a href='$uri'>".htmlspecialchars($this->name)."</a></h1>
     " . $this->add_button() . "
     <nav>" . $this->view_list() . "
-      <a href='{$uri}action=settings' class='lm_button'>Settings</a>
+      <a href='{$uri}action=settings&amp;{$qs}' class='lm_button'>".$this->translate('settings')."</a>
       <a href='{$uri}_pdf=1&amp;{$qs}' class='lm_button' title='download PDF'>PDF</a>
+      " . $this->export_button() . "
+      <a href='{$uri}_lang=de-de&amp;{$qs}' class='lm_button'>de</a>
+      <a href='{$uri}_lang=en-us&amp;{$qs}' class='lm_button'>en</a>
     </nav>
-    " . $this->export_button() . "
     " . $this->search_box() . "
     " . $this->list_edit_tables() . "
   </header>

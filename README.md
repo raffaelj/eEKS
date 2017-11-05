@@ -11,7 +11,7 @@ Kindly excuse my clause grammar mistakes and some wrong vocabularies. I try my b
 
 This will be a complete rewrite of a "works for me" solution with some bugs in a private repo of mine.
 
-The original one grew over a few years after experimenting with Open Office Base, porting the database to SQLite and later to MySQL. Open Office Base doesn't work well, is complicated and I really don't like the visual experience. With [lazymofo/datagrid][3] I found an easy solution to insert and change my data and every time I needed a new feature I hacked a view new lines in the code, mixed up German and English variable names...
+The original one grew over a few years after experimenting with Open Office Base, porting the database to SQLite and later to MySQL. Open Office Base doesn't work well, is complicated and I really don't like the visual experience. With [lazymofo/datagrid][3] I found an easy solution to insert and change my data and every time I needed a new feature I hacked a few new lines in the code, mixed up German and English variable names...
 
 This time I try to have a cleaner coding style, avoid any German language in the source code and translate it later with a language file.
 
@@ -98,10 +98,6 @@ coming soon
 
 ### revise lm code and features
 
-* delete dataset without javascript
-  * [x] single from grid
-  * [x] multi from grid (without confirmation)
-  * [x] from form
 * grid - set class names (or data attributes) for data types
   * [x] get rid of javascript inside code
   * [x] get rid of inline styles (nowrap, align...)
@@ -125,13 +121,18 @@ coming soon
   * [x] i18n number format
   * [x] no inline styles
 * [x] no inline styles
-* [ ] no javascript for basic usage
-  * [x] delete
+* no javascript for basic usage
+  * delete dataset without javascript
+    * [x] single from grid
+    * [x] multi from grid (without confirmation)
+    * [ ] multi from grid (with confirmation)
+    * [x] single from form
   * [x] back
   * [ ] multi delete
   * [ ] go button on giant datasets
 * [x] output via template file
 * CSV export
+  * [x] optional renaming of column heaaders
   * [ ] needs i18n number_format
   * [ ] doesn't work with multiple grids (chooses first grid)
   * [ ] trigger for export should be outside of grid
@@ -144,7 +145,9 @@ coming soon
   * [x] mixed landscape/portrait (EKS)
   * [ ] user should choose if landscape or portrait
   * [ ] use different margins for EKS and all other pages
-  * [ ] doesn't recognize changed input fields, expected: output same as screen, should submit form data to querystring 
+  * [ ] doesn't recognize changed input fields, expected: output same as screen, should submit form data to querystring
+* [x] I really have to figure out how `$this->query_string_list` works for _view, _lang, _action
+* [x] escape ampersands in links
 
 ### pages
 

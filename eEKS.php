@@ -27,9 +27,46 @@ class eEKS extends lazy_mofo{
   // contains error message --> must be in template
   public $error = "";
   
+  // placeholders for date filters
+  public $date_filter_from = "from";
+  public $date_filter_to = "to";
+  
+  // other words that need translation and may appear somewhere
+  // example in i18n file: $this->translate['all'] = "alle";
+  public $translate = array();
+  
+  // active views
+  // options: no_date, monthly, edit, eks
+  public $views = array();
+  
+  // optional sums in last row (monthly view)
+  public $grid_show_column_sums = false;
+  // automated sums in grid
+  public $column_sums = array();
+  public $carryover = "";
+  public $grid_show_carryover = false;
+  
+  public $rename_csv_headers = false;
+  
+  // folder for pdf creation
+  public $pdf_path = "exports";
+  
+  // for PDF export wkhtmltopdf must be installed
+  // you have to define the full path of the wkhtmltopdf executable
+  // Example on Uberspace: '/home/$USER/bin/wkhtmltopdf';
+  // more info in `docs/install.md` (coming soon)
+  public $wkhtmltopdf_path = 'wkhtmltopdf';
+  
+  // optional configuration via ini file
+  private $config = array();
+  
+  // public variable to overwrite i18n
+  public $i18n = "";
+  
   
   
   /////////////// overwrite LM variables
+  // some of them are new for i18n
   
   public $table = 'accounting';    // table name for updates, inserts and deletes
   public $identity_name = 'ID';    // identity / primary key for table
@@ -45,6 +82,8 @@ class eEKS extends lazy_mofo{
   // this solution uses CSS, a checkbox and a confirm button
   public $grid_delete_link = "<input type='checkbox' name='[identity_name]' id='delete_[identity_id]' value='[identity_id]' class='button_delete'><label for='delete_[identity_id]' class='lm_button lm_icon alarm'>X</label><div class='delete_confirm'><p>[delete_confirm]</p><input type='submit' name='confirm_delete' value='[grid_text_delete]' class='button_delete_confirm lm_button alarm'></div>";
   
+  public $grid_export_link_text = "Export CSV";
+  public $grid_export_link = "<a href='[script_name]_export=1&amp;[qs]' title='[grid_export_link_text]' class='lm_button grid_export_link'>CSV</a>";
   
   // form buttons
   public $form_add_button_text    = "Add";
@@ -84,46 +123,16 @@ class eEKS extends lazy_mofo{
     </fieldset>
   </form>";
   
-  // placeholders for date filters
-  public $date_filter_from = "from";
-  public $date_filter_to = "to";
+  /**
+   * query string list for search filters
+   * 
+   * date filters: _date_between,_from,_to
+   * income/costs: _amount (pos, neg)
+   * main category filters: _mode_of_employment,_type_of_costs
+   * custom category filters: _cat_01... - coming soon
+   */
   
-  // query string for search filters
-  // date filters: _date_between,_from,_to
-  // income/costs: _amount (pos, neg)
-  // main category filters (_mode_of_employment,_type_of_costs): _moe, _tov
-  // custom category filters: _cat_01 ...
-  
-  // public $query_string_list = "_date_between,_from,_to,_moe,_toc,_amount,_view";
-  public $query_string_list = "_date_between,_from,_to,_view,_amount,_type_of_costs,_mode_of_employment,_edit_table";
-  // public $query_string_list = "_view";
-  public $query_string_list_post = '_view';     // comma delimited list of variable names to carry around in the URL for POST-search button
-  
-  // active views
-  // options: no_date, monthly, edit, eks
-  public $views = array();
-  
-  // optional configuration via ini file
-  private $config = array();
-  
-  
-  // optional sums in last row (monthly view)
-  public $grid_show_column_sums = false;
-  // automated sums in grid
-  public $column_sums = array();
-  public $carryover = "";
-  public $grid_show_carryover = false;
-  
-  public $rename_csv_headers = false;
-  
-  // folder for pdf creation
-  public $pdf_path = "exports";
-  
-  // for PDF export wkhtmltopdf must be installed
-  // you have to define the full path of the wkhtmltopdf executable
-  // Example on Uberspace: '/home/$USER/bin/wkhtmltopdf';
-  // more info in `docs/install.md` (coming soon)
-  public $wkhtmltopdf_path = 'wkhtmltopdf';
+  public $query_string_list = "_date_between,_from,_to,_amount,_type_of_costs,_mode_of_employment,_edit_table";
   
   
   //////////////////////////////////////////////////////////////////////////////
@@ -144,13 +153,6 @@ class eEKS extends lazy_mofo{
     // avoid notices for this noonce token
     if(!isset($_SESSION['_csrf']))
       $_SESSION['_csrf'] = '';
-
-    // load requested internationalization file, en-us is defined above, in this class
-    if(strlen($i18n) > 0 && $i18n != 'en-us'){
-      if(!file_exists("i18n/{$i18n}.php"))
-        die("Error: Requested i18n file ({$i18n}.php) does not exist.");
-      include("i18n/{$i18n}.php");    
-    }
     
     // load configuration from ini file
     if(strlen($ini) > 0){
@@ -161,6 +163,7 @@ class eEKS extends lazy_mofo{
       else
         die("Error: Requested ini file ({$ini}) does not exist.");
       
+      // overwrite public variables defined in config file
       $this->config_from_ini();
     }
     
@@ -169,7 +172,10 @@ class eEKS extends lazy_mofo{
   //////////////////////////////////////////////////////////////////////////////
   function run(){
 
-    // purpose: built-in controller 
+    // purpose: built-in controller
+    
+    // load internationalization file if it exists, en-us (default) is defined this class
+    $this->set_language();
     
     // set commands and grid_sql
     $this->grid_view();
@@ -185,6 +191,38 @@ class eEKS extends lazy_mofo{
       default:              $this->template($this->index());
     }
 
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////
+  function set_language(){
+    
+    // purpose: load internationalization file, default: en-us
+    
+    if(strlen(@$_GET['_lang']) == 5 && !strpos(@$_GET['_lang'], '/'))
+      $i18n = $_GET['_lang'];
+    else
+      $i18n = $this->i18n;
+    
+    if(strlen($i18n) > 0 && $i18n != 'en-us'){
+      if(!file_exists("i18n/{$i18n}.php"))
+        $this->error = "Error: Requested i18n file ({$i18n}.php) does not exist.";
+      else
+        include("i18n/{$i18n}.php");
+    }
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////
+  function translate($str = ""){
+    
+    // purpose: translate words
+    // example:
+    // content of i18n file: `$this->translate['all'] = "alle";`  (array)
+    //          use in code: `$this->translate('all');`           (function)
+    
+    if(array_key_exists($str, $this->translate))
+      return $this->translate[$str];
+    else
+      return $str;
   }
   
   //////////////////////////////////////////////////////////////////////////////
@@ -259,17 +297,20 @@ class eEKS extends lazy_mofo{
     
     $uri = $this->get_uri_path();
     
+    // qs without _view
+    $qs = $this->get_qs('_order_by,_desc,_offset,_search,_pagination_off,_lang');
+    
     $html = "";
     
     // default
-    $html .= "<a href='".$uri."_view=default' class='lm_button$class'>default</a> ";
+    $html .= "<a href='{$uri}_view=default&amp;$qs' class='lm_button$class'>default</a> ";
     
     // other options
     foreach($this->views as $val){
       $class = "";
       if($val == $active_view)
         $class = " active";
-      $html .= "<a href='".$uri."_view=$val' class='lm_button$class'>$val</a> ";
+      $html .= "<a href='".$uri."_view=$val&amp;$qs' class='lm_button$class'>$val</a> ";
     }
     
     return $html;
@@ -688,6 +729,7 @@ class eEKS extends lazy_mofo{
     $grid_export_link = $this->grid_export_link;
     $grid_export_link = str_replace('[script_name]', $uri_path, $grid_export_link);
     $grid_export_link = str_replace('[qs]', $qs, $grid_export_link);
+    $grid_export_link = str_replace('[grid_export_link_text]', $this->grid_export_link_text, $grid_export_link);
     return $grid_export_link;
   }
   //////////////////////////////////////////////////////////////////////////////
@@ -1002,10 +1044,10 @@ class eEKS extends lazy_mofo{
         $edit_delete = "    <th class='col_edit'></th>\n"; // if identity is last column then this is the column with the edit and delete links
       elseif( $this->multi_column_on ){ // experimental multi-value column active
         if( !in_array($column_name, $this->config['multi_column']) )
-          $head .= "    <th><a href='{$uri_path}_order_by=" . ($i + 1) . "&amp;_desc=$_desc_invert&amp;" . $this->get_qs('_search') . "' class='lm_$column_name'>$title</a></th>\n";
+          $head .= "    <th><a href='{$uri_path}_order_by=" . ($i + 1) . "&amp;_desc=$_desc_invert&amp;" . $this->get_qs('_search,_view,_lang') . "' class='lm_$column_name'>$title</a></th>\n";
       }
       else
-        $head .= "    <th><a href='{$uri_path}_order_by=" . ($i + 1) . "&amp;_desc=$_desc_invert&amp;" . $this->get_qs('_search') . "' class='lm_$column_name'>$title</a></th>\n";
+        $head .= "    <th><a href='{$uri_path}_order_by=" . ($i + 1) . "&amp;_desc=$_desc_invert&amp;" . $this->get_qs('_search,_view,_lang') . "' class='lm_$column_name'>$title</a></th>\n";
   
       $i++;
 
@@ -1526,15 +1568,15 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
     $selected = "";
     if( !empty($_GET["_amount"]) && $_GET["_amount"] != "pos" && $_GET["_amount"] != "neg" )
       $selected = " selected='selected'";
-    $html .= "<option value=''$selected>all</option>";
+    $html .= "<option value=''$selected>".$this->translate('all')."</option>";
     $selected = "";
     if( !empty($_GET["_amount"]) && $_GET["_amount"] == "pos" )
       $selected = " selected='selected'";
-    $html .= "<option value='pos'$selected>income</option>";
+    $html .= "<option value='pos'$selected>".$this->translate('income')."</option>";
     $selected = "";
     if( !empty($_GET["_amount"]) && $_GET["_amount"] == "neg" )
       $selected = " selected='selected'";
-    $html .= "<option value='neg'$selected>costs</option>";
+    $html .= "<option value='neg'$selected>".$this->translate('costs')."</option>";
     $html .= "</select>";
     
     
@@ -1544,7 +1586,7 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
       $html .= "<fieldset>\r\n";
       
       if($count == 1) // text with hidden input field
-        $html .= "  <input type='hidden' name='_date_between' readonly='readonly' value='".$date_filters[0] . "'>" . $this->rename[$date_filters[0]] . ": \r\n";
+        $html .= "  <input type='hidden' name='_date_between' readonly='readonly' value='".$date_filters[0] . "'>" . $this->format_title($date_filters[0], @$this->rename[$date_filters[0]]) . ": \r\n";
       else{ // select
         $html .= "  <select name='_date_between'>\r\n";
         
@@ -1552,7 +1594,7 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
           $selected = "";
           if(isset($_GET["_date_between"]) && $val == $_GET["_date_between"]) 
             $selected .= ' selected="selected"';
-          $html .= "    <option value='$val'$selected>".$this->rename[$val]."</option>\r\n";
+          $html .= "    <option value='$val'$selected>" . $this->format_title($val, @$this->rename[$val]) . "</option>\r\n";
         }
         $html .= "  </select>\r\n";
       }
@@ -1581,7 +1623,7 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
           $arr = $this->query("SELECT ID, $cat FROM $cat ORDER BY COALESCE(NULLIF($cat.sort_order, ''), 99)  ASC, $cat", array(), "search_box_filters()");
         
         // empty field first
-        $html .= "    <option value='' class='select_title'>".$this->rename[$cat]." (all)</option>\r\n";
+        $html .= "    <option value='' class='select_title'>" . $this->format_title($cat, @$this->rename[$cat]) . " (".$this->translate('all').")</option>\r\n";
         
         foreach($arr as $key=>$val){
           
@@ -1615,15 +1657,6 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
     
     // get input
     $_search = $this->clean_out(@$_REQUEST['_search']);
-    // $qs = $this->get_qs();
-    
-    // populate link placeholders    
-    // $grid_add_link = $this->grid_add_link;
-    // $grid_export_link = $this->grid_export_link;
-    // $grid_add_link = str_replace('[script_name]', $uri_path, $grid_add_link);
-    // $grid_add_link = str_replace('[qs]', $qs, $grid_add_link);
-    // $grid_export_link = str_replace('[script_name]', $uri_path, $grid_export_link);
-    // $grid_export_link = str_replace('[qs]', $qs, $grid_export_link);
     
     // search bar
     $search_box = '';
@@ -1631,8 +1664,8 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
   
       // carry values defined in query_string_list
       $query_string_list_inputs = '';
-      if(mb_strlen($this->query_string_list_post) > 0){
-        $arr = explode(',', trim($this->query_string_list_post, ', '));
+      if(mb_strlen($this->query_string_list) > 0){
+        $arr = explode(',', trim($this->query_string_list, ', '));
         foreach($arr as $val){
           $value = $this->clean_out(@$_REQUEST[$val]);
           if(mb_strlen($value) > 0)
@@ -1642,7 +1675,7 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
       }
           
       $search_box = $this->grid_search_box;
-      $search_box = str_replace('[script_name]', $uri_path . $this->get_qs('') , $search_box); // for 'x' cancel do add get_qs('') to carry query_string_list
+      $search_box = str_replace('[script_name]', $uri_path . $this->get_qs('_view,_lang') , $search_box); // for 'x' cancel do add get_qs('') to carry query_string_list
       $search_box = str_replace('[_search]', $_search, $search_box);
       $search_box = str_replace('[_csrf]', $_SESSION['_csrf'], $search_box);
       $search_box = str_replace('[query_string_list]', $query_string_list_inputs, $search_box);
@@ -1651,7 +1684,6 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
       $search_box = str_replace('[filters]', $this->search_box_filters(), $search_box);
     }
 
-    // $add_record_search_bar = "<div class='lm_add_search'>$grid_add_link $grid_export_link $search_box</div>\r\n";
     $add_record_search_bar = "<div class='lm_add_search'>$search_box</div>\r\n";
     
     return $add_record_search_bar;
@@ -1853,7 +1885,7 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
       $action = 'action=edit&';
 
     // redirect user
-    $url = $this->get_uri_path() . "{$action}_success=1&$this->identity_name=$id&" . $this->get_qs(''); // do carry items defined in query_string_list, '' removes the default
+    $url = $this->get_uri_path() . "{$action}_success=1&$this->identity_name=$id&" . $this->get_qs('_view,_lang'); // do carry items defined in query_string_list, '' removes the default
     $this->redirect($url, $id);
 
   }
@@ -2405,6 +2437,61 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
     else
       return "no version available";
     
+  }
+  
+  function get_qs($query_string_list = '_order_by,_desc,_offset,_search,_pagination_off,_view,_lang'){
+
+    // purpose: render querysting. user selections for order, search, and page are carry from page to page. 
+    // this maintains search state while paging, updating, etc...
+
+    // append users additions
+    if(mb_strlen($this->query_string_list) > 0)
+        $query_string_list .= ',' . $this->query_string_list;
+
+    $get = '';
+    $arr = explode(',', trim($query_string_list, ','));
+    foreach($arr as $var){
+      if(mb_strlen(@$_REQUEST[$var]) > 0)
+        $get .= "&amp;$var=" . urlencode($_REQUEST[$var]);
+    }
+
+    return mb_substr($get, 5);
+
+  }
+  
+  function redirect($url, $automatic = true){
+
+    // purpose: redirect user to url
+    // returns: html redirect
+    // if $automatic is false user has to click "continue" to proceed. 
+    
+    // replace escaped ampersands from get_qs() with unescaped ampersands
+    $url = str_replace('&amp;', '&', $url);
+
+    if($automatic === false){
+      echo("<center><a href='$url'>Continue</a></center>");    
+      return;
+    }
+    
+    // this feature is only used used with WordPress plugins - use a simple js redirect for WP
+    if(mb_strlen($this->uri_path) > 0 || $this->redirect_using_js){
+      echo "<script>window.location.href='$url';</script><noscript><a href='$url'>Continue</a></noscript>";
+      return;
+    }
+
+    $port = '';    
+    $host = preg_replace('/:[0-9]+$/', '', $_SERVER['HTTP_HOST']); // host without port number
+    $protocol = 'http://';
+    if(@$_SERVER['HTTPS'] != '' && @$_SERVER['HTTPS'] != 'off')
+      $protocol = 'https://';
+    if(!($_SERVER['SERVER_PORT'] == '80' || $_SERVER['SERVER_PORT'] == '443'))
+      $port = ':' . $_SERVER['SERVER_PORT'];
+    if(!isset($_SESSION))
+      session_write_close();
+    
+    header("Location: $protocol$host$port$url");
+    die;
+  
   }
   
   

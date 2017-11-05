@@ -28,7 +28,7 @@ catch(PDOException $e) {
 }
 
 // create LM/eEKS object, pass in PDO connection and i18n code
-$eeks = new eEKS($dbh, 'de-de', 'eEKS.config.ini.php');
+$eeks = new eEKS($dbh, '', 'eEKS.config.ini.php');
 
 $eeks->form_sql = "
 SELECT

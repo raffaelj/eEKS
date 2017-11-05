@@ -12,6 +12,9 @@
 
 [eeks]
 
+;; language i18n
+i18n = de-de
+
 ;; name of theme must be the same like the folder name with `index.theme` file
 theme = default
 ; theme = test

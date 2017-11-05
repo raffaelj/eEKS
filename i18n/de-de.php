@@ -32,7 +32,7 @@ $this->form_text_record_added = 'Eintrag hinzugefügt';
 // links on grid
 $this->grid_add_link_text    = "Neuer Eintrag";
 $this->grid_edit_link_text   = "ändern";
-$this->grid_export_link = "<a href='[script_name]_export=1&amp;[qs]' title='CSV herunterladen' class='lm_button grid_export_link'>CSV</a>";
+$this->grid_export_link_text = "CSV herunterladen";
 
 // search box
 // $this->grid_search_box = "
@@ -91,6 +91,13 @@ $this->grid_search_box_search = "Suche";
 // placeholders for date filters
 $this->date_filter_from = "von";
 $this->date_filter_to = "bis";
+
+// other words that need translation and may appear somewhere
+$this->translate['all'] = "alle";
+$this->translate['income'] = "Einkommen";
+$this->translate['costs'] = "Ausgaben";
+$this->translate['settings'] = "Einstellungen";
+$this->translate['monthly'] = "monatlich";
 
 // number format
 $this->decimals = 2;
