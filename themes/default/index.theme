@@ -7,6 +7,7 @@ $body_class = $this->get_action();
 
 $uri = $this->get_uri_path();
 $qs = $this->get_qs();
+$qs_without_lang = $this->get_qs('_order_by,_desc,_offset,_search,_pagination_off,_view');
 
 $background_image = "";
 if (mb_strlen($this->background_image) > 0)
@@ -29,8 +30,8 @@ echo "<!DOCTYPE html>
       <a href='{$uri}action=settings&amp;{$qs}' class='lm_button'>".$this->translate('settings')."</a>
       <a href='{$uri}_pdf=1&amp;{$qs}' class='lm_button' title='download PDF'>PDF</a>
       " . $this->export_button() . "
-      <a href='{$uri}_lang=de-de&amp;{$qs}' class='lm_button'>de</a>
-      <a href='{$uri}_lang=en-us&amp;{$qs}' class='lm_button'>en</a>
+      <a href='{$uri}_lang=de-de&amp;{$qs_without_lang}' class='lm_button'>de</a>
+      <a href='{$uri}_lang=en-us&amp;{$qs_without_lang}' class='lm_button'>en</a>
     </nav>
     " . $this->search_box() . "
     " . $this->list_edit_tables() . "
