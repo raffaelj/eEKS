@@ -2,6 +2,7 @@
 -- Tabellenstruktur für Tabelle `accounting`
 --
 
+DROP TABLE IF EXISTS `accounting`;
 CREATE TABLE IF NOT EXISTS `accounting` (
 `ID` int(10) unsigned NOT NULL,
   `date_created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
@@ -95,7 +96,7 @@ INSERT INTO `accounting` (`ID`, `date_created`, `date_last_changed`, `value_date
 (58, '2017-10-20 21:56:05', '2017-10-27 17:33:15', '2016-11-17', NULL, '-23.42', NULL, 'Girokonto', NULL, 'lowcost-clothing (ebay)', NULL, 'Glitzerunterwäsche', 22, 2, NULL, NULL, NULL, NULL, NULL, 'keine Rechnung, nur E-Mail-Bestätigung', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (59, '2017-10-20 21:56:05', '2017-10-27 17:33:03', '2016-11-22', NULL, '-5.19', NULL, 'Girokonto', NULL, 'lowqualitiy24 (ebay)', NULL, 'USB-Maus', 12, 2, NULL, NULL, NULL, NULL, NULL, 'keine Rechnung, nur E-Mail-Bestätigung', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (60, '2017-10-20 21:56:05', '2017-10-27 16:11:09', '2016-11-22', '2016-11-22', '-20.55', NULL, NULL, NULL, 'Good Lack', NULL, 'Farben', 3, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(65, '0000-00-00 00:00:00', '2017-11-05 23:54:27', '2017-08-14', '2017-08-14', '-25.00', NULL, 'Barkasse', NULL, 'test', NULL, 'Test', 12, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+(65, '0000-00-00 00:00:00', '2017-11-06 15:05:01', '2017-08-14', '2017-08-14', '-25.00', NULL, 'Barkasse', NULL, 'test supplier', NULL, 'Test', 12, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -103,6 +104,7 @@ INSERT INTO `accounting` (`ID`, `date_created`, `date_last_changed`, `value_date
 -- Tabellenstruktur für Tabelle `coa_jobcenter_eks_01_2017`
 --
 
+DROP TABLE IF EXISTS `coa_jobcenter_eks_01_2017`;
 CREATE TABLE IF NOT EXISTS `coa_jobcenter_eks_01_2017` (
 `ID` int(11) NOT NULL,
   `type_of_costs` varchar(127) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -164,6 +166,7 @@ INSERT INTO `coa_jobcenter_eks_01_2017` (`ID`, `type_of_costs`, `topic`, `page`)
 -- Tabellenstruktur für Tabelle `mode_of_employment`
 --
 
+DROP TABLE IF EXISTS `mode_of_employment`;
 CREATE TABLE IF NOT EXISTS `mode_of_employment` (
 `ID` int(11) NOT NULL,
   `mode_of_employment` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
@@ -191,6 +194,7 @@ INSERT INTO `mode_of_employment` (`ID`, `mode_of_employment`, `sort_order`, `not
 -- Tabellenstruktur für Tabelle `type_of_costs`
 --
 
+DROP TABLE IF EXISTS `type_of_costs`;
 CREATE TABLE IF NOT EXISTS `type_of_costs` (
 `ID` int(10) unsigned NOT NULL,
   `type_of_costs` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
