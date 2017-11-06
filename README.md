@@ -87,6 +87,7 @@ coming soon
 ### lower priority
 
 * customer database
+* product database
 * dashboard
 * better GUI (navigation, search bar, settings)
 * icons
@@ -149,15 +150,6 @@ coming soon
 * [x] I really have to figure out how `$this->query_string_list` works for _view, _lang, _action
 * [x] escape ampersands in links
 
-### pages
-
-* [ ] dashboard (with views)
-* [x] accounting (default page)
-  * [ ] extra: records without value_date
-* [ ] settings
-  * [x] change content of tables (as view with table name via $_GET and some input controls)
-  * [ ] change (some) content of ini files
-
 ### searchbox
 
 * [x] not in grid
@@ -180,7 +172,7 @@ monthly view needs filters, too
 * [x] full text search
 * [ ] GROUP BY something (except notes, files) --> see views->monthly sums
 
-### views
+### views/pages
 
 * [ ] monthly sums
   * [ ] only income
@@ -189,6 +181,12 @@ monthly view needs filters, too
   * [ ] cash basis accounting (German: EÜR)
 * [ ] EKS preview
 * [ ] charts --> maybe with javascript
+* [ ] dashboard (with views)
+* [x] accounting (default page)
+  * [ ] extra: records without value_date
+* [ ] settings
+  * [x] change content of tables (as view with table name via $_GET and some input controls)
+  * [ ] change (some) content of ini files
 
 ### EKS preview
 

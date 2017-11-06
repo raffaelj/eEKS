@@ -11,6 +11,7 @@ class eEKS extends lazy_mofo{
   public $background_image = "";
   
   // column names in this array are shown together in a multi-value column
+  public $multi_column_on = false;
   public $multi_value_column_title = "Multiple Values";
   public $multi_column = array();
   
@@ -21,8 +22,6 @@ class eEKS extends lazy_mofo{
   
   // language for html lang attribute
   public $html_lang = "en";
-  
-  public $multi_column_on = 0;
   
   // contains error message --> must be in template
   public $error = "";
@@ -36,8 +35,18 @@ class eEKS extends lazy_mofo{
   public $translate = array();
   
   // active views
-  // options: no_date, monthly, edit, eks
+  // options: missing_date, monthly, edit, eks
   public $views = array();
+  
+  // active date filters
+  // contain column names containing dates
+  public $date_filters = array();
+  
+  // column names of category filters in search box
+  public $category_filters = array();
+  
+  // define columns for full text search
+  public $search_in_columns = array();
   
   // optional sums in last row (monthly view)
   public $grid_show_column_sums = false;
@@ -178,7 +187,7 @@ class eEKS extends lazy_mofo{
     $this->set_language();
     
     // set commands and grid_sql
-    $this->grid_view();
+    $this->set_grid_view_parameters();
 
     switch($this->get_action()){
       case "edit":          $this->template($this->edit());        break;
@@ -188,6 +197,7 @@ class eEKS extends lazy_mofo{
       case "delete":        $this->template($this->delete());      break;
       case "eks":           $this->template($this->eks());         break;
       case "settings":      $this->template($this->settings());    break;
+      case "dashboard":     $this->template($this->dashboard());    break;
       default:              $this->template($this->index());
     }
 
@@ -212,17 +222,58 @@ class eEKS extends lazy_mofo{
   }
   
   //////////////////////////////////////////////////////////////////////////////
-  function translate($str = ""){
+  function translate($str = "", $upper = ""){
     
     // purpose: translate words
     // example:
     // content of i18n file: `$this->translate['all'] = "alle";`  (array)
     //          use in code: `$this->translate('all');`           (function)
     
-    if(array_key_exists($str, $this->translate))
-      return $this->translate[$str];
-    else
+    if(array_key_exists($str, $this->translate)){
+      if($upper == "pretty"){
+        return $this->format_title($this->translate($str));
+      }
+      else
+        return $this->translate[$str];
+    }
+    else{
+      if($upper == "pretty"){
+        return $this->format_title($str);
+      }
       return $str;
+    }
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////
+  function dashboard(){
+    
+    // purpose: show multiple grids with predefiend filters
+    
+    $html = "";
+    
+    $html .= "<div class='lm_error'><p>Dashboard - coming soon</p></div>";
+    
+    $html .= "<div class='center'>";
+    
+    // unpayed invoices
+    $html .= "<div class='dash_grid'>";
+    
+    
+    
+    
+    $html .= "</div>";
+    
+    // custom sorted, filtered, grouped grid(s)
+    
+    
+    
+    // graphs
+    
+    
+    $html .= "</div>";
+    
+    return $html;
+    
   }
   
   //////////////////////////////////////////////////////////////////////////////
@@ -234,7 +285,7 @@ class eEKS extends lazy_mofo{
     
     // form(s) for editing config file(S)
     
-    $html .= "<div class='lm_error'><p>Settings - coming soon</p></div>";
+    $html .= "<div class='lm_error'><p>Settings - coming soon - form doesn't work</p></div>";
     // $this->error = "Settings - coming soon";
     
     $html .= "<div class='center'>";
@@ -310,7 +361,7 @@ class eEKS extends lazy_mofo{
       $class = "";
       if($val == $active_view)
         $class = " active";
-      $html .= "<a href='".$uri."_view=$val&amp;$qs' class='lm_button$class'>$val</a> ";
+      $html .= "<a href='".$uri."_view=$val&amp;$qs' class='lm_button$class'>".$this->translate($val, 'pretty')."</a> ";
     }
     
     return $html;
@@ -319,7 +370,7 @@ class eEKS extends lazy_mofo{
   
   function list_edit_tables(){
     $html = "";
-    if( isset($_GET['_view']) && $_GET['_view'] == "edit" ){
+    if( isset($_GET['_view']) && $_GET['_view'] == "edit_tables" ){
       $arr = $this->query("show tables");
       
       $html = "<ul class='list_of_tables'>";
@@ -334,7 +385,7 @@ class eEKS extends lazy_mofo{
   }
   
   //////////////////////////////////////////////////////////////////////////////
-  function grid_view(){
+  function set_grid_view_parameters(){
     
     // purpose: show different views with different grids, forms and searchboxes
     
@@ -344,7 +395,6 @@ class eEKS extends lazy_mofo{
     
     
     // EKS
-    // ...
     if($view == "eks"){
       
       $_POST['action'] = "eks";
@@ -352,10 +402,24 @@ class eEKS extends lazy_mofo{
       
     }
     
+    // Settings
+    elseif($view == "settings"){
+      
+      $_POST['action'] = "settings";
+      $this->settings();
+      
+    }
     
+    // dashboard
+    elseif($view == "dashboard"){
+      
+      $_POST['action'] = "dashboard";
+      $this->dashboard();
+      
+    }
     
     // edit tables
-    elseif($view == "edit"){
+    elseif($view == "edit_tables"){
       
       // disable multi-value column
       $this->multi_column_on = false;
@@ -381,13 +445,13 @@ class eEKS extends lazy_mofo{
     
     
     // monthly sums, grouped by type_of_costs or EKS-type_of_costs
-    elseif($view == "monthly"){
+    elseif($view == "monthly_sums"){
       $this->grid_sql = $this->generate_grid_sql_monthly();
-      $this->multi_column_on = 0;
+      $this->multi_column_on = false;
     }
     
     // default: accounting with generate_grid_sql()
-    // else default, no_date, null
+    // else default, missing_date, null
     else
       $this->grid_sql = $this->generate_grid_sql();
     
@@ -1043,7 +1107,8 @@ class eEKS extends lazy_mofo{
       if($column_name == $this->identity_name && $i == ($column_count - 1))
         $edit_delete = "    <th class='col_edit'></th>\n"; // if identity is last column then this is the column with the edit and delete links
       elseif( $this->multi_column_on ){ // experimental multi-value column active
-        if( !in_array($column_name, $this->config['multi_column']) )
+        // if( !in_array($column_name, $this->config['multi_column']) )
+        if( !in_array($column_name, $this->multi_column) )
           $head .= "    <th><a href='{$uri_path}_order_by=" . ($i + 1) . "&amp;_desc=$_desc_invert&amp;" . $this->get_qs('_search,_view,_lang') . "' class='lm_$column_name'>$title</a></th>\n";
       }
       else
@@ -1130,7 +1195,7 @@ class eEKS extends lazy_mofo{
         // column sums
         if($this->grid_show_column_sums){
           
-          if(!$this->multi_column_on || ( $this->multi_column_on && !in_array($column_name, $this->config['multi_column']) ) ){
+          if(!$this->multi_column_on || ( $this->multi_column_on && !in_array($column_name, $this->multi_column) ) ){
             // set sums
             if( !isset($this->column_sums[$column_name]) ){
               if( is_numeric($value) && $column_name != $this->identity_name )
@@ -1152,7 +1217,7 @@ class eEKS extends lazy_mofo{
         
         
         // test with multi-value column
-        elseif(in_array($column_name, $this->config['multi_column']) && $this->multi_column_on){
+        elseif(in_array($column_name, $this->multi_column) && $this->multi_column_on){
           $multi_column_content .= "<div>";
           if(mb_strlen($value) > 0) $multi_column_content .= "$title: ";
           $multi_column_content .= $this->get_output_control($column_name . '-' . $row[$this->identity_name], $value, '--text', 'grid') . "</div>";
@@ -1232,8 +1297,9 @@ class eEKS extends lazy_mofo{
     
     // purpose: generate sql query ($this->grid_sql) with defined filter options
     
-    $search_in_columns = $this->config['search_in_columns'];
-    $date_filters = $this->config['date_filters'];
+    $search_in_columns = $this->search_in_columns;
+    // $date_filters = $this->config['date_filters'];
+    $date_filters = $this->date_filters;
     
     $query = "";
     $query .= "SELECT\r\n";
@@ -1242,9 +1308,18 @@ class eEKS extends lazy_mofo{
     $where = array();
     $date_filter = array();
     
+    // get active columns
+    $active_columns = array();
+    foreach($this->config['active_columns'] as $key=>$val){
+      if($val && $key != "edit_delete_column")
+        $active_columns[] = $key;
+      elseif($val && $key == "edit_delete_column")
+      $active_columns[] = $this->identity_name;
+    }
+    
     // list active columns (defined in ini file)
     $i = 0;
-    foreach($this->config['active_columns']['table'] as $val){
+    foreach($active_columns as $val){
       
       if($i != 0)
         $query .= ", ";
@@ -1327,7 +1402,7 @@ class eEKS extends lazy_mofo{
     $query .= ")\r\n";
       
     // add AND clause for filter by category
-    foreach($this->config['category_filters'] as $val){
+    foreach($this->category_filters as $val){
       if(!empty($_REQUEST["_$val"])){
         $query .= "AND a.$val LIKE :_$val\r\n";
         $this->grid_sql_param[":_$val"] = $this->clean_out(@$_REQUEST["_$val"]);
@@ -1358,7 +1433,7 @@ class eEKS extends lazy_mofo{
     }
     
     // add AND clause for no-date filter
-    if(isset($_GET['_view']) && $_GET['_view'] == 'no_date')
+    if(isset($_GET['_view']) && $_GET['_view'] == 'missing_date')
       $query .= "AND (value_date IS NULL OR voucher_date IS NULL)";
     
     // add ORDER BY
@@ -1456,7 +1531,7 @@ class eEKS extends lazy_mofo{
     $query .= "ON a.$group = t.ID\r\n";
     
     // add AND clause for filter by category
-    foreach($this->config['category_filters'] as $val){
+    foreach($this->category_filters as $val){
       if(!empty($_GET["_$val"])){
         if( $val == 'type_of_costs' )
           $query .= "WHERE( a.$val LIKE :_$val)\r\n";
@@ -1550,8 +1625,9 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
     // purpose: more filters for searching
     // output: html
     
-    $date_filters = $this->config['date_filters'];
-    $category_filters = $this->config['category_filters'];
+    // $date_filters = $this->config['date_filters'];
+    $date_filters = $this->date_filters;
+    $category_filters = $this->category_filters;
     
     $_from = $this->clean_out(@$_GET['_from']);
     $_to = $this->clean_out(@$_GET['_to']);
