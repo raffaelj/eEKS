@@ -16,7 +16,7 @@ gross_amount      Bruttobetrag
 tax_rate          Steuersatz
 account           Konto
 invoice_number    RechnungsNr
-from_to           Auftraggeber/Empfänger
+customer_supplier Auftraggeber/Empfänger, Händler/Kunde
 posting_text      Buchungstext
 object            Zusatztext (was)
 type_of_costs     KostenErloesArt

@@ -98,6 +98,8 @@ $this->translate['income'] = "Einkommen";
 $this->translate['costs'] = "Ausgaben";
 $this->translate['settings'] = "Einstellungen";
 $this->translate['monthly'] = "monatlich";
+$this->translate['monthly_sums'] = "monatlich summiert";
+$this->translate['missing_date'] = "ohne Datum";
 
 // number format
 $this->decimals = 2;
@@ -117,10 +119,10 @@ $this->rename['gross_amount'] = 'Bruttobetrag';
 $this->rename['tax_rate'] = 'Steuersatz';
 $this->rename['account'] = 'Konto';
 $this->rename['invoice_number'] = 'Rechnungs-Nr.';
-$this->rename['from_to'] = 'Auftraggeber/ Empfänger';
+$this->rename['customer_supplier'] = 'Auftraggeber/ Zulieferer';
 $this->rename['posting_text'] = 'Buchungstext';
 $this->rename['object'] = 'Gegenstand';
-$this->rename['type_of_costs'] = 'Kostenart/ Erlösart';
+$this->rename['type_of_costs'] = 'Kosten-/Erlösart';
 $this->rename['mode_of_employment'] = 'Beschäftigungsart';
 $this->rename['cat_01'] = 'Geschäftsbereich';
 $this->rename['cat_02'] = 'Projekt';

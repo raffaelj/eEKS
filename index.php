@@ -39,7 +39,7 @@ SELECT
 , a.tax_rate
 , a.account
 , a.invoice_number
-, a.from_to
+, a.customer_supplier
 , a.posting_text
 , a.object
 , a.type_of_costs

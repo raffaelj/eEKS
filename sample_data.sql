@@ -2,7 +2,6 @@
 -- Tabellenstruktur für Tabelle `accounting`
 --
 
-DROP TABLE IF EXISTS `accounting`;
 CREATE TABLE IF NOT EXISTS `accounting` (
 `ID` int(10) unsigned NOT NULL,
   `date_created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
@@ -13,7 +12,7 @@ CREATE TABLE IF NOT EXISTS `accounting` (
   `tax_rate` decimal(3,2) DEFAULT NULL,
   `account` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
   `invoice_number` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `from_to` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `customer_supplier` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `posting_text` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `object` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `type_of_costs` int(4) unsigned DEFAULT NULL,
@@ -31,13 +30,13 @@ CREATE TABLE IF NOT EXISTS `accounting` (
   `file_01` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `file_02` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `file_03` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL
-) ENGINE=MyISAM AUTO_INCREMENT=65 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=66 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- Daten für Tabelle `accounting`
 --
 
-INSERT INTO `accounting` (`ID`, `date_created`, `date_last_changed`, `value_date`, `voucher_date`, `gross_amount`, `tax_rate`, `account`, `invoice_number`, `from_to`, `posting_text`, `object`, `type_of_costs`, `mode_of_employment`, `cat_01`, `cat_02`, `cat_03`, `cat_04`, `cat_05`, `notes_01`, `notes_02`, `notes_03`, `notes_04`, `notes_05`, `file_01`, `file_02`, `file_03`) VALUES
+INSERT INTO `accounting` (`ID`, `date_created`, `date_last_changed`, `value_date`, `voucher_date`, `gross_amount`, `tax_rate`, `account`, `invoice_number`, `customer_supplier`, `posting_text`, `object`, `type_of_costs`, `mode_of_employment`, `cat_01`, `cat_02`, `cat_03`, `cat_04`, `cat_05`, `notes_01`, `notes_02`, `notes_03`, `notes_04`, `notes_05`, `file_01`, `file_02`, `file_03`) VALUES
 (1, '2017-10-20 21:56:05', '2017-10-27 09:55:12', '2016-06-15', '2016-06-29', '150.00', NULL, 'Girokonto', '16011', 'Barbara Baldrian', NULL, 'Website-Erstellung Nachbesserungen', 15, 1, 4, NULL, NULL, NULL, NULL, 'in Raten überwiesen', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (2, '2017-10-20 21:56:05', '2017-10-27 09:55:12', NULL, '2016-06-29', '1000.00', NULL, 'Girokonto', '17009', 'Max Mustermann', NULL, 'Website-Erstellung', 15, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (3, '2017-10-20 21:56:05', '2017-10-27 09:55:12', '2016-07-27', '2016-06-29', '350.00', NULL, 'Girokonto', '16011', 'Barbara Baldrian', NULL, 'Website-Erstellung Nachbesserungen', 15, 1, 4, NULL, NULL, NULL, NULL, 'in Raten überwiesen', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
@@ -91,11 +90,12 @@ INSERT INTO `accounting` (`ID`, `date_created`, `date_last_changed`, `value_date
 (53, '2017-10-20 21:56:05', '2017-10-27 10:14:47', '2017-04-06', '2017-04-05', '-16.99', NULL, 'Girokonto', NULL, 'LABEL-Markt', NULL, 'Haartrockner', 4, 2, NULL, NULL, NULL, NULL, NULL, NULL, 'ja', NULL, NULL, NULL, NULL, NULL, NULL),
 (54, '2017-10-20 21:56:05', '2017-10-27 10:14:47', '2017-04-24', '2017-04-24', '-47.97', NULL, 'Barkasse', NULL, 'Opi-Baumarkt', NULL, 'Verteilerdosen, Regal', 12, 2, NULL, NULL, NULL, NULL, NULL, NULL, 'ja', NULL, NULL, NULL, NULL, NULL, NULL),
 (55, '2017-10-20 21:56:05', '2017-10-27 10:48:38', '2017-04-24', '2017-04-24', '-8.99', NULL, 'Barkasse', NULL, 'LEBE-Markt', NULL, 'Thermoskanne', 12, 2, NULL, NULL, NULL, NULL, NULL, NULL, 'ja', NULL, NULL, NULL, NULL, NULL, NULL),
-(56, '2017-10-20 21:56:05', '2017-10-27 10:14:47', NULL, '2017-05-09', '-37.98', '0.00', 'Girokonto', NULL, 'Kleidungsladen', NULL, 'Hemd, Krawatte', 22, 1, NULL, NULL, NULL, NULL, NULL, NULL, 'ja', NULL, NULL, NULL, NULL, NULL, NULL),
+(56, '2017-10-20 21:56:05', '2017-11-05 23:43:10', NULL, '2017-05-09', '-37.98', '0.00', 'Girokonto', NULL, 'Kleidungsladen', NULL, 'Hemd, Krawatten', 22, 1, NULL, NULL, NULL, NULL, NULL, NULL, 'ja', NULL, NULL, NULL, NULL, NULL, NULL),
 (57, '2017-10-20 21:56:05', '2017-10-27 10:14:47', '2017-05-10', '2017-05-09', '-149.99', NULL, 'Girokonto', NULL, 'Haushaltswarenladen', NULL, 'Spezial-Kaffeemaschine', 12, 2, NULL, NULL, NULL, NULL, NULL, NULL, '5 Jahre', NULL, NULL, NULL, NULL, NULL, NULL),
 (58, '2017-10-20 21:56:05', '2017-10-27 17:33:15', '2016-11-17', NULL, '-23.42', NULL, 'Girokonto', NULL, 'lowcost-clothing (ebay)', NULL, 'Glitzerunterwäsche', 22, 2, NULL, NULL, NULL, NULL, NULL, 'keine Rechnung, nur E-Mail-Bestätigung', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (59, '2017-10-20 21:56:05', '2017-10-27 17:33:03', '2016-11-22', NULL, '-5.19', NULL, 'Girokonto', NULL, 'lowqualitiy24 (ebay)', NULL, 'USB-Maus', 12, 2, NULL, NULL, NULL, NULL, NULL, 'keine Rechnung, nur E-Mail-Bestätigung', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(60, '2017-10-20 21:56:05', '2017-10-27 16:11:09', '2016-11-22', '2016-11-22', '-20.55', NULL, NULL, NULL, 'Good Lack', NULL, 'Farben', 3, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+(60, '2017-10-20 21:56:05', '2017-10-27 16:11:09', '2016-11-22', '2016-11-22', '-20.55', NULL, NULL, NULL, 'Good Lack', NULL, 'Farben', 3, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(65, '0000-00-00 00:00:00', '2017-11-05 23:54:27', '2017-08-14', '2017-08-14', '-25.00', NULL, 'Barkasse', NULL, 'test', NULL, 'Test', 12, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -103,7 +103,6 @@ INSERT INTO `accounting` (`ID`, `date_created`, `date_last_changed`, `value_date
 -- Tabellenstruktur für Tabelle `coa_jobcenter_eks_01_2017`
 --
 
-DROP TABLE IF EXISTS `coa_jobcenter_eks_01_2017`;
 CREATE TABLE IF NOT EXISTS `coa_jobcenter_eks_01_2017` (
 `ID` int(11) NOT NULL,
   `type_of_costs` varchar(127) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -165,7 +164,6 @@ INSERT INTO `coa_jobcenter_eks_01_2017` (`ID`, `type_of_costs`, `topic`, `page`)
 -- Tabellenstruktur für Tabelle `mode_of_employment`
 --
 
-DROP TABLE IF EXISTS `mode_of_employment`;
 CREATE TABLE IF NOT EXISTS `mode_of_employment` (
 `ID` int(11) NOT NULL,
   `mode_of_employment` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
@@ -193,7 +191,6 @@ INSERT INTO `mode_of_employment` (`ID`, `mode_of_employment`, `sort_order`, `not
 -- Tabellenstruktur für Tabelle `type_of_costs`
 --
 
-DROP TABLE IF EXISTS `type_of_costs`;
 CREATE TABLE IF NOT EXISTS `type_of_costs` (
 `ID` int(10) unsigned NOT NULL,
   `type_of_costs` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -268,7 +265,7 @@ ALTER TABLE `type_of_costs`
 -- AUTO_INCREMENT für Tabelle `accounting`
 --
 ALTER TABLE `accounting`
-MODIFY `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=65;
+MODIFY `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=66;
 --
 -- AUTO_INCREMENT für Tabelle `coa_jobcenter_eks_01_2017`
 --

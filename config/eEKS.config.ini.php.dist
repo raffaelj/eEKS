@@ -8,6 +8,28 @@
 ;; change your config and rename this file to `eEKS.config.ini.php`
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; lazy_mofo config
+
+[lm]
+timezone = 'Europe/Berlin'
+return_to_edit_after_insert = false
+return_to_edit_after_update = false
+grid_show_images = true
+grid_show_search_box = true
+
+;; pagination
+grid_limit = 50
+
+;; max chars in cell
+grid_ellipse_at = 80
+
+;; interval of records to repeat header column titles at
+grid_repeat_header_at = 25
+
+;; activate checkboxes for multiple deletions
+grid_multi_delete = false
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; eEKS specific config
 
 [eeks]
@@ -35,11 +57,6 @@ slogan = "Don't worry, be happy ;-)"
 background_image = ""
 
 
-;; active views
-views[] = no_date
-views[] = monthly
-views[] = edit
-views[] = eks
 
 ;; turn multi-value column on
 multi_column_on = true
@@ -57,93 +74,74 @@ rename_csv_headers = true
 ;; set path to wkhtmltopdf for PDF export
 wkhtmltopdf_path = "/home/$USER/bin/wkhtmltopdf"
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; lazy_mofo config
+;; active views
+views[] = dashboard
+views[] = missing_date
+views[] = monthly_sums
+views[] = edit_tables
+views[] = eks
+views[] = settings
 
-[lm]
-timezone = 'Europe/Berlin'
-return_to_edit_after_insert = false
-return_to_edit_after_update = false
-grid_show_images = true
-grid_show_search_box = true
+;; date filters
+date_filters[] = value_date
+date_filters[] = voucher_date
 
-;; pagination
-grid_limit = 50
+;; column names for full text search in search box
+search_in_columns[] = from_to
+search_in_columns[] = object
 
-;; max chars in cell
-grid_ellipse_at = 80
+;; column names of category filters in search box
+category_filters[] = type_of_costs
+category_filters[] = mode_of_employment
+; category_filters[] = cat_01
 
-;; interval of records to repeat header column titles at
-grid_repeat_header_at = 25
-
-;; activate checkboxes for multiple deletions
-grid_multi_delete = false
+;; column names in this array are shown together in a multi-value column
+multi_column[] = invoice_number
+multi_column[] = account
+multi_column[] = cat_02
+multi_column[] = cat_03
+multi_column[] = notes_02
 
 ;; dashboard
 [dashboard]
 ;; unpaid invoices
-0 = no_value_date_income
+no_value_date_income = true
 ;; sums for last months, this year, maybe comparison with last year
-1 = sums
+sums = true
 ;; notices about assessment basis, lose of small business state etc.
-2 = notices
-3 = graphs
-
-
-;; column names of date filters in search box
-[date_filters]
-0 = value_date
-1 = voucher_date
-
-;; column names of category filters in search box
-[category_filters]
-0 = type_of_costs
-1 = mode_of_employment
-; 2 = cat_01
-
-;; column names for full text search in search box
-[search_in_columns]
-0 = from_to
-1 = object
+notices = true
+graphs = true
 
 ;; active columns in default table to show in grid
 ;; comment or uncomment the following lines for your needs
 [active_columns]
-table[] = ID
-table[] = value_date
-table[] = voucher_date
-table[] = gross_amount
-; table[] = tax_rate
-table[] = account
-table[] = invoice_number
-table[] = from_to
-; table[] = posting_text
-table[] = object
-; table[] = type_of_costs
-table[] = type_of_costs
-table[] = mode_of_employment
-table[] = cat_01
-; table[] = cat_02
-; table[] = cat_03
-; table[] = cat_04
-; table[] = cat_05
-table[] = notes_01
-table[] = notes_02
-; table[] = notes_03
-; table[] = notes_04
-; table[] = notes_05
-table[] = file_01
-; table[] = file_02
-; table[] = file_03
-table[] = ID
-
-;; column names in this array are shown together in a multi-value column
-[multi_column]
-1 = invoice_number
-2 = account
-3 = cat_02
-4 = cat_03
-5 = notes_02
+ID = true
+value_date = true
+voucher_date = true
+gross_amount = true
+tax_rate = false
+account = true
+invoice_number = true
+customer_supplier = true
+posting_text = false
+object = true
+type_of_costs = false
+type_of_costs = true
+mode_of_employment = true
+cat_01 = true
+cat_02 = false
+cat_03 = false
+cat_04 = false
+cat_05 = false
+notes_01 = true
+notes_02 = true
+notes_03 = false
+notes_04 = false
+notes_05 = false
+file_01 = true
+file_02 = false
+file_03 = false
+edit_delete_column = true
 
 
 ;; default sort order of default table
