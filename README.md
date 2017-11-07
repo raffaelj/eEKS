@@ -149,6 +149,7 @@ coming soon
   * [ ] doesn't recognize changed input fields, expected: output same as screen, should submit form data to querystring
 * [x] I really have to figure out how `$this->query_string_list` works for _view, _lang, _action
 * [x] escape ampersands in links
+* [ ] optional: disable links in column headers
 
 ### searchbox
 
@@ -202,10 +203,11 @@ monthly view needs filters, too
   * [ ] table pages require variables from page before (sum, carryover)
 
 
-### GUI
+### GUI and styling
 
 * [ ] CSS for small(er) screens
 * [ ] all select boxes need titles
+* [ ] cross browser print CSS - Oh my god!
 
 
 

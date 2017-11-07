@@ -34,17 +34,6 @@ $this->grid_add_link_text    = "Neuer Eintrag";
 $this->grid_edit_link_text   = "ändern";
 $this->grid_export_link_text = "CSV herunterladen";
 
-// search box
-// $this->grid_search_box = "
-  // <form action='[script_name]' class='lm_search_box'>
-    // [filters]
-    // <input type='text' name='_search' value='[_search]' size='20' class='lm_search_input'>
-    // <a href='[script_name]' title='[grid_search_box_clear]' class='button_clear_search'>x</a>
-    // <input type='submit' class='lm_button lm_search_button' value='[grid_search_box_search]'>
-    // <input type='hidden' name='action' value='search'>[query_string_list]
-  // </form>"; 
-
-
 // grid messages
 $this->grid_text_record_added     = "Eintrag hinzugefügt";
 $this->grid_text_changes_saved    = "Änderungen gespeichert";

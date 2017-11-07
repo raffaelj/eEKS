@@ -103,6 +103,8 @@ $eeks->run();
 // print_r($eeks->grid_sql_param);
 // echo "\r\n";
 // print_r($eeks->column_sums);
+// print_r($eeks->get_qs('_order_by,_desc,_offset,_search,_pagination_off,_view,_lang'));
+// print_r($eeks->get_qs('_view,_lang'));
 // echo "</pre></code>";
 
 ?>
