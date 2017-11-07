@@ -393,18 +393,22 @@ class eEKS extends lazy_mofo{
     
   }
   
+  //////////////////////////////////////////////////////////////////////////////
   function list_edit_tables(){
+    
+    // purpose: list existing tables in database with edit links
+    
     $html = "";
     if( isset($_GET['_view']) && $_GET['_view'] == "edit_tables" ){
-      $arr = $this->query("show tables");
+      $arr = $this->query("SHOW TABLES");
       
       $html = "<ul class='list_of_tables'>";
       foreach($arr as $value){
-        $html .= '<li><a class="lm_button" href="?_view=edit_tables&amp;_edit_table='.array_values($value)[0].'">'. $this->format_title(array_values($value)[0]) .'</a></li>';
+        $title = array_values($value)[0];
+        $html .= '<li><a class="lm_button" href="?_view=edit_tables&amp;_edit_table='.$title.'">'. $this->format_title($title, @$this->rename[$title]) .'</a></li>';
       }
       $html .= '</ul>';
     }
-
     
     return $html;
   }

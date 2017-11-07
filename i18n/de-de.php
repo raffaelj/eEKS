@@ -89,6 +89,7 @@ $this->translate['settings'] = "Einstellungen";
 $this->translate['monthly'] = "monatlich";
 $this->translate['monthly_sums'] = "monatlich summiert";
 $this->translate['missing_date'] = "ohne Datum";
+$this->translate['edit_tables'] = "Tabellen bearbeiten";
 
 // number format
 $this->decimals = 2;
@@ -100,6 +101,7 @@ $this->multi_value_column_title = "Mehrere Einträge";
 
 // rename fieldnames from database
 
+// table accounting
 $this->rename['date_created'] = 'Erstellt am';
 $this->rename['date_last_changed'] = 'zuletzt geändert';
 $this->rename['value_date'] = 'Zahlungs-Datum';
@@ -134,6 +136,8 @@ $this->rename['file_03'] = 'Datei 3';
 
 
 // rename fields from other tables
+$this->rename['accounting'] = 'Buchhhaltung';
+
 $this->rename['is_income'] = 'ist Einnahme';
 $this->rename['sort_order'] = 'Sortierreihenfolge';
 $this->rename['notes'] = 'Notizen';
