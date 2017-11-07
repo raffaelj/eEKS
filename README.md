@@ -175,6 +175,8 @@ monthly view needs filters, too
 
 ### views/pages
 
+* [ ] dashboard (with views)
+  * [ ] move to action or somewhere else, it contains views and shouldn't be a view itself
 * [ ] monthly sums
   * [ ] only income
   * [ ] only costs
@@ -182,7 +184,6 @@ monthly view needs filters, too
   * [ ] cash basis accounting (German: EÜR)
 * [ ] EKS preview
 * [ ] charts --> maybe with javascript
-* [ ] dashboard (with views)
 * [x] accounting (default page)
   * [ ] extra: records without value_date
 * [ ] settings
