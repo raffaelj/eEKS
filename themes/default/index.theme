@@ -26,7 +26,9 @@ echo "<!DOCTYPE html>
   <header>
     <h1><a href='$uri'>".htmlspecialchars($this->name)."</a></h1>
     " . $this->add_button() . "
-    <nav>" . $this->view_list() . "
+    <nav>
+      <a href='{$uri}action=dashboard' class='lm_button'>Dashboard</a>
+      " . $this->view_list() . "
       <a href='{$uri}_pdf=1&amp;{$qs}' class='lm_button' title='download PDF'>PDF</a>
       " . $this->export_button() . "
       <a href='{$uri}_lang=de-de&amp;{$qs_without_lang}' class='lm_button lang_button'>de</a>
