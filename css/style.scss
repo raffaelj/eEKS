@@ -70,13 +70,26 @@ $font: Arial, Helvetica, sans-serif;
 	-webkit-transform-origin: $origin;
           transform-origin: $origin;
 }
-
+// word-wrap
+@mixin word-wrap() {
+       word-break: break-word;
+  -webkit-hyphens: auto;
+     -moz-hyphens: auto;
+          hyphens: auto;
+}
+// box-sizing
+@mixin box-sizing($box) {
+  -webkit-box-sizing: $box;
+     -moz-box-sizing: $box;
+          box-sizing: $box;
+}
 
 
 // default stuff
 html {
   margin:0;
   padding:0;
+  @include word-wrap();
 }
 
 body {
@@ -188,6 +201,11 @@ nav {
   @media print{display:none;}
 }
 
+.list_of_tables{
+  li{
+    display:inline-block;
+  }
+}
 
 // tables
 
@@ -212,6 +230,8 @@ table {
   th {
     background-color: $clr_main_2;
     color: $clr_grey_dark;
+    word-break: normal;
+    hyphens: manual;
     // @media print{
       // background-color:transparent;
     // }
@@ -235,14 +255,11 @@ table {
       font-size:.8em;
       white-space:nowrap;
     }
-    &[data-col=from_to]{
+    &[data-col=customer_supplier]{
       white-space:nowrap;
     }
     &[data-col^=notes]{
       // white-space:nowrap;
-    }
-    input{
-      // margin:0 auto;
     }
   }
   tr {
@@ -259,6 +276,8 @@ table {
     &.column_sums td{
       font-weight:bold;
       border-top:1px solid $clr_grey_dark;
+      word-break: normal;
+      hyphens: manual;
     }
     @media print{
       page-break-inside:avoid;
@@ -520,7 +539,7 @@ input
   margin:0 .1em;
   padding: .2em;
   font-size: .9em;
-  box-sizing: border-box;
+  @include box-sizing(border-box);
 }
 input[type="checkbox"], input[type="radio"]{
   margin: -2px .2em 0 0;
@@ -1015,7 +1034,7 @@ body.eks form.eks_form{
         // background:transparent;
         font-size:$fontsize_screen;
         // line-height:$font;
-        box-sizing:border-box;
+        @include box-sizing(border-box);
       }
       th{
         background-color:$clr_main_tr;
@@ -1173,5 +1192,30 @@ body.eks form.eks_form{
 
 }
 
+////// dashboard
+.dash_box{
+  display: inline-block;
+  width:24%;
+  height:300px;
+  margin: .5%;
+  padding: 0;
+  @include box-sizing(border-box);
+  overflow:auto;
+  text-align:left;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  vertical-align: top;
+  &.wide{
+    width:99%;
+  }
+  h2{
+    text-align:center;
+    margin: .2em 0;
+    font-size: 1em;
+  }
+  table{
+    font-size:.6em;
+  }
+}
 
 

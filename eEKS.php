@@ -247,7 +247,7 @@ class eEKS extends lazy_mofo{
   //////////////////////////////////////////////////////////////////////////////
   function dashboard(){
     
-    // purpose: show multiple grids with predefiend filters
+    // purpose: show multiple grids with predefined filters
     
     $html = "";
     
@@ -255,20 +255,45 @@ class eEKS extends lazy_mofo{
     
     $html .= "<div class='center'>";
     
-    // unpayed invoices
-    $html .= "<div class='dash_grid'>";
+    // sums of last three months
+    $html .= "<div class='dash_box'>";
+    $html .= "<h2>last three months</h2>";
     
+    $_GET['_from'] = (new DateTime())->modify("- 3 months")->modify("first day of this month")->format($this->date_out);
     
+    $this->multi_column_on = false;
+    
+    $this->grid_sql = $this->generate_grid_sql_monthly();
+    
+    $html .= $this->grid('', true);
     
     
     $html .= "</div>";
     
     // custom sorted, filtered, grouped grid(s)
+    $html .= "<div class='dash_box'>";
+    $html .= "<h2>something with filters</h2>";
+    
+    $html .= "</div>";
     
     
+    // unpayed invoices
+    $html .= "<div class='dash_box'>";
+    $html .= "<h2>unpayed invoices</h2>";
+    
+    $html .= "</div>";
     
     // graphs
+    $html .= "<div class='dash_box'>";
+    $html .= "<h2>maybe a graph, because it looks cool</h2>";
     
+    $html .= "</div>";
+    
+    // a wide one
+    $html .= "<div class='dash_box wide'>";
+    $html .= "<h2>another table with a lot of columns</h2>";
+    
+    $html .= "</div>";
     
     $html .= "</div>";
     
@@ -375,7 +400,7 @@ class eEKS extends lazy_mofo{
       
       $html = "<ul class='list_of_tables'>";
       foreach($arr as $value){
-        $html .= '<li><a href="?_view=edit&amp;_edit_table='.array_values($value)[0].'">'. array_values($value)[0] .'</a></li>';
+        $html .= '<li><a class="lm_button" href="?_view=edit_tables&amp;_edit_table='.array_values($value)[0].'">'. $this->format_title(array_values($value)[0]) .'</a></li>';
       }
       $html .= '</ul>';
     }
@@ -1742,6 +1767,8 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
       $query_string_list_inputs = '';
       if(mb_strlen($this->query_string_list) > 0){
         $arr = explode(',', trim($this->query_string_list, ', '));
+        $arr[] = "_view";
+        $arr[] = "_lang";
         foreach($arr as $val){
           $value = $this->clean_out(@$_REQUEST[$val]);
           if(mb_strlen($value) > 0)
