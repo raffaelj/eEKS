@@ -133,7 +133,7 @@ coming soon
   * [ ] go button on giant datasets
 * [x] output via template file
 * CSV export
-  * [x] optional renaming of column heaaders
+  * [x] optional renaming of column headers
   * [ ] needs i18n number_format
   * [ ] doesn't work with multiple grids (chooses first grid)
   * [ ] trigger for export should be outside of grid
