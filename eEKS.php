@@ -986,7 +986,7 @@ class eEKS extends lazy_mofo{
     
   }
   
-  
+  //////////////////////////////////////////////////////////////////////////////
   function html_number_output($str = "", $type = "float"){
     
     // purpose: set class names for different numbers
@@ -997,6 +997,22 @@ class eEKS extends lazy_mofo{
     if ($str == 0) $class .= " zero";
     if ($str < 0)  $class .= " minus";
     if ($str > 0)  $class .= " plus";
+    
+    return "<span class='$class'>$str</span>";
+    
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////
+  function html_date_output($str = "", $use_time = false){
+    
+    // purpose: set class names for different numbers
+    
+    $str = $this->date_out($str, $use_time);
+    
+    if($use_time)
+      $class = "datetime";
+    else
+      $class = "date";
     
     return "<span class='$class'>$str</span>";
     
@@ -2177,10 +2193,14 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
 
     if($cmd == 'text')
       return $this->clean_out($value, $this->grid_ellipse_at); 
+    // elseif($cmd == 'date')
+      // return $this->date_out($value); 
+    // elseif($cmd == 'datetime')
+      // return $this->date_out($value, true); 
     elseif($cmd == 'date')
-      return $this->date_out($value); 
+      return $this->html_date_output($value); 
     elseif($cmd == 'datetime')
-      return $this->date_out($value, true); 
+      return $this->html_date_output($value, true); 
     elseif($cmd == 'email')
       return "<a href='mailto:$value'>$value</a>";
     elseif($cmd == 'document')
@@ -2502,7 +2522,7 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
       // set params
       $param = "";
       $param .= " --print-media-type";            // use print CSS
-      $param .= " -L 0 -R 0 -B 0 -T 0";           // set margins to 0 for full size background images
+      $param .= " -L 10 -R 10 -B 10 -T 10";           // set margins to 0 for full size background images
       $param .= " -d 300";                        // dpi
       $param .= " --disable-smart-shrinking";     // Disable to make WebKit pixel/dpi ratio constant
       if( empty($_GET['_portrait']) && @$_GET['_portrait'] != 1 ) // wkhtmltopdf default: portrait
