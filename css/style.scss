@@ -2,32 +2,6 @@
 https://github.com/raffaelj/eEKS/blob/master/css/style.scss
 **********************************************************/
 
-// define colors
-// `_tr` means transparent
-$clr_white: #fafafa;
-$clr_white_tr: rgba(220,220,240,.8);
-$clr_black: #0d0d0d;
-$clr_black_tr: rgba(0,0,0,.1);
-$clr_black_tr_light: rgba(0,0,0,.02);
-$clr_black_tr_light_2: rgba(0,0,0,.12);
-$clr_black_tr_dark: rgba(0,0,0,.5);
-$clr_grey_light: #ccc;
-$clr_grey_light_tr: rgba(250,250,250,0.8);
-$clr_grey: #666;
-$clr_grey_dark: #222;
-$clr_main: #1D90B7;//blue - rgb(29,144,183)
-$clr_main_tr: rgba(29,144,183,.5);//blue
-$clr_main_light: #29ABD7;//blue
-$clr_main_2: #A4BA1E;//green
-$clr_alarm: #FF6347;//red (tomato)
-$clr_alarm_dark: #8c0909;//dark red
-$clr_attention: #ffc435;//orange
-$clr_confirm: #C5C924;//green - rgb(197,201,36)
-$clr_confirm_tr: rgba(197,201,36,.8);//green
-
-// fonts
-$font: Arial, Helvetica, sans-serif;
-
 ////////// mixins
 
 // box-shadow
@@ -77,12 +51,45 @@ $font: Arial, Helvetica, sans-serif;
      -moz-hyphens: auto;
           hyphens: auto;
 }
+@mixin hyphens($val) {
+  -webkit-hyphens: $val;
+     -moz-hyphens: $val;
+          hyphens: $val;
+}
 // box-sizing
 @mixin box-sizing($box) {
   -webkit-box-sizing: $box;
      -moz-box-sizing: $box;
           box-sizing: $box;
 }
+
+////////// variables
+
+// define colors
+// `..._tr` means transparent
+$clr_white: #fafafa;
+$clr_white_tr: rgba(220,220,240,.8);
+$clr_black: #0d0d0d;
+$clr_black_tr: rgba(0,0,0,.1);
+$clr_black_tr_light: rgba(0,0,0,.02);
+$clr_black_tr_light_2: rgba(0,0,0,.12);
+$clr_black_tr_dark: rgba(0,0,0,.5);
+$clr_grey_light: #ccc;
+$clr_grey_light_tr: rgba(250,250,250,0.8);
+$clr_grey: #666;
+$clr_grey_dark: #222;
+$clr_main: #1D90B7;//blue - rgb(29,144,183)
+$clr_main_tr: rgba(29,144,183,.5);//blue
+$clr_main_light: #29ABD7;//blue
+$clr_main_2: #A4BA1E;//green
+$clr_alarm: #FF6347;//red (tomato)
+$clr_alarm_dark: #8c0909;//dark red
+$clr_attention: #ffc435;//orange
+$clr_confirm: #C5C924;//green - rgb(197,201,36)
+$clr_confirm_tr: rgba(197,201,36,.8);//green
+
+// fonts
+$font: Arial, Helvetica, sans-serif;
 
 
 // default stuff
@@ -98,7 +105,7 @@ body {
   font-family: $font;
   font-size: 16px;  
   @media print{
-    font-size:10pt;
+    font-size:11px;
   }
 }
 
@@ -118,14 +125,9 @@ p{
 // custom classes for easier styling
 .text-right {text-align:right;}
 .text-left {text-align:left;}
-.number,.integer,.date,.datetime{display:block;text-align:right;}
 .center{margin-left:auto;margin-right:auto;text-align:center;}
 .hidden{display:none;}
 
-// positive and negative numbers
-.minus{color: $clr_alarm_dark;}
-.zero{color:$clr_grey_light;}
-.plus{}
 
 // set page size and reset a few rules for printing
 
@@ -162,7 +164,7 @@ main{
   background-attachment: fixed;
   @media print{
     padding:0;
-    padding:20mm;// for printing but EKS needs 0mm for background image
+    // padding:20mm;// for printing but EKS needs 0mm for background image
     background-color:transparent;
   }
 }
@@ -218,20 +220,45 @@ table {
   font-size:14px;
   clear:both;// float right from lm_save_changes_button
   @media print{
-    border-collapse: collapse;
+    // border-collapse: collapse;
+    border-collapse: unset;//fix loosing borders in second page in firefox
+    border-spacing:0;//fix loosing borders in firefox
     margin:0;
     page-break-inside:auto;
     width:100%;
+    font-size:12px;
+    // border:none;
+    border-radius:0;
   }
   td,th { 
     padding: 4px;
     border-bottom: 1px solid $clr_grey_light;
+    @media print{
+      border-left: 1px solid $clr_grey_light;
+      // border-right: 1px solid $clr_grey_light;
+      // border-bottom:none;
+      // border-top:1px solid $clr_grey_light;
+      // border:1px solid $clr_grey_light;
+      &:first-child{border-left:none;}
+    }
+    
+    .number,.integer,.date,.datetime{
+      display:block;
+      text-align:right;
+      @include hyphens(none);
+      word-break:keep-all;
+      white-space:nowrap;
+    }
+    // positive and negative numbers
+    .minus{color: $clr_alarm_dark;}
+    .zero{color:$clr_grey_light;}
+    .plus{}
   }
   th {
     background-color: $clr_main_2;
     color: $clr_grey_dark;
     word-break: normal;
-    hyphens: manual;
+    @include hyphens(manual);
     // @media print{
       // background-color:transparent;
     // }
@@ -254,9 +281,15 @@ table {
     &.col_multi_value{
       font-size:.8em;
       white-space:nowrap;
+      @media print{
+        white-space:normal;
+      }
     }
     &[data-col=customer_supplier]{
       white-space:nowrap;
+      @media print{
+        white-space:normal;
+      }
     }
     &[data-col^=notes]{
       // white-space:nowrap;
@@ -277,19 +310,31 @@ table {
       font-weight:bold;
       border-top:1px solid $clr_grey_dark;
       word-break: normal;
-      hyphens: manual;
+      @include hyphens(none);
     }
     @media print{
+      // border-top:1px solid $clr_grey_light;
+      // border-bottom:1px solid $clr_grey_light;
+      // border:1px solid $clr_grey_light;
       page-break-inside:avoid;
       page-break-after:auto;
+      &:first-child{// column ID
+        @include hyphens(none);
+        word-break:keep-all;
+        white-space:nowrap;
+      }
       &.grid_repeat_header{
         display:none;
       }
       td,th{
         background-color:transparent;
-        border-left: 1px solid $clr_grey_light;
-        &:first-child{border-left:none;}
-        &:last-child{border-left:none;}
+        border-radius:0;
+        // &:first-child{
+          // border-left:1px solid $clr_grey_light;
+        // }
+        // &:last-child{
+          // border-right:1px solid $clr_grey_light;
+        // }
         &.col_edit{
           display:none;
         }
@@ -373,7 +418,10 @@ th a.lm_account{
   }
   &.lm_save_changes_button{
     float:right;
-    @media print{display:none;}
+    @media print{
+      display:none;
+      float: none !important;
+    }
   }
 }
 
