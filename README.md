@@ -97,7 +97,7 @@ coming soon
 * driver's log
 * print CSS for (large) tables
 
-### revise lm code and features
+### revise lm code, structural changes and features
 
 * grid - set class names (or data attributes) for data types
   * [x] get rid of javascript inside code
@@ -155,6 +155,7 @@ coming soon
 
 * [x] not in grid
 * [x] add filters
+* [ ] custom searchbox per view
 
 ### filters
 
@@ -175,6 +176,7 @@ monthly view needs filters, too
 
 ### views/pages
 
+* [ ] views need their own config file or section in config.ini
 * [ ] dashboard (with views)
   * [ ] move to action or somewhere else, it contains views and shouldn't be a view itself
 * [ ] monthly sums
@@ -209,6 +211,7 @@ monthly view needs filters, too
 * [ ] CSS for small(er) screens
 * [ ] all select boxes need titles
 * [ ] cross browser print CSS - Oh my god!
+  * `white-space:nowrap` seems to break layout in FF and wkhtmltopdf
 
 
 
