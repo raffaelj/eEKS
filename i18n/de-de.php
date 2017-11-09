@@ -83,6 +83,7 @@ $this->date_filter_to = "bis";
 
 // other words that need translation and may appear somewhere
 $this->translate['all'] = "alle";
+$this->translate['edit'] = "bearbeiten";
 $this->translate['income'] = "Einkommen";
 $this->translate['costs'] = "Ausgaben";
 $this->translate['settings'] = "Einstellungen";
