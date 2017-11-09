@@ -39,7 +39,7 @@ i18n = de-de
 
 ;; name of theme must be the same like the folder name with `index.theme` file
 theme = default
-; theme = test
+; theme = minimal
 
 ;; feature does not exist, but would be nice to have
 ;; change to true for demo data
@@ -47,7 +47,7 @@ demo = false
 
 ;; You don't like the name of this software?
 ;; It remembers you to employment agency? - Change it!
-; name = "I <3 data"
+; software_name = "I <3 data"
 
 ;; slogan
 slogan = "Don't worry, be happy ;-)"
@@ -79,7 +79,6 @@ views[] = missing_date
 views[] = monthly_sums
 views[] = edit_tables
 views[] = eks
-views[] = settings
 
 ;; date filters
 date_filters[] = value_date

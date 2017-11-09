@@ -142,11 +142,12 @@ coming soon
   * [ ] with grid_input_control
   * [x] with column sums
 * [x] PDF export
-  * [ ] trigger for export must be outside of grid
+  * [x] trigger for export must be outside of grid ! --> also for pdf background fix
   * [x] mixed landscape/portrait (EKS)
   * [ ] user should choose if landscape or portrait
   * [ ] use different margins for EKS and all other pages
   * [ ] doesn't recognize changed input fields, expected: output same as screen, should submit form data to querystring
+  * [x] background-image not loading inside @media print, [wkhtmltopdf issue](https://github.com/wkhtmltopdf/wkhtmltopdf/issues/3126)
 * [x] I really have to figure out how `$this->query_string_list` works for _view, _lang, _action
 * [x] escape ampersands in links
 * [ ] optional: disable links in column headers
@@ -212,6 +213,7 @@ monthly view needs filters, too
 * [ ] all select boxes need titles
 * [ ] cross browser print CSS - Oh my god!
   * `white-space:nowrap` seems to break layout in FF and wkhtmltopdf
+  * rotate hack - page-break with margin-top breaks in Opera
 
 
 

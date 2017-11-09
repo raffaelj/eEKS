@@ -6,7 +6,7 @@ class eEKS extends lazy_mofo{
   
   /////////////// custom non-LM variables
   
-  public $name = "eEKS";
+  public $software_name = "eEKS";
   public $slogan = "";
   public $background_image = "";
   
@@ -189,7 +189,7 @@ class eEKS extends lazy_mofo{
     
     // set commands and grid_sql
     $this->set_grid_view_parameters();
-
+    
     switch($this->get_action()){
       case "edit":          $this->template($this->edit());        break;
       case "insert":        $this->insert();      break;
@@ -385,7 +385,7 @@ class eEKS extends lazy_mofo{
   }
   
   //////////////////////////////////////////////////////////////////////////////
-  function view_list(){
+  function list_of_views(){
     
     // purpose: buttons/navigation with different views
     
@@ -399,19 +399,20 @@ class eEKS extends lazy_mofo{
     $uri = $this->get_uri_path();
     
     // qs without _view
-    $qs = $this->get_qs('_order_by,_desc,_offset,_search,_pagination_off,_lang');
+    // $qs = $this->get_qs('_order_by,_desc,_offset,_search,_pagination_off,_lang');
+    $qs = $this->get_qs('_lang');
     
     $html = "";
     
     // default
-    $html .= "<a href='{$uri}_view=default&amp;$qs' class='lm_button$class'>default</a> ";
+    $html .= "<a href='{$uri}_view=default&amp;$qs' class='lm_button view_button$class'>default</a>";
     
     // other options
     foreach($this->views as $val){
       $class = "";
       if($val == $active_view)
         $class = " active";
-      $html .= "<a href='".$uri."_view=$val&amp;$qs' class='lm_button$class'>".$this->translate($val, 'pretty')."</a> ";
+      $html .= "<a href='".$uri."_view=$val&amp;$qs' class='lm_button view_button$class'>".$this->translate($val, 'pretty')."</a>";
     }
     
     return $html;
@@ -419,7 +420,7 @@ class eEKS extends lazy_mofo{
   }
   
   //////////////////////////////////////////////////////////////////////////////
-  function list_edit_tables(){
+  function list_of_editable_tables(){
     
     // purpose: list existing tables in database with edit links
     
@@ -453,14 +454,6 @@ class eEKS extends lazy_mofo{
       
       $_POST['action'] = "eks";
       $this->eks();
-      
-    }
-    
-    // Settings
-    elseif($view == "settings"){
-      
-      $_POST['action'] = "settings";
-      $this->settings();
       
     }
     
@@ -700,7 +693,7 @@ class eEKS extends lazy_mofo{
       $html .= '<label for="page3_calculated"></label>';
       $html .= "</fieldset>";
       
-      // small business / Kleinunternehmer/in (§ 19 UStG)
+      // small business / Kleinunternehmer/in (19 UStG)
       $html .= "<fieldset>";
       $eks['eks']['small_business'] ? $checked = " checked='checked'" : $checked = "";
       $html .= '<input type="checkbox" id="small_business" name="small_business"'.$checked.' />';
@@ -744,19 +737,16 @@ class eEKS extends lazy_mofo{
     if(in_array(5, $eks_pages)){
       $html .= "<page id='eks_page5' class='eks_page landscape'>";
       
-      // carryover
-      // $html .= "<table class='eks_carryover'>";
-      // $html .= "<tr>";
-      // foreach($this->column_sums as $column_name=>$value)
-        // $html .= '    <td data-coltitle="'.htmlspecialchars($column_name).'" data-col="'.htmlspecialchars($column_name).'">' . $this->get_output_control($column_name . '-0', $value, '--number', 'grid') . "</td>\r\n";
-      // $html .= "</tr>";
-      // $html .= "</table>";
-      
       // set carryover
       $this->grid_show_carryover = true;
       
       // sum pages
       $this->column_sums = $sum['page3'];
+      
+      
+      // There is a second sum of all costs in this form, which breaks my logic
+      // about injecting sums and carryovers into grid()
+      
       
       // grid
       $this->grid_sql = $this->generate_grid_sql_eks(5);
@@ -764,11 +754,6 @@ class eEKS extends lazy_mofo{
       
       // unset carryover
       $this->grid_show_carryover = false;
-      
-      // store $this->column_sums for carryover
-      // $sum['page5'] = $this->column_sums;
-      // reset $this->column_sums
-      // $this->column_sums = array();
       
       $html .= "</page>";
     }
@@ -802,16 +787,6 @@ class eEKS extends lazy_mofo{
   }
   
   //////////////////////////////////////////////////////////////////////////////
-  function eks_grid(){
-    
-    // purpose: 
-    
-    
-    
-    
-  }
-  
-  //////////////////////////////////////////////////////////////////////////////
   function back_button($identity_id = 0){
     
     $uri_path = $this->get_uri_path();
@@ -837,6 +812,7 @@ class eEKS extends lazy_mofo{
     return $grid_add_link;
   }
   
+  //////////////////////////////////////////////////////////////////////////////
   function export_button(){
     $qs = $this->get_qs();
     $uri_path = $this->get_uri_path();
@@ -846,15 +822,80 @@ class eEKS extends lazy_mofo{
     $grid_export_link = str_replace('[grid_export_link_text]', $this->grid_export_link_text, $grid_export_link);
     return $grid_export_link;
   }
+  
   //////////////////////////////////////////////////////////////////////////////
   function template($content){
     
     // purpose: use template file for HTML output
     
+    // wkhtmltopdf has a bug and doesnt't load background images inside @media rules
+    // issue: https://github.com/wkhtmltopdf/wkhtmltopdf/issues/3126
+    // Therefore we have to insert some CSS to overwrite the screen images with
+    // high-resulution images for printing
+    $_wkhtmltopdf_img_fix = intval(@$_REQUEST['_wkhtmltopdf_img_fix']);
+    $_pdf = intval(@$_REQUEST['_pdf']);
+
+    // export page to PDF and quit 
+    if($_pdf == 1){
+      $url = $this->get_uri_path() . $this->get_qs();
+      $url .= "&_wkhtmltopdf_img_fix=1"; // add parameter to qs of current page for CSS insert
+      $this->generate_pdf($url);
+      return;
+    }
+
+    $css = "";
+    if($_wkhtmltopdf_img_fix == 1) // insert CSS to overwrite background images
+      $css .= "body.eks form.eks_form #eks_page1.eks_page{background-image:url('img/eks_1-6_print.png');}body.eks form.eks_form #eks_page2.eks_page{background-image:url('img/eks_2-6_print.png');}body.eks form.eks_form #eks_page3.eks_page{background-image:url('img/eks_3-6_print.png');}body.eks form.eks_form #eks_page4.eks_page{background-image:url('img/eks_4-6_print.png');}body.eks form.eks_form #eks_page5.eks_page{background-image:url('img/eks_5-6_print.png');}body.eks form.eks_form #eks_page6.eks_page{background-image:url('img/eks_6-6_print.png');}";
+    
+    
+    //// variables for templating
+    
+    // class name generated by page name/type for easier styling
+    $body_class = $this->get_action();
+
+    $uri = $this->get_uri_path();
+    $qs = $this->get_qs();
+    $qs_without_lang = $this->get_qs('_order_by,_desc,_offset,_search,_pagination_off,_view');
+
+    // optional background image
+    $background_image = "";
+    if (mb_strlen($this->background_image) > 0)
+      $background_image = " style='background-image:url($this->background_image)' ";
+    
+    $lang = $this->html_lang;
+    // $title = $this->get_page_name()." - ".htmlspecialchars($this->software_name);
+    $title = $this->get_page_name();
+    $software_name = htmlspecialchars($this->software_name);
+    $slogan = htmlspecialchars($this->slogan);
+    $version = $this->version();
+    
+    $user_css = "";
+    if(mb_strlen($css) > 0)
+      $user_css .= "<style>$css</style>";
+    
+    // buttons
+    $settings_button = "<a href='{$uri}action=settings' class='lm_button'>".$this->translate("settings", "pretty")."</a>";
+    $dashboard_button = "<a href='{$uri}action=dashboard' class='lm_button'>Dashboard</a>";
+    $add_button = $this->add_button();
+    $export_button_csv = $this->export_button();
+    $export_button_pdf = "<a target='_blank' href='{$uri}_pdf=1&amp;{$qs}' class='lm_button' title='download PDF'>PDF</a>";
+    // language buttons
+    $langs = array("de-de", "en-us");
+    $language_button = "";
+    foreach($langs as $lang)
+      $language_button .= "<a href='{$uri}_lang=$lang&amp;$qs_without_lang' class='lm_button lang_button'>".substr($lang,0,2)."</a>";
+    
+    $list_of_views = $this->list_of_views();
+    $searchbox = $this->search_box();
+    $list_of_editable_tables = $this->list_of_editable_tables(); // empty if _view != "edit_tables"
+    
+    $error = $this->error;
+    
+    // include template file
     if(file_exists('themes/'.$this->config['eeks']['theme'].'/index.theme'))
-      include('themes/'.$this->config['eeks']['theme'].'/index.theme');
+      echo include('themes/'.$this->config['eeks']['theme'].'/index.theme');
     else
-      include('themes/default/index.theme');
+      echo include('themes/default/index.theme');
   }
   
   //////////////////////////////////////////////////////////////////////////////
@@ -1060,7 +1101,6 @@ class eEKS extends lazy_mofo{
     $_desc = abs(intval(@$_REQUEST['_desc']));         // descending order flag
     $_offset = abs(intval(@$_REQUEST['_offset']));     // pagination offset
     $_export = intval(@$_REQUEST['_export']);
-    $_pdf = intval(@$_REQUEST['_pdf']);
     
     $qs = $this->get_qs();
 
@@ -1127,13 +1167,6 @@ class eEKS extends lazy_mofo{
     // export data to CSV and quit 
     if($_export == 1 && $count > 0){
       $this->export($result, $columns);
-      return;
-    }
-    
-    // export page to PDF and quit 
-    if($_pdf == 1){
-      $url = $this->get_uri_path() . $this->get_qs();
-      $this->generate_pdf($url);
       return;
     }
 
@@ -1698,9 +1731,7 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
     
     $html = "";
     
-    // view filter
-    
-    // $html .= $this->view_list();
+    //// view filter
     
     // pos/neg filter
     
@@ -1837,37 +1868,37 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
   //////////////////////////////////////////////////////////////////////////////
   function delete(){
 
-        // purpose: called from contoller to display update() data
+    // purpose: called from contoller to display update() data
 
-        // call user function to validate or whatever
-        $error = '';
-        if($this->on_delete_user_function != '')
-            $error = call_user_func($this->on_delete_user_function);
+    // call user function to validate or whatever
+    $error = '';
+    if($this->on_delete_user_function != '')
+      $error = call_user_func($this->on_delete_user_function);
 
-        // go back on validation error
-        if($error != ''){
-            if($_POST['_called_from'] == 'form')
-                $this->edit($error);
-            else
-                $this->index($error);
+    // go back on validation error
+    if($error != ''){
+      if($_POST['_called_from'] == 'form')
+        $this->edit($error);
+      else
+        $this->index($error);
 
-            return;
-        }
-        
-        // delete data
-        $flag = $this->sql_delete();
-
-        // user function after delete
-        if($this->after_delete_user_function != '')
-            call_user_func($this->after_delete_user_function);
-
-        // redirect user
-        $url = $this->get_uri_path() . "_success=3&" . $this->get_qs();
-        $this->redirect($url, $flag);
-
+      return;
     }
+    
+    // delete data
+    $flag = $this->sql_delete();
+
+    // user function after delete
+    if($this->after_delete_user_function != '')
+      call_user_func($this->after_delete_user_function);
+
+    // redirect user
+    $url = $this->get_uri_path() . "_success=3&" . $this->get_qs();
+    $this->redirect($url, $flag);
+
+  }
   
-  
+  //////////////////////////////////////////////////////////////////////////////
   function sql_delete(){
 
         // purpose: delete the requested record
@@ -2034,22 +2065,15 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
 
   }
   
-  
-  
-  
-  
   //////////////////////////////////////////////////////////////////////////////
-  // custom function cast_value
-    
-    // number output need i18n (dot and comma separators)
-    // $this->number_out($value) instead of $this->clean_out($value)
-  
   function cast_value($val, $column_name = '', $posted_from = 'form'){
       
     // purpose: cast data going into the database. set blanks null and format dates
     // returns: string
     // $column_name is not used right now but might be needed as a hack to cast by column name for databases like sqlite
     // missing types seem to always be numbers
+    
+    // changes in eEKS, compared to lm: added number_in)()
 
     if(is_array($val))
       $val = implode($this->delim, $val);
@@ -2083,16 +2107,12 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
   }
   
   //////////////////////////////////////////////////////////////////////////////
-  // custom function get_input_control (line: 1553)
-    
-    // get rid of inline styles (size, maxlength, rows, cols)
-    // line 1602-1603:
-    // elseif($cmd == 'number') ... $this->number_out($value)
-    
   function get_input_control($column_name, $value, $command, $called_from, &$validate = array()){
 
     // purpose: render html input based "command", if command is then try to call a user function
     // returns: html 
+    
+    // changes in eEKS, compared to lm: added number_out(), no inline styles
     
     // parse $command into $sql and $cmd, remove delimiter
     $pos = mb_strrpos($command, '--');
@@ -2102,12 +2122,6 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
     // default
     if(mb_strlen($cmd) == 0)
       $cmd = 'text';
-
-    // set input size    
-    // if($called_from == 'grid')
-      // $size = $this->grid_text_input_size;
-    // else
-      // $size = $this->form_text_input_size;
 
     $class = $this->get_class_name($column_name); 
 
@@ -2174,15 +2188,12 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
   }
   
   //////////////////////////////////////////////////////////////////////////////
-  // custom function get_output_control (line: 1636)
-    
-    // number output need i18n (dot and comma separators)
-    // elseif($cmd == 'number') ... return $this->number_out($value); 
-  
   function get_output_control($column_name, $value, $command, $called_from){
 
     // purpose: render html output based "command", if command is then try to call a user function
-    // returns: html 
+    // returns: html
+    
+    // changes in eEKS, compared to lm: added html_number_output()
 
     // get command only, no '--'
     $cmd = trim(mb_substr($command, mb_strrpos($command, '--') + 2));
@@ -2220,7 +2231,6 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
 
   }
   
-  //////////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
   function form($error = ''){
 
@@ -2384,6 +2394,7 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
 
   }// end of form()
   
+  //////////////////////////////////////////////////////////////////////////////
   function display_error($error, $source_function){
         
     // purpose: display errors to user.
@@ -2534,6 +2545,7 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
         $param = " --print-media-type -L 0 -R 0 -B 0 -T 0 -d 300 --disable-smart-shrinking";
       }
       
+      
       // execute wkhtmltopdf
       exec($path.$param.' "'.$url.'" '.$file);
       
@@ -2551,21 +2563,37 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
   }
   
   //////////////////////////////////////////////////////////////////////////////
+  function get_view(){
+    
+    // purpose: return name of current view
+    
+    if( !empty($_GET['_view']) && in_array($_GET['_view'], $this->views) )
+      return $_GET['_view'];
+    else
+      return "default";
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////
   function get_page_name(){
     
     // purpose: get a page name from action and view
     
     $title = "";
-    if (mb_strlen($this->get_action()) > 0 )
-      $title .= $this->get_action();
-    if( !empty($_GET['_view']) && in_array($_GET['_view'], $this->views) ){
+    
+    // add action
+    $title .= $this->translate($this->get_action(), "pretty");
+    
+    // add view
+    if($this->get_view() != "default"){
       if(mb_strlen($title) > 0)
         $title .= " - ";
-      $title .= $_GET['_view'];
+      $title .= $this->translate($this->get_view(), "pretty");
     }
-      
-    if(mb_strlen($title) == 0)
-      $title = $this->name;
+    
+    // add software name
+    if(mb_strlen($title) > 0)
+      $title .= " - ";
+    $title .= "$this->software_name";
       
     return htmlspecialchars($title);
     
@@ -2587,6 +2615,7 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
     
   }
   
+  //////////////////////////////////////////////////////////////////////////////
   function get_qs($query_string_list = '_order_by,_desc,_offset,_search,_pagination_off,_view,_lang'){
 
     // purpose: render querysting. user selections for order, search, and page are carry from page to page. 
@@ -2607,6 +2636,7 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
 
   }
   
+  //////////////////////////////////////////////////////////////////////////////
   function redirect($url, $automatic = true){
 
     // purpose: redirect user to url

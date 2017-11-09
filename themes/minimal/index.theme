@@ -1,5 +1,5 @@
 <?php
-// default template file for eEKS
+// minimal template file for eEKS
 
 return
 "<!DOCTYPE html>
@@ -16,25 +16,13 @@ return
   <header>
     <h1><a href='$uri'>$software_name</a></h1>
     $add_button
-    <nav>
-      $dashboard_button
-      $list_of_views
-      $settings_button
-    </nav>
     $export_button_pdf
     $export_button_csv
-    $language_button
     $searchbox
-    $list_of_editable_tables
   </header>
   <main$background_image>
     $error
     $content
   </main>
-    <footer class='center'>
-    <p>$slogan</p>
-    <p><a href='https://github.com/raffaelj/eeks'>Sourcecode on Github</a></p>
-    <p>$version</p>
-  </footer>
 </body>
 </html>";
