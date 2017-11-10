@@ -209,7 +209,7 @@ nav {
   }
 }
 
-// tables
+//////// tables
 
 table {
   border-spacing: 2px;
@@ -219,142 +219,124 @@ table {
   border-radius: 6px;
   font-size:14px;
   clear:both;// float right from lm_save_changes_button
+  
+  img{// images
+    display:block;
+    height:2em;
+  }
+  
   @media print{
-    // border-collapse: collapse;
     border-collapse: unset;//fix loosing borders in second page in firefox
     border-spacing:0;//fix loosing borders in firefox
     margin:0;
     page-break-inside:auto;
     width:100%;
     font-size:12px;
-    // border:none;
     border-radius:0;
   }
-  td,th { 
-    padding: 4px;
-    border-bottom: 1px solid $clr_grey_light;
+}
+td,th {
+  padding: 4px;
+  border-bottom: 1px solid $clr_grey_light;
+  @media print{
+    padding:2px;
+    border-left: 1px solid $clr_grey_light;
+    &:first-child{border-left:none;}
+  }
+  
+  .number,.integer,.date,.datetime{
+    display:block;
+    text-align:right;
+    @include hyphens(none);
+    word-break:keep-all;
+    white-space:nowrap;
+  }
+  // positive and negative numbers
+  .minus{color: $clr_alarm_dark;}
+  .zero{color:$clr_grey_light;}
+  .plus{}
+}
+th {
+  background-color: $clr_main_2;
+  color: $clr_grey_dark;
+  word-break: normal;
+  @include hyphens(manual);
+  a {
+    display: block;
+    padding: .2em .1em .1em;
+    text-decoration: none;
+    font-size: 1.05em;;
+    color: $clr_grey_dark;
     @media print{
-      border-left: 1px solid $clr_grey_light;
-      // border-right: 1px solid $clr_grey_light;
-      // border-bottom:none;
-      // border-top:1px solid $clr_grey_light;
-      // border:1px solid $clr_grey_light;
-      &:first-child{border-left:none;}
+      padding:0;
+      font-size:inherit;
     }
-    
-    .number,.integer,.date,.datetime{
-      display:block;
-      text-align:right;
+  }
+  &.col_edit{
+    width:3em;
+    @media print{
+      width:0;
+      padding:0;
+    }
+  }
+}
+td{
+  &.col_multi_value{
+    font-size:.8em;
+    white-space:nowrap;
+    @media print{
+      white-space:normal;
+    }
+  }
+  &[data-col=customer_supplier]{
+    white-space:nowrap;
+    @media print{
+      white-space:normal;
+    }
+  }
+  &[data-col=sum]{
+    font-weight:bold;
+    border-left:1px solid $clr_grey_dark;
+  }
+}
+tr {
+  // rounded borders
+  &:first-child th:first-child{border-top-left-radius:3px;}
+  &:first-child th:last-child{border-top-right-radius:3px;}
+  &:last-child td:first-child{border-bottom-left-radius:3px;}
+  &:last-child td:last-child{border-bottom-right-radius:3px;}
+  // different colors for even and odd rows
+  &:nth-child(even) td {background-color: $clr_white_tr;}
+  &:nth-child(odd) td {background-color: $clr_grey_light_tr;}
+  // highlight hover and current row edited
+  &.lm_active td, &:hover td {background: $clr_confirm_tr;}
+  &.column_sums td{
+    font-weight:bold;
+    border-top:1px solid $clr_grey_dark;
+    word-break: normal;
+    @include hyphens(none);
+  }
+  @media print{
+    page-break-inside:avoid;
+    page-break-after:auto;
+    &:first-child{ // column ID
       @include hyphens(none);
       word-break:keep-all;
       white-space:nowrap;
     }
-    // positive and negative numbers
-    .minus{color: $clr_alarm_dark;}
-    .zero{color:$clr_grey_light;}
-    .plus{}
-  }
-  th {
-    background-color: $clr_main_2;
-    color: $clr_grey_dark;
-    word-break: normal;
-    @include hyphens(manual);
-    // @media print{
-      // background-color:transparent;
-    // }
-    a {
-      display: block;
-      padding: .2em .1em .1em;
-      text-decoration: none;
-      font-size: 1.05em;;
-      color: $clr_grey_dark;
+    &.grid_repeat_header{
+      display:none;
     }
-    &.col_edit{
-      width:3em;
-      @media print{
-        width:0;
-        padding:0;
-      }
-    }
-  }
-  td{
-    &.col_multi_value{
-      font-size:.8em;
-      white-space:nowrap;
-      @media print{
-        white-space:normal;
-      }
-    }
-    &[data-col=customer_supplier]{
-      white-space:nowrap;
-      @media print{
-        white-space:normal;
-      }
-    }
-    &[data-col^=notes]{
-      // white-space:nowrap;
-    }
-  }
-  tr {
-    // rounded borders
-    &:first-child th:first-child{border-top-left-radius:3px;}
-    &:first-child th:last-child{border-top-right-radius:3px;}
-    &:last-child td:first-child{border-bottom-left-radius:3px;}
-    &:last-child td:last-child{border-bottom-right-radius:3px;}
-    // different colors for even and odd rows
-    &:nth-child(even) td {background-color: $clr_white_tr;}
-    &:nth-child(odd) td {background-color: $clr_grey_light_tr;}
-    // highlight hover and current row edited
-    &.lm_active td, &:hover td {background: $clr_confirm_tr;}
-    &.column_sums td{
-      font-weight:bold;
-      border-top:1px solid $clr_grey_dark;
-      word-break: normal;
-      @include hyphens(none);
-    }
-    @media print{
-      // border-top:1px solid $clr_grey_light;
-      // border-bottom:1px solid $clr_grey_light;
-      // border:1px solid $clr_grey_light;
-      page-break-inside:avoid;
-      page-break-after:auto;
-      &:first-child{// column ID
-        @include hyphens(none);
-        word-break:keep-all;
-        white-space:nowrap;
-      }
-      &.grid_repeat_header{
+    td,th{
+      background-color:transparent;
+      border-radius:0;
+      &.col_edit{
         display:none;
       }
-      td,th{
-        background-color:transparent;
-        border-radius:0;
-        // &:first-child{
-          // border-left:1px solid $clr_grey_light;
-        // }
-        // &:last-child{
-          // border-right:1px solid $clr_grey_light;
-        // }
-        &.col_edit{
-          display:none;
-        }
-      }
-      &:nth-child(even) td {background-color: transparent;}
-      &:nth-child(odd) td {background-color: transparent;}
     }
+    &:nth-child(even) td {background-color: transparent;}
+    &:nth-child(odd) td {background-color: transparent;}
   }
-}
-
-// eeks specific table layout
-th a.lm_account{
-  width:3.5em;
-}
-
-// images
-
-.lm_grid img{
-  display:block;
-  height:2em;
 }
 
 // lm_success and lm_error
@@ -380,9 +362,7 @@ th a.lm_account{
 
 ///////////// buttons and icons
 
-.button
-,.lm_button
-{
+.button,.lm_button{
   display:inline-block;
   padding:.5em;
   margin:.2em;
@@ -393,6 +373,8 @@ th a.lm_account{
   font-family:inherit;
   font-size: 1em;
   font-weight: bold;
+  line-height:inherit;
+  vertical-align:inherit;
   text-decoration:none;
   cursor: pointer;
   @include box-shadow(0 -2px 0 $clr_black_tr_light_2 inset);
@@ -411,13 +393,6 @@ th a.lm_account{
   &.alarm{background-color:$clr_alarm;}
   &.confirm{background-color:$clr_confirm;}
   &.view_button{background-color:$clr_main_2;}
-  
-  &.grid_export_link{
-    // position: absolute;
-    // top: .7em;
-    // right: 1em;
-    // font-size: .8em;
-  }
   &.lm_save_changes_button{
     float:right;
     @media print{
@@ -439,7 +414,7 @@ th a.lm_account{
   line-height: 1em;
   font-weight: normal;
   vertical-align: middle;
-  &.lm_grid_edit_link{// temporarily until icons are added
+  &.lm_grid_edit_link{// temporary until icons are added
     overflow: hidden;
     @media print{display:none;}
   }
@@ -497,6 +472,7 @@ th a.lm_account{
         border-radius: 50%;
         color: $clr_grey_light;
         background-color: $clr_white;
+        font-weight:normal;
       }
     }
   }
@@ -671,835 +647,817 @@ $fontsize_print: 16px;
     }
   }
 } */
-body.eks main{
+.landscape{
+  height:$zoom *  210px;
+   width:$zoom *  297px;
   @media print{
-    padding:0;//reset 20mm padding to print with full size background-image
+    height:210mm;
+    // height:209mm;
+    width:297mm;
+    // rotate landscape pages because browsers and wkhtmltopdf don't
+    // understand mixed orientations (portrait + landsacpe)
+    @include transform(rotate(-90deg) translate(-297mm, 0));
+    @include transform-origin(0 0);
+    margin-top:0;
+    ~ .landscape{// add margin-top for print rotation hack
+      margin-top: 87mm;
+    }
   }
 }
-body.eks form.eks_form{
-  text-align:center;// centering inline-block pages
+
+
+//////////////// attachment EKS
+body.eks{
+  main{
+    @media print{
+      padding:0;//reset 20mm padding to print with full size background-image
+    }
+  }
+  .eks_form{
+    text-align:center;// centering inline-block pages
+  }
+}
   
-  .eks_page{
-    text-align:left;
-    display:inline-block;
-    position:relative;// for absolute positioning of input fields
-    margin: 1em;
+.eks_page{
+  text-align:left;
+  display:inline-block;
+  position:relative;// for absolute positioning of input fields
+  margin: 1em;
+  padding:0;
+  background-repeat:no-repeat;
+  background-size:cover;
+  border:1px solid $clr_grey_light;
+  vertical-align: top;
+  @media print{
+    display:block;
+    margin:0;
     padding:0;
-    background-repeat:no-repeat;
-    background-size:cover;
-    border:1px solid $clr_grey_light;
-    vertical-align: top;
-    &.landscape{
-      height:$zoom *  210px;
-       width:$zoom *  297px;
+    border:none;
+    page-break-after:always; // page is too high if 297mm, maybe rounding issue
+  }
+  
+  fieldset{
+    margin: 0;
+    padding: 0;
+    border: none;
+    font-size:$fontsize_screen;
+    @media print{
+      font-size:$fontsize_print;
+    }
+  }
+  
+  input,textarea,label{
+    position:absolute;
+    background-color:$clr_main_tr;
+    margin:0;
+    padding: 0 3px;
+    border:none;
+    font-size: inherit;
+    @media print{
+      background-color:transparent;
+      font-size:$fontsize_print;
+    }
+  }
+  textarea{
+    font-family:'Courier New', monospace;
+  }
+  input[type=checkbox],input[type=radio]{
+    display:none;
+    + label{
+      display:inline-block;
+      width: $zoom * 5px;
+      height: $zoom * 5px;
+      padding: 0;
+      border: 1px solid #ccc;
+      border-radius: 2px;
+    }
+    &:checked{
+      + label{
+        background-image: url(../img/check.svg);
+        background-size: cover;
+      }
     }
     @media print{
-      display:block;
-      margin:0;
-      padding:0;
-      border:none;
-      page-break-after:always; // page is too high if 297mm, maybe rounding issue
-      
-      &.landscape{
-        height:210mm;
-        // height:209mm;
-        width:297mm;
-        // rotate landscape pages because browsers and wkhtmltopdf don't
-        // understand mixed orientations (portrait + landsacpe)
-        @include transform(rotate(-90deg) translate(-297mm, 0));
-        @include transform-origin(0 0);
-        // margin-top: 87mm;
-        margin-top:0;
-        ~ .landscape{
-          // reset margin-top from print rotation hack
-          // margin-top:0;
-          margin-top: 87mm;
-        }
-      }
-    }
-    
-    fieldset{
-      margin: 0;
-      padding: 0;
-      border: none;
-      font-size:$fontsize_screen;
-      @media print{
-        font-size:$fontsize_print;
-      }
-    }
-    
-    input,textarea,label{
-      position:absolute;
-      background-color:$clr_main_tr;
-      margin:0;
-      padding: 0 3px;
-      border:none;
-      font-size: inherit;
-      @media print{
-        background-color:transparent;
-        font-size:$fontsize_print;
-      }
-    }
-    textarea{
-      font-family:'Courier New', monospace;
-    }
-    input[type=checkbox],input[type=radio]{
-      display:none;
       + label{
-        display:inline-block;
-        width: $zoom * 5px;
-        height: $zoom * 5px;
-        padding: 0;
-        border: 1px solid #ccc;
-        border-radius: 2px;
-      }
-      &:checked{
-        + label{
-          background-image: url(../img/check.svg);
-          background-size: cover;
-        }
-      }
-      @media print{
-        + label{
-          width: $zoom_print * 5px;
-          height: $zoom_print * 5px;
-          border: none;
-          background-color: transparent;
-        }
-      }
-    }
-    
-    ////////////// page 1
-    &#eks_page1{
-      background-image:url('../img/eks_1-6_web.png');
-      
-      input[name=title]{
-        bottom: $zoom * 200px;
-        left: $zoom * 20px;
-        width:18%;
-      }
-      input[name=first_name]{
-        bottom: $zoom * 200px;
-        left: $zoom * 60px;
-        width:38%;
-      }
-      input[name=last_name]{
-        bottom: $zoom * 188px;
-        left: $zoom * 20px;
-        width:37%;
-      }
-      input[name=birthday]{
-        bottom: $zoom * 188px;
-        left: $zoom * 100px;
-        width:19%;
-      }
-      input[name=bg_number]{
-        bottom: $zoom * 176px;
-        left: $zoom * 20px;
-        width:57%;
-      }
-      input[name=title_refer]{
-        bottom: $zoom * 154px;
-        left: $zoom * 20px;
-        width:18%;
-      }
-      input[name=first_name_refer]{
-        bottom: $zoom * 154px;
-        left: $zoom * 60px;
-        width:38%;
-      }
-      input[name=last_name_refer]{
-        bottom: $zoom * 142px;
-        left: $zoom * 20px;
-        width:37%;
-      }
-      input[name=birthday_refer]{
-        bottom: $zoom * 142px;
-        left: $zoom * 100px;
-        width:19%;
-      }
-      input[name=calculated],input[name=calculated] + label{
-        bottom: $zoom * 124px;
-        left: $zoom * 77px;
-      }
-      input[name=estimated],input[name=estimated] + label{
-        bottom: $zoom * 124px;
-        left: $zoom * 21px;
-      }
-      input[name=period]{
-        bottom: $zoom * 104px;
-        left: $zoom * 26px;
-        width:55%;
-      }
-      input[name=activity]{
-        bottom: $zoom * 67px;
-        left: $zoom * 26px;
-        width:55%;
-      }
-      input[name=activity]{
-        bottom: $zoom * 67px;
-        left: $zoom * 26px;
-        width:55%;
-      }
-      input[name=start_date]{
-        bottom: $zoom * 55px;
-        left: $zoom * 26px;
-        width:6em;
-      }
-      input[name=end_date]{
-        bottom: $zoom * 55px;
-        left: $zoom * 26px + 112px;
-        width:6em;
-      }
-      input[name=company_location]{
-        bottom: $zoom * 43px;
-        left: $zoom * 26px;
-        width:55%;
-      }
-      input[name=legal_form]{
-        bottom: $zoom * 31px;
-        left: $zoom * 26px;
-        width:55%;
-      }
-      input[name=number_of_employees]{
-        bottom: $zoom * 15px;
-        left: $zoom * 58px;
-        width: 1.5em;
-        // font-size:$fontsize_screen;
-      }
-      input[name=has_employees],input[name=has_employees] + label{
-        bottom: $zoom * 16.6px;
-        left: $zoom * 20.6px;
-      }
-      @media print{
-        
-        // background-image:url('../img/eks_1-6_print.png');
-        
-        input[name=title]{
-          bottom: $zoom_print * 200px;
-          left: $zoom_print * 20px;
-        }
-        input[name=first_name]{
-          bottom: $zoom_print * 200px;
-          left: $zoom_print * 60px;
-        }
-        input[name=last_name]{
-          bottom: $zoom_print * 188px;
-          left: $zoom_print * 20px;
-        }
-        input[name=birthday]{
-          bottom: $zoom_print * 188px;
-          left: $zoom_print * 100px;
-        }
-        input[name=bg_number]{
-          bottom: $zoom_print * 176px;
-          left: $zoom_print * 20px;
-        }
-        input[name=title_refer]{
-          bottom: $zoom_print * 154px;
-          left: $zoom_print * 20px;
-        }
-        input[name=first_name_refer]{
-          bottom: $zoom_print * 154px;
-          left: $zoom_print * 60px;
-        }
-        input[name=last_name_refer]{
-          bottom: $zoom_print * 142px;
-          left: $zoom_print * 20px;
-        }
-        input[name=birthday_refer]{
-          bottom: $zoom_print * 142px;
-          left: $zoom_print * 100px;
-        }
-        input[name=calculated],input[name=calculated] + label{
-          bottom: $zoom_print * 124px;
-          left: $zoom_print * 77px;
-        }
-        input[name=estimated],input[name=estimated] + label{
-          bottom: $zoom_print * 124px;
-          left: $zoom_print * 21px;
-        }
-        input[name=period]{
-          bottom: $zoom_print * 104px;
-          left: $zoom_print * 26px;
-        }
-        input[name=activity]{
-          bottom: $zoom_print * 67px;
-          left: $zoom_print * 26px;
-        }
-        input[name=activity]{
-          bottom: $zoom_print * 67px;
-          left: $zoom_print * 26px;
-        }
-        input[name=start_date]{
-          bottom: $zoom_print * 55px;
-          left: $zoom_print * 26px;
-        }
-        input[name=end_date]{
-          bottom: $zoom_print * 55px;
-          left: $zoom_print * 26px + 112px
-        }
-        input[name=company_location]{
-          bottom: $zoom_print * 43px;
-          left: $zoom_print * 26px;
-        }
-        input[name=legal_form]{
-          bottom: $zoom_print * 31px;
-          left: $zoom_print * 26px;
-        }
-        input[name=number_of_employees]{
-          bottom: $zoom_print * 15px;
-          left: $zoom_print * 58px;
-          width: 1.5em;
-        }
-        input[name=has_employees],input[name=has_employees] + label{
-          bottom: $zoom_print * 16.6px;
-          left: $zoom_print * 20.6px;
-        }
-      }
-    }
-    
-    ////////////// page 2
-    &#eks_page2{
-      background-image:url('../img/eks_2-6_web.png');
-      
-      // subsidies / 5.  Zuschüsse/Beihilfen
-      input[name=subsidies_has_subsidies],input[name=subsidies_has_subsidies] + label{
-        bottom: $zoom * 267px;
-        left: $zoom * 10px;
-      }
-      input[name=subsidies_payer]{
-        bottom: $zoom * 254px;
-        left: $zoom * 15px;
-        width:61%;
-      }
-      input[name=subsidies_start_date]{
-        bottom: $zoom * 238px;
-        left: $zoom * 15px;
-        width:14%;
-      }
-      input[name=subsidies_end_date]{
-        bottom: $zoom * 238px;
-        left: $zoom * 49px;
-        width:14%;
-      }
-      input[name=subsidies_monthly_amount]{
-        bottom: $zoom * 238px;
-        left: $zoom * 80px;
-        width:30%;
-      }
-      input[name=subsidies_applied_subsidies],input[name=subsidies_applied_subsidies] + label{
-        bottom: $zoom * 224.7px;
-        left: $zoom * 10px;
-      }
-      input[name=subsidies_applied_payer]{
-        bottom: $zoom * 214px;
-        left: $zoom * 15px;
-        width:61%;
-      }
-      input[name=subsidies_apply_date]{
-        bottom: $zoom * 201px;
-        left: $zoom * 15px;
-        width:30%;
-      }
-      input[name=subsidies_apply_start_date]{
-        bottom: $zoom * 201px;
-        left: $zoom * 80px;
-        width:30%;
-      }
-      
-      // loan / 6.  Darlehen
-      
-      
-      // operations rooms / 7.  Angaben zu den Betriebsräumen
-      
-      
-      // location and signature
-      textarea[name=location]{
-        bottom: $zoom * 71px;
-        left: $zoom * 10px;
-        width:20.5%;
-        height:$zoom * 12px;
-        // font-size:.8em;
-        line-height:1.2em;
-        font-family:inherit;
-      }
-      textarea[name=signature]{
-        bottom: $zoom * 70.8px;
-        left: $zoom * 54px;
-        width: 46%;
-        font-size: .7em;
-        line-height: 1.2em;
-        height: $zoom * 9.6px;
-        padding: $zoom * .8px;
-      }
-      @media print{
-        // background-image:url('../img/eks_2-6_print.png');
-        
-        // subsidies / 5.  Zuschüsse/Beihilfen
-        input[name=subsidies_has_subsidies],input[name=subsidies_has_subsidies] + label{
-          bottom: $zoom_print * 267px;
-          left: $zoom_print * 10px;
-        }
-        input[name=subsidies_payer]{
-          bottom: $zoom_print * 254px;
-          left: $zoom_print * 15px;
-        }
-        input[name=subsidies_start_date]{
-          bottom: $zoom_print * 238px;
-          left: $zoom_print * 15px;
-        }
-        input[name=subsidies_end_date]{
-          bottom: $zoom_print * 238px;
-          left: $zoom_print * 49px;
-        }
-        input[name=subsidies_monthly_amount]{
-          bottom: $zoom_print * 238px;
-          left: $zoom_print * 80px;
-        }
-        input[name=subsidies_applied_subsidies],input[name=subsidies_applied_subsidies] + label{
-          bottom: $zoom_print * 224.7px;
-          left: $zoom_print * 10px;
-        }
-        input[name=subsidies_applied_payer]{
-          bottom: $zoom_print * 214px;
-          left: $zoom_print * 15px;
-        }
-        input[name=subsidies_apply_date]{
-          bottom: $zoom_print * 201px;
-          left: $zoom_print * 15px;
-        }
-        input[name=subsidies_apply_start_date]{
-          bottom: $zoom_print * 201px;
-          left: $zoom_print * 80px;
-        }
-        
-        // loan / 6.  Darlehen
-        
-        
-        // operations rooms / 7.  Angaben zu den Betriebsräumen
-        
-        
-        // location and signature
-        textarea[name=location]{
-          bottom: $zoom_print * 71px;
-          left: $zoom_print * 10px;
-          height:$zoom_print * 12px;
-          // font-size:.8em;
-        }
-        textarea[name=signature]{
-          bottom: $zoom_print * 70.8px;
-          left: $zoom_print * 54px;
-          // font-size: .6em;
-          height: $zoom_print * 9.6px;
-          padding: $zoom_print * .8px;
-        }
-      }
-    }
-    
-    ////////////// pages 3-6
-    &#eks_page3,&#eks_page4,&#eks_page5,&#eks_page6{
-      
-      // reset table styles
-      .lm_pagination{display:none;}
-      table{
-        position:absolute;
-        left:$zoom * 8px;
-        width: 94.6%;
-        // right:$zoom * 8.4px;
-        table-layout:fixed; // prevent rows from auto height by line break
-        border-collapse:collapse;
-      }
-      table,tr,td,th,input,textarea{
-        margin:0;
-        padding:0;
-        border:none;
-        border-radius:0;
-        // background:transparent;
-        font-size:$fontsize_screen;
-        // line-height:$font;
-        @include box-sizing(border-box);
-      }
-      th{
-        background-color:$clr_main_tr;
-        text-align:center;
-        a{// reset link styles (until links in headers are disabled)
-          display:inline;
-          padding:0;
-          font-size:inherit;
-        }
-      }
-      // tr.column_sums td{
-        // border-top:1px solid $clr_grey;
-      // }
-      td,th{
-        padding:0 ($zoom * .8px);
-        // height:1em;
-        line-height:1em;
-        &:nth-child(1){display:none;}//ID
-        &:nth-child(2){//type_of_costs
-          width:23%;
-          font-size:.7em;
-          overflow: hidden; // prevent rows from auto height by line break
-          white-space: nowrap; // prevent rows from auto height by line break
-        }
-        &:nth-child(n+3):nth-child(-n+8){width: 8.56%;}//months
-        &:nth-child(9){//sum
-          width:9%;
-          font-weight:bold;
-          border-left:1px solid $clr_grey;
-        }
-      }
-      @media print{
-        
-        // rotate landscape pages because browsers and wkhtmltopdf don't
-        // understand mixed orientations (portrait + landsacpe)
-        // @include transform(rotate(-90deg) translate(-297mm, 0));
-        // @include transform-origin(0 0);
-        // margin-top: 87mm;
-        
-        table{
-          left:$zoom_print * 8px;
-          // right:$zoom_print * 8.4px;
-        }
-        table,tr,td,th,input,textarea{
-          font-size:$fontsize_print;
-        }
-        td,th{
-          padding:0 ($zoom_print * .8px);
-          &:nth-child(2){//type_of_costs
-            opacity:0;// hide, but preserve the space
-          }
-          &:nth-child(9){//sum
-            border:none;
-          }
-          &:nth-child(10){//average
-            opacity:0;
-          }
-        }
-        th{
-          background-color:transparent;
-          &:nth-child(9){//sum
-            opacity:0;
-          }
-        }
-      }
-    }
-    
-    ////////////// page 3
-    &#eks_page3{
-      background-image:url('../img/eks_3-6_web.png');
-      
-      input[name=last_first_name]{
-        bottom: $zoom * 167px;
-        left: $zoom * 8px;
-        width:95%;
-      }
-      input[name=page3_bg_number]{
-        bottom: $zoom * 155px;
-        left: $zoom * 8px;
-        width:95%;
-      }
-      input[name=page3_estimated],input[name=page3_estimated] + label{
-        bottom: $zoom * 142.4px;
-        left: $zoom * 8.8px;
-      }
-      input[name=page3_calculated],input[name=page3_calculated] + label{
-        bottom: $zoom * 142.4px;
-        left: $zoom * 148.4px;
-      }
-      input[name=small_business],input[name=small_business] + label{
-        bottom: $zoom * 121.2px;
-        left: $zoom * 8.8px;
-      }
-      
-      table{
-        bottom:$zoom * 16px;
-        height: 37.3%;
-      }
-      tr{
-        &:nth-child(1) th{
-          height:$zoom * 7.2px;
-        }
-        &:nth-child(n+2):nth-child(-n+6) td{
-          height:$zoom * 8px;
-        }
-        &:nth-child(n+7):nth-child(-n+8) td{
-          height:$zoom * 11.2px;
-        }
-      }
-      td,th{
-        &:nth-child(9){//sum
-          width:11.5%;
-        }
-      }
-      @media print{
-        // background-image:url('../img/eks_3-6_print.png');
-        
-        // reset margin-top from print rotation hack
-        // margin-top:0;
-        
-        input[name=last_first_name]{
-          bottom: $zoom_print * 167px;
-          left: $zoom_print * 8px;
-        }
-        input[name=page3_bg_number]{
-          bottom: $zoom_print * 155px;
-          left: $zoom_print * 8px;
-        }
-        input[name=page3_estimated],input[name=page3_estimated] + label{
-          bottom: $zoom_print * 142.4px;
-          left: $zoom_print * 8.8px;
-        }
-        input[name=page3_calculated],input[name=page3_calculated] + label{
-          bottom: $zoom_print * 142.4px;
-          left: $zoom_print * 148.4px;
-        }
-        input[name=small_business],input[name=small_business] + label{
-          bottom: $zoom_print * 121.2px;
-          left: $zoom_print * 8.8px;
-        }
-        
-        table{
-          bottom:$zoom_print * 16px;
-        }
-        tr{
-          &:nth-child(1) th{
-            height:$zoom_print * 7.2px;
-          }
-          &:nth-child(n+2):nth-child(-n+6) td{
-            height:$zoom_print * 8px;
-          }
-          &:nth-child(n+7):nth-child(-n+8) td{
-            height:$zoom_print * 11.2px;
-          }
-        }
-      }
-    }
-    ////////////// page 4
-    &#eks_page4{
-      // background-image:url('../img/eks_4-6_web.png');
-      background-image:url('../img/eks_4-6_print.png');
-      table{
-        bottom:$zoom * 16.8px;
-        height: 82.1%;
-      }
-      tr{
-        &:nth-child(1) th{
-          height:$zoom * 7.6px;
-        }
-        &:nth-child(3) td{
-          padding-top:$zoom * 9px;// space for empty row
-          line-height:$zoom * 5.4px;
-        }
-        &:nth-child(n+2):nth-child(-n+4) td
-        ,&:nth-child(n+9):nth-child(-n+12) td
-        ,&:nth-child(n+14):nth-child(-n+17) td
-        {
-          height:$zoom * 5.4px;
-        }
-        &:nth-child(n+5):nth-child(-n+8) td{
-          height:$zoom * 9px;
-        }
-        &:nth-child(9) td{
-          padding-top:$zoom * 20.8px;// space for driver's log
-          line-height:$zoom * 5.4px;
-        }
-        &:nth-child(13) td{
-          height:$zoom * 12px;
-          line-height:$zoom * 12px;
-          padding-top:$zoom * 9px;// space for driver's log (private rides)
-        }
-        &:nth-child(14) td // space for comment above
-        , &:nth-child(15) td{ // space for comment above
-          padding-top:$zoom * 5.4px;
-          line-height:$zoom * 5.4px;
-        }
-        &:nth-child(18) td{// last row
-          height:$zoom * 8px;
-        }
-      }
-      @media print{
-        // background-image:url('../img/eks_4-6_print.png');
-        
-        table{
-          bottom:$zoom_print * 16.8px + 2px;
-        }
-        tr{
-          &:nth-child(1) th{
-            height:$zoom_print * 7.6px;
-          }
-          &:nth-child(3) td{
-            padding-top:$zoom_print * 9px;// space for empty row
-            line-height:$zoom_print * 5.4px;
-          }
-          &:nth-child(n+2):nth-child(-n+4) td
-          ,&:nth-child(n+9):nth-child(-n+12) td
-          ,&:nth-child(n+14):nth-child(-n+17) td
-          {
-            height:$zoom_print * 5.4px;
-          }
-          &:nth-child(n+5):nth-child(-n+8) td{
-            height:$zoom_print * 9px;
-          }
-          &:nth-child(9) td{
-            padding-top:$zoom_print * 20.8px;// space for driver's log
-            line-height:$zoom_print * 5.4px;
-          }
-          &:nth-child(13) td{
-            height:$zoom_print * 12px;
-            line-height:$zoom_print * 12px;
-            padding-top:$zoom_print * 9px;// space for driver's log (private rides)
-          }
-          &:nth-child(14) td // space for comment above
-          , &:nth-child(15) td{ // space for comment above
-            padding-top:$zoom_print * 5.4px;
-            line-height:$zoom_print * 5.4px;
-          }
-          &:nth-child(18) td{// last row
-            height:$zoom_print * 8px;
-          }
-        }
-      }
-    }
-    ////////////// page 5
-    &#eks_page5{
-      background-image:url('../img/eks_5-6_web.png');
-      table{
-        bottom:$zoom * 21.8px;
-        height: 78%;
-      }
-      tr{
-        
-        &:nth-child(1) th{ // carryover
-          height:$zoom * 7.2px;
-        }
-        &:nth-child(2) td{ // carryover
-          height:$zoom * 10px;
-        }
-        &:nth-child(n+3):nth-child(-n+18) td
-        ,&:nth-child(20) td
-        {
-          height:$zoom * 5.4px;
-        }
-        &:nth-child(19) td
-        ,&:nth-child(21) td
-        {
-          height:$zoom * 9px;
-        }
-        &:nth-child(3) td{
-          padding-top:$zoom * 5.4px; // space for comment above
-          line-height:$zoom * 5.4px;
-        }
-        &:nth-child(4) td{
-          padding-top:$zoom * 9.2px; // space for comment above
-          line-height:$zoom * 5.4px;
-        }
-        &:nth-child(9) td{
-          padding-top:$zoom * 5.4px; // space for comment above
-          line-height:$zoom * 5.4px;
-        }
-        &:nth-child(20) td{
-        }
-        &:last-child td{// last row right now 22, should be 23
-          padding-top:$zoom * 10px;
-          height:$zoom * 8px;
-          line-height:$zoom * 8px;
-        }
-      }
-      @media print{
-        // background-image:url('../img/eks_5-6_print.png');
-        table{
-          bottom:$zoom_print * 21.8px + 4px;
-        }
-        tr{
-          
-          &:nth-child(1) th{ // carryover
-            height:$zoom_print * 7.2px;
-          }
-          &:nth-child(2) td{ // carryover
-            height:$zoom_print * 10px;
-          }
-          &:nth-child(n+3):nth-child(-n+18) td
-          ,&:nth-child(20) td
-          {
-            height:$zoom_print * 5.4px;
-          }
-          &:nth-child(19) td
-          ,&:nth-child(21) td
-          {
-            height:$zoom_print * 9px;
-          }
-          &:nth-child(3) td{
-            padding-top:$zoom_print * 5.4px; // space for comment above
-            line-height:$zoom_print * 5.4px;
-          }
-          &:nth-child(4) td{
-            padding-top:$zoom_print * 9.2px; // space for comment above
-            line-height:$zoom_print * 5.4px;
-          }
-          &:nth-child(9) td{
-            padding-top:$zoom_print * 5.4px; // space for comment above
-            line-height:$zoom_print * 5.4px;
-          }
-          &:nth-child(20) td{
-          }
-          &:last-child td{// last row right now 22, should be 23
-            padding-top:$zoom_print * 10px;
-            height:$zoom_print * 8px;
-            line-height:$zoom_print * 8px;
-          }
-          &:nth-child(n+13):nth-child(-n+17) td:nth-child(2){ // display custom types of costs
-            opacity:1;
-            // hacky solution to hide first part of text (until changing database to better names)
-            text-indent: -3.2em;
-            position: relative;
-            left: 52px;
-          }
-        }
-      }
-    }
-    ////////////// page 6
-    &#eks_page6{
-      background-image:url('../img/eks_6-6_web.png');
-      
-      // location and signature
-      textarea[name=location]{
-        bottom: $zoom * 20px;
-        left: $zoom * 119px;
-        width:22%;
-        height:$zoom * 7px;
-        font-family:inherit;
-      }
-      textarea[name=signature]{
-        bottom: $zoom * 20px;
-        left: $zoom * 199px;
-        width: 30%;
-        font-size: .7em;
-        line-height: 1.1em;
-        height: $zoom * 8.8px;
-        padding: $zoom * .8px;
-      }
-      @media print{
-        // background-image:url('../img/eks_6-6_print.png');
-        
-        textarea[name=location]{
-          bottom: $zoom_print * 20px;
-          left: $zoom_print * 119px;
-          height:$zoom_print * 7px;
-        }
-        textarea[name=signature]{
-          bottom: $zoom_print * 20px;
-          left: $zoom_print * 199px;
-          font-size: .7em;
-          height: $zoom_print * 8.8px;
-          padding: $zoom_print * .8px;
-        }
+        width: $zoom_print * 5px;
+        height: $zoom_print * 5px;
+        border: none;
+        background-color: transparent;
       }
     }
   }
-
 }
+
+////////////// page 1
+#eks_page1{
+  background-image:url('../img/eks_1-6_web.png');
+  
+  input[name=title]{
+    bottom: $zoom * 200px;
+    left: $zoom * 20px;
+    width:18%;
+  }
+  input[name=first_name]{
+    bottom: $zoom * 200px;
+    left: $zoom * 60px;
+    width:38%;
+  }
+  input[name=last_name]{
+    bottom: $zoom * 188px;
+    left: $zoom * 20px;
+    width:37%;
+  }
+  input[name=birthday]{
+    bottom: $zoom * 188px;
+    left: $zoom * 100px;
+    width:19%;
+  }
+  input[name=bg_number]{
+    bottom: $zoom * 176px;
+    left: $zoom * 20px;
+    width:57%;
+  }
+  input[name=title_refer]{
+    bottom: $zoom * 154px;
+    left: $zoom * 20px;
+    width:18%;
+  }
+  input[name=first_name_refer]{
+    bottom: $zoom * 154px;
+    left: $zoom * 60px;
+    width:38%;
+  }
+  input[name=last_name_refer]{
+    bottom: $zoom * 142px;
+    left: $zoom * 20px;
+    width:37%;
+  }
+  input[name=birthday_refer]{
+    bottom: $zoom * 142px;
+    left: $zoom * 100px;
+    width:19%;
+  }
+  input[name=calculated],input[name=calculated] + label{
+    bottom: $zoom * 124px;
+    left: $zoom * 77px;
+  }
+  input[name=estimated],input[name=estimated] + label{
+    bottom: $zoom * 124px;
+    left: $zoom * 21px;
+  }
+  input[name=period]{
+    bottom: $zoom * 104px;
+    left: $zoom * 26px;
+    width:55%;
+  }
+  input[name=activity]{
+    bottom: $zoom * 67px;
+    left: $zoom * 26px;
+    width:55%;
+  }
+  input[name=activity]{
+    bottom: $zoom * 67px;
+    left: $zoom * 26px;
+    width:55%;
+  }
+  input[name=start_date]{
+    bottom: $zoom * 55px;
+    left: $zoom * 26px;
+    width:6em;
+  }
+  input[name=end_date]{
+    bottom: $zoom * 55px;
+    left: $zoom * 26px + 112px;
+    width:6em;
+  }
+  input[name=company_location]{
+    bottom: $zoom * 43px;
+    left: $zoom * 26px;
+    width:55%;
+  }
+  input[name=legal_form]{
+    bottom: $zoom * 31px;
+    left: $zoom * 26px;
+    width:55%;
+  }
+  input[name=number_of_employees]{
+    bottom: $zoom * 15px;
+    left: $zoom * 58px;
+    width: 1.5em;
+    // font-size:$fontsize_screen;
+  }
+  input[name=has_employees],input[name=has_employees] + label{
+    bottom: $zoom * 16.6px;
+    left: $zoom * 20.6px;
+  }
+  @media print{
+    
+    // background-image:url('../img/eks_1-6_print.png');
+    
+    input[name=title]{
+      bottom: $zoom_print * 200px;
+      left: $zoom_print * 20px;
+    }
+    input[name=first_name]{
+      bottom: $zoom_print * 200px;
+      left: $zoom_print * 60px;
+    }
+    input[name=last_name]{
+      bottom: $zoom_print * 188px;
+      left: $zoom_print * 20px;
+    }
+    input[name=birthday]{
+      bottom: $zoom_print * 188px;
+      left: $zoom_print * 100px;
+    }
+    input[name=bg_number]{
+      bottom: $zoom_print * 176px;
+      left: $zoom_print * 20px;
+    }
+    input[name=title_refer]{
+      bottom: $zoom_print * 154px;
+      left: $zoom_print * 20px;
+    }
+    input[name=first_name_refer]{
+      bottom: $zoom_print * 154px;
+      left: $zoom_print * 60px;
+    }
+    input[name=last_name_refer]{
+      bottom: $zoom_print * 142px;
+      left: $zoom_print * 20px;
+    }
+    input[name=birthday_refer]{
+      bottom: $zoom_print * 142px;
+      left: $zoom_print * 100px;
+    }
+    input[name=calculated],input[name=calculated] + label{
+      bottom: $zoom_print * 124px;
+      left: $zoom_print * 77px;
+    }
+    input[name=estimated],input[name=estimated] + label{
+      bottom: $zoom_print * 124px;
+      left: $zoom_print * 21px;
+    }
+    input[name=period]{
+      bottom: $zoom_print * 104px;
+      left: $zoom_print * 26px;
+    }
+    input[name=activity]{
+      bottom: $zoom_print * 67px;
+      left: $zoom_print * 26px;
+    }
+    input[name=activity]{
+      bottom: $zoom_print * 67px;
+      left: $zoom_print * 26px;
+    }
+    input[name=start_date]{
+      bottom: $zoom_print * 55px;
+      left: $zoom_print * 26px;
+    }
+    input[name=end_date]{
+      bottom: $zoom_print * 55px;
+      left: $zoom_print * 26px + 112px
+    }
+    input[name=company_location]{
+      bottom: $zoom_print * 43px;
+      left: $zoom_print * 26px;
+    }
+    input[name=legal_form]{
+      bottom: $zoom_print * 31px;
+      left: $zoom_print * 26px;
+    }
+    input[name=number_of_employees]{
+      bottom: $zoom_print * 15px;
+      left: $zoom_print * 58px;
+      width: 1.5em;
+    }
+    input[name=has_employees],input[name=has_employees] + label{
+      bottom: $zoom_print * 16.6px;
+      left: $zoom_print * 20.6px;
+    }
+  }
+}
+
+////////////// page 2
+#eks_page2{
+  background-image:url('../img/eks_2-6_web.png');
+  
+  // subsidies / 5.  Zuschüsse/Beihilfen
+  input[name=subsidies_has_subsidies],input[name=subsidies_has_subsidies] + label{
+    bottom: $zoom * 267px;
+    left: $zoom * 10px;
+  }
+  input[name=subsidies_payer]{
+    bottom: $zoom * 254px;
+    left: $zoom * 15px;
+    width:61%;
+  }
+  input[name=subsidies_start_date]{
+    bottom: $zoom * 238px;
+    left: $zoom * 15px;
+    width:14%;
+  }
+  input[name=subsidies_end_date]{
+    bottom: $zoom * 238px;
+    left: $zoom * 49px;
+    width:14%;
+  }
+  input[name=subsidies_monthly_amount]{
+    bottom: $zoom * 238px;
+    left: $zoom * 80px;
+    width:30%;
+  }
+  input[name=subsidies_applied_subsidies],input[name=subsidies_applied_subsidies] + label{
+    bottom: $zoom * 224.7px;
+    left: $zoom * 10px;
+  }
+  input[name=subsidies_applied_payer]{
+    bottom: $zoom * 214px;
+    left: $zoom * 15px;
+    width:61%;
+  }
+  input[name=subsidies_apply_date]{
+    bottom: $zoom * 201px;
+    left: $zoom * 15px;
+    width:30%;
+  }
+  input[name=subsidies_apply_start_date]{
+    bottom: $zoom * 201px;
+    left: $zoom * 80px;
+    width:30%;
+  }
+  
+  // loan / 6.  Darlehen
+  
+  
+  // operations rooms / 7.  Angaben zu den Betriebsräumen
+  
+  
+  // location and signature
+  textarea[name=location]{
+    bottom: $zoom * 71px;
+    left: $zoom * 10px;
+    width:20.5%;
+    height:$zoom * 12px;
+    // font-size:.8em;
+    line-height:1.2em;
+    font-family:inherit;
+  }
+  textarea[name=signature]{
+    bottom: $zoom * 70.8px;
+    left: $zoom * 54px;
+    width: 46%;
+    font-size: .7em;
+    line-height: 1.2em;
+    height: $zoom * 9.6px;
+    padding: $zoom * .8px;
+  }
+  @media print{
+    // background-image:url('../img/eks_2-6_print.png');
+    
+    // subsidies / 5.  Zuschüsse/Beihilfen
+    input[name=subsidies_has_subsidies],input[name=subsidies_has_subsidies] + label{
+      bottom: $zoom_print * 267px;
+      left: $zoom_print * 10px;
+    }
+    input[name=subsidies_payer]{
+      bottom: $zoom_print * 254px;
+      left: $zoom_print * 15px;
+    }
+    input[name=subsidies_start_date]{
+      bottom: $zoom_print * 238px;
+      left: $zoom_print * 15px;
+    }
+    input[name=subsidies_end_date]{
+      bottom: $zoom_print * 238px;
+      left: $zoom_print * 49px;
+    }
+    input[name=subsidies_monthly_amount]{
+      bottom: $zoom_print * 238px;
+      left: $zoom_print * 80px;
+    }
+    input[name=subsidies_applied_subsidies],input[name=subsidies_applied_subsidies] + label{
+      bottom: $zoom_print * 224.7px;
+      left: $zoom_print * 10px;
+    }
+    input[name=subsidies_applied_payer]{
+      bottom: $zoom_print * 214px;
+      left: $zoom_print * 15px;
+    }
+    input[name=subsidies_apply_date]{
+      bottom: $zoom_print * 201px;
+      left: $zoom_print * 15px;
+    }
+    input[name=subsidies_apply_start_date]{
+      bottom: $zoom_print * 201px;
+      left: $zoom_print * 80px;
+    }
+    
+    // loan / 6.  Darlehen
+    
+    
+    // operations rooms / 7.  Angaben zu den Betriebsräumen
+    
+    
+    // location and signature
+    textarea[name=location]{
+      bottom: $zoom_print * 71px;
+      left: $zoom_print * 10px;
+      height:$zoom_print * 12px;
+      // font-size:.8em;
+    }
+    textarea[name=signature]{
+      bottom: $zoom_print * 70.8px;
+      left: $zoom_print * 54px;
+      // font-size: .6em;
+      height: $zoom_print * 9.6px;
+      padding: $zoom_print * .8px;
+    }
+  }
+}
+
+////////////// pages 3-6
+#eks_page3,#eks_page4,#eks_page5,#eks_page6{
+  
+  .lm_pagination{display:none;}
+  // reset table styles
+  table{
+    position:absolute;
+    left:$zoom * 8px;
+    width: 94.6%;
+    table-layout:fixed; // prevent rows from auto height by line break
+    border-collapse:collapse;
+  }
+  table,tr,td,th,input,textarea{
+    margin:0;
+    padding:0;
+    border:none;
+    border-radius:0;
+    font-size:$fontsize_screen;
+    @include box-sizing(border-box);
+  }
+  th{
+    background-color:$clr_main_tr;
+    text-align:center;
+    a{// reset link styles (until links in headers are disabled)
+      display:inline;
+      padding:0;
+      font-size:inherit;
+    }
+  }
+  td,th{
+    padding:0 ($zoom * .8px);
+    line-height:1em;
+    &:nth-child(1){display:none;}//ID
+    &:nth-child(2){//type_of_costs
+      width:23%;
+      font-size:.7em;
+      overflow: hidden; // prevent rows from auto height by line break
+      white-space: nowrap; // prevent rows from auto height by line break
+    }
+    &:nth-child(n+3):nth-child(-n+8){width: 8.56%;}//months
+    &:nth-child(9){//sum
+      width:9%;
+      font-weight:bold;
+      border-left:1px solid $clr_grey;
+    }
+  }
+  @media print{
+    table{
+      left:$zoom_print * 8px;
+    }
+    table,tr,td,th,input,textarea{
+      font-size:$fontsize_print;
+    }
+    td,th{
+      padding:0 ($zoom_print * .8px);
+      &:nth-child(2){//type_of_costs
+        opacity:0;// hide, but preserve the space
+      }
+      &:nth-child(9){//sum
+        border:none;
+      }
+      &:nth-child(10){//average
+        opacity:0;
+      }
+    }
+    th{
+      background-color:transparent;
+      &:nth-child(9){//sum
+        opacity:0;
+      }
+    }
+  }
+}
+
+////////////// page 3
+#eks_page3{
+  background-image:url('../img/eks_3-6_web.png');
+  
+  input[name=last_first_name]{
+    bottom: $zoom * 167px;
+    left: $zoom * 8px;
+    width:95%;
+  }
+  input[name=page3_bg_number]{
+    bottom: $zoom * 155px;
+    left: $zoom * 8px;
+    width:95%;
+  }
+  input[name=page3_estimated],input[name=page3_estimated] + label{
+    bottom: $zoom * 142.4px;
+    left: $zoom * 8.8px;
+  }
+  input[name=page3_calculated],input[name=page3_calculated] + label{
+    bottom: $zoom * 142.4px;
+    left: $zoom * 148.4px;
+  }
+  input[name=small_business],input[name=small_business] + label{
+    bottom: $zoom * 121.2px;
+    left: $zoom * 8.8px;
+  }
+  
+  table{
+    bottom:$zoom * 16px;
+    height: 37.3%;
+  }
+  tr{
+    &:nth-child(1) th{
+      height:$zoom * 7.2px;
+    }
+    &:nth-child(n+2):nth-child(-n+6) td{
+      height:$zoom * 8px;
+    }
+    &:nth-child(n+7):nth-child(-n+8) td{
+      height:$zoom * 11.2px;
+    }
+  }
+  td,th{
+    &:nth-child(9){//sum
+      width:11.5%;
+    }
+  }
+  @media print{
+    // background-image:url('../img/eks_3-6_print.png');// wkhtmltopdf @media img bug
+    
+    input[name=last_first_name]{
+      bottom: $zoom_print * 167px;
+      left: $zoom_print * 8px;
+    }
+    input[name=page3_bg_number]{
+      bottom: $zoom_print * 155px;
+      left: $zoom_print * 8px;
+    }
+    input[name=page3_estimated],input[name=page3_estimated] + label{
+      bottom: $zoom_print * 142.4px;
+      left: $zoom_print * 8.8px;
+    }
+    input[name=page3_calculated],input[name=page3_calculated] + label{
+      bottom: $zoom_print * 142.4px;
+      left: $zoom_print * 148.4px;
+    }
+    input[name=small_business],input[name=small_business] + label{
+      bottom: $zoom_print * 121.2px;
+      left: $zoom_print * 8.8px;
+    }
+    
+    table{
+      bottom:$zoom_print * 16px;
+    }
+    tr{
+      &:nth-child(1) th{
+        height:$zoom_print * 7.2px;
+      }
+      &:nth-child(n+2):nth-child(-n+6) td{
+        height:$zoom_print * 8px;
+      }
+      &:nth-child(n+7):nth-child(-n+8) td{
+        height:$zoom_print * 11.2px;
+      }
+    }
+  }
+}
+////////////// page 4
+#eks_page4{
+  background-image:url('../img/eks_4-6_web.png');
+  table{
+    bottom:$zoom * 16.8px;
+    height: 82.1%;
+  }
+  tr{
+    &:nth-child(1) th{
+      height:$zoom * 7.6px;
+    }
+    &:nth-child(3) td{
+      padding-top:$zoom * 9px;// space for empty row
+      line-height:$zoom * 5.4px;
+    }
+    &:nth-child(n+2):nth-child(-n+4) td
+    ,&:nth-child(n+9):nth-child(-n+12) td
+    ,&:nth-child(n+14):nth-child(-n+17) td
+    {
+      height:$zoom * 5.4px;
+    }
+    &:nth-child(n+5):nth-child(-n+8) td{
+      height:$zoom * 9px;
+    }
+    &:nth-child(9) td{
+      padding-top:$zoom * 20.8px;// space for driver's log
+      line-height:$zoom * 5.4px;
+    }
+    &:nth-child(13) td{
+      height:$zoom * 12px;
+      line-height:$zoom * 12px;
+      padding-top:$zoom * 9px;// space for driver's log (private rides)
+    }
+    &:nth-child(14) td // space for comment above
+    , &:nth-child(15) td{ // space for comment above
+      padding-top:$zoom * 5.4px;
+      line-height:$zoom * 5.4px;
+    }
+    &:nth-child(18) td{// last row
+      height:$zoom * 8px;
+    }
+  }
+  @media print{
+    // background-image:url('../img/eks_4-6_print.png');// wkhtmltopdf @media img bug
+    
+    table{
+      bottom:$zoom_print * 16.8px + 2px;
+    }
+    tr{
+      &:nth-child(1) th{
+        height:$zoom_print * 7.6px;
+      }
+      &:nth-child(3) td{
+        padding-top:$zoom_print * 9px;// space for empty row
+        line-height:$zoom_print * 5.4px;
+      }
+      &:nth-child(n+2):nth-child(-n+4) td
+      ,&:nth-child(n+9):nth-child(-n+12) td
+      ,&:nth-child(n+14):nth-child(-n+17) td
+      {
+        height:$zoom_print * 5.4px;
+      }
+      &:nth-child(n+5):nth-child(-n+8) td{
+        height:$zoom_print * 9px;
+      }
+      &:nth-child(9) td{
+        padding-top:$zoom_print * 20.8px;// space for driver's log
+        line-height:$zoom_print * 5.4px;
+      }
+      &:nth-child(13) td{
+        height:$zoom_print * 12px;
+        line-height:$zoom_print * 12px;
+        padding-top:$zoom_print * 9px;// space for driver's log (private rides)
+      }
+      &:nth-child(14) td // space for comment above
+      , &:nth-child(15) td{ // space for comment above
+        padding-top:$zoom_print * 5.4px;
+        line-height:$zoom_print * 5.4px;
+      }
+      &:nth-child(18) td{// last row
+        height:$zoom_print * 8px;
+      }
+    }
+  }
+}
+////////////// page 5
+#eks_page5{
+  background-image:url('../img/eks_5-6_web.png');
+  table{
+    bottom:$zoom * 21.8px;
+    height: 78%;
+  }
+  tr{
+    
+    &:nth-child(1) th{ // carryover
+      height:$zoom * 7.2px;
+    }
+    &:nth-child(2) td{ // carryover
+      height:$zoom * 10px;
+    }
+    &:nth-child(n+3):nth-child(-n+18) td
+    ,&:nth-child(20) td
+    {
+      height:$zoom * 5.4px;
+    }
+    &:nth-child(19) td
+    ,&:nth-child(21) td
+    {
+      height:$zoom * 9px;
+    }
+    &:nth-child(3) td{
+      padding-top:$zoom * 5.4px; // space for comment above
+      line-height:$zoom * 5.4px;
+    }
+    &:nth-child(4) td{
+      padding-top:$zoom * 9.2px; // space for comment above
+      line-height:$zoom * 5.4px;
+    }
+    &:nth-child(9) td{
+      padding-top:$zoom * 5.4px; // space for comment above
+      line-height:$zoom * 5.4px;
+    }
+    &:nth-child(20) td{
+    }
+    &:last-child td{// last row right now 22, should be 23
+      padding-top:$zoom * 10px;
+      height:$zoom * 8px;
+      line-height:$zoom * 8px;
+    }
+  }
+  @media print{
+    // background-image:url('../img/eks_5-6_print.png');// wkhtmltopdf @media img bug
+    table{
+      bottom:$zoom_print * 21.8px + 4px;
+    }
+    tr{
+      
+      &:nth-child(1) th{ // carryover
+        height:$zoom_print * 7.2px;
+      }
+      &:nth-child(2) td{ // carryover
+        height:$zoom_print * 10px;
+      }
+      &:nth-child(n+3):nth-child(-n+18) td
+      ,&:nth-child(20) td
+      {
+        height:$zoom_print * 5.4px;
+      }
+      &:nth-child(19) td
+      ,&:nth-child(21) td
+      {
+        height:$zoom_print * 9px;
+      }
+      &:nth-child(3) td{
+        padding-top:$zoom_print * 5.4px; // space for comment above
+        line-height:$zoom_print * 5.4px;
+      }
+      &:nth-child(4) td{
+        padding-top:$zoom_print * 9.2px; // space for comment above
+        line-height:$zoom_print * 5.4px;
+      }
+      &:nth-child(9) td{
+        padding-top:$zoom_print * 5.4px; // space for comment above
+        line-height:$zoom_print * 5.4px;
+      }
+      &:nth-child(20) td{
+      }
+      &:last-child td{// last row right now 22, should be 23
+        padding-top:$zoom_print * 10px;
+        height:$zoom_print * 8px;
+        line-height:$zoom_print * 8px;
+      }
+      &:nth-child(n+13):nth-child(-n+17) td:nth-child(2){ // display custom types of costs
+        opacity:1;
+        // hacky solution to hide first part of text (until changing database to better names)
+        text-indent: -3.2em;
+        position: relative;
+        left: 52px;
+      }
+    }
+  }
+}
+////////////// page 6
+#eks_page6{
+  background-image:url('../img/eks_6-6_web.png');
+  
+  // location and signature
+  textarea[name=location]{
+    bottom: $zoom * 20px;
+    left: $zoom * 119px;
+    width:22%;
+    height:$zoom * 7px;
+    font-family:inherit;
+  }
+  textarea[name=signature]{
+    bottom: $zoom * 20px;
+    left: $zoom * 199px;
+    width: 30%;
+    font-size: .7em;
+    line-height: 1.1em;
+    height: $zoom * 8.8px;
+    padding: $zoom * .8px;
+  }
+  @media print{
+    // background-image:url('../img/eks_6-6_print.png');// wkhtmltopdf @media img bug
+    
+    textarea[name=location]{
+      bottom: $zoom_print * 20px;
+      left: $zoom_print * 119px;
+      height:$zoom_print * 7px;
+    }
+    textarea[name=signature]{
+      bottom: $zoom_print * 20px;
+      left: $zoom_print * 199px;
+      font-size: .7em;
+      height: $zoom_print * 8.8px;
+      padding: $zoom_print * .8px;
+    }
+  }
+}
+
 
 ////// dashboard
 .dash_box{
