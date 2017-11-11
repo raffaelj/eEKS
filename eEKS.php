@@ -539,13 +539,6 @@ class eEKS extends lazy_mofo{
     $uri_path = $this->get_uri_path();
     $qs = $this->get_qs();
     
-    // show only one/some pages
-    // --> UX --> don't show two much content
-    // --> set page filter for grids
-    $eks_pages = array(1,2,3,4,5,6);
-    if( !empty($_REQUEST['_eks_pages']) )
-      $eks_pages = $_REQUEST['_eks_pages'];
-    
     // get current date for signatures
     $today = $this->date_out(date('Y-m-d'));
     
@@ -555,8 +548,23 @@ class eEKS extends lazy_mofo{
     
     $html .= "<form action='$uri_path$qs&amp;action=eks' method='post' class='eks_form'>";
     
+    // hide selected pages
+    //     CSS checkbox ~ hack
+    // --> pages must
+    //     * follow checkboxes in the DOM
+    //     * have the same parent
+      
+    for($i=1; $i <=6; $i++){
+      $checked = "";
+      if( !empty($_GET['_hide_page']) && in_array($i, $_GET['_hide_page']) )
+        $checked .= " checked=checked";
+      $html .= "<input type='checkbox' value='$i' name='_hide_page[]' id='_hide_page_$i' class='hide_page'$checked />\r\n";
+      $hide = $this->translate("hide");
+      $show = $this->translate("show");
+      $html .= "<label for='_hide_page_$i' data-hide='$hide' data-show='$show'>$i</label>\r\n";
+    }
+    
     ///////////////// EKS page 1
-    if(in_array(1, $eks_pages)){
       $html .= "<page id='eks_page1' class='eks_page portrait'>";
       
       // 1.1 personal data of applicant
@@ -614,13 +622,9 @@ class eEKS extends lazy_mofo{
       $html .= "</fieldset>";
       
       
-      
       $html .= "</page>";
-
-    }
     
     ///////////////// EKS page 2
-    if(in_array(2, $eks_pages)){
       $html .= "<page id='eks_page2' class='eks_page portrait'>";
       
       
@@ -649,11 +653,9 @@ class eEKS extends lazy_mofo{
       
       
       $html .= "</page>";
-
-    }
+      
     
     ///////////////// EKS page 3
-    if(in_array(3, $eks_pages)){
       $html .= "<page id='eks_page3' class='eks_page landscape'>";
       
       $html .= "<fieldset>";
@@ -703,11 +705,9 @@ class eEKS extends lazy_mofo{
       $this->column_sums = array();
       
       $html .= "</page>";
-
-    }
+      
     
     ///////////////// EKS page 4
-    if(in_array(4, $eks_pages)){
       $html .= "<page id='eks_page4' class='eks_page landscape'>";
       
       // grid
@@ -721,10 +721,8 @@ class eEKS extends lazy_mofo{
       
       $html .= "</page>";
 
-    }
     
     ///////////////// EKS page 5
-    if(in_array(5, $eks_pages)){
       $html .= "<page id='eks_page5' class='eks_page landscape'>";
       
       // set carryover
@@ -746,10 +744,9 @@ class eEKS extends lazy_mofo{
       $this->grid_show_carryover = false;
       
       $html .= "</page>";
-    }
+      
     
     ///////////////// EKS page 6
-    if(in_array(6, $eks_pages)){
       $html .= "<page id='eks_page6' class='eks_page landscape'>";
       
       // grid
@@ -765,12 +762,9 @@ class eEKS extends lazy_mofo{
       $html .= "</fieldset>";
       
       $html .= "</page>";
-    }
+      
 
     $html .= "</form>";
-    
-    // reset $this->grid_sql to all pages (for export)
-    // $this->grid_sql = $this->generate_grid_sql_eks("1,2,3,4,5,6");
     
     return $html;
     
@@ -1801,23 +1795,6 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
       
       $html .= "</fieldset>\r\n";
       
-    }
-    
-    // eks pages filter
-    if($view == "eks"){
-      
-      $html .= "<fieldset>\r\n";
-      $html .= "EKS pages: ";
-      
-      for($i=1; $i <=6; $i++){
-        $checked = "";
-        if(empty($_GET['_eks_pages']) || ( !empty($_GET['_eks_pages']) && in_array($i, $_GET['_eks_pages']) ) )
-          $checked .= " checked=checked";
-        $html .= "$i: <input type='checkbox' value='$i' name='_eks_pages[]'$checked />\r\n";
-      }
-      
-      
-      $html .= "</fieldset>\r\n";
     }
     
     

@@ -654,6 +654,7 @@ body.eks{
   }
   .eks_form{
     text-align:center;// centering inline-block pages
+    position:relative;// for absolute positioned hide-page-checkboxes
   }
 }
 
@@ -735,6 +736,58 @@ body.eks{
     }
   }
 }
+
+// checkboxes to hide selected pages
+$size: 1.5em;
+.hide_page{
+  display:none;
+  + label{
+    display:block;
+    box-sizing:border-box;
+    position:fixed;
+    top:30%;
+    width:$size;
+    height:$size;
+    margin:.1em;
+    line-height:$size;
+    border:1px solid #ccc;
+    border-radius:2px;
+    background-color:$clr_confirm;
+    &:nth-of-type(2){margin-top:1.2 * $size;}
+    &:nth-of-type(3){margin-top:2 * 1.2 * $size;}
+    &:nth-of-type(4){margin-top:3 * 1.2 * $size;}
+    &:nth-of-type(5){margin-top:4 * 1.2 * $size;}
+    &:nth-of-type(6){margin-top:5 * 1.2 * $size;}
+    &:hover{
+      background-color:$clr_attention;
+      &:before{
+        content:attr(data-hide);
+        display:block;
+        position:absolute;
+        left:$size;
+        white-space: nowrap;
+        margin-left:.1em;
+      }
+    }
+    @media print{display:none;}
+  }
+  &:checked + label{
+    background-color:$clr_attention;
+    &:hover{
+      background-color:$clr_confirm;
+      &:before{
+        content:attr(data-show);
+      }
+    }
+  }
+}
+
+#_hide_page_1:checked ~ #eks_page1{display:none;}
+#_hide_page_2:checked ~ #eks_page2{display:none;}
+#_hide_page_3:checked ~ #eks_page3{display:none;}
+#_hide_page_4:checked ~ #eks_page4{display:none;}
+#_hide_page_5:checked ~ #eks_page5{display:none;}
+#_hide_page_6:checked ~ #eks_page6{display:none;}
 
 ////////////// page 1
 #eks_page1{

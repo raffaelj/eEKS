@@ -91,6 +91,8 @@ $this->translate['monthly'] = "monatlich";
 $this->translate['monthly_sums'] = "monatlich summiert";
 $this->translate['missing_date'] = "ohne Datum";
 $this->translate['edit_tables'] = "Tabellen bearbeiten";
+$this->translate['hide'] = "ausblenden";
+$this->translate['show'] = "anzeigen";
 
 // number format
 $this->decimals = 2;

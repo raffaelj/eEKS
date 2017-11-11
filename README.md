@@ -204,7 +204,7 @@ monthly view needs filters, too
   * [ ] save estimated data for comparing in the future
 * [x] rotate landscape pages for printing and PDF export
 * [x] show only one/some pages
-  * [ ] table pages require variables from page before (sum, carryover)
+  * [x] table pages require variables from page before (sum, carryover)
 
 
 ### GUI and styling
