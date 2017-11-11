@@ -1,6 +1,4 @@
-/*** eEKS styles  ******* uncompressed SCSS file here:  ***
-https://github.com/raffaelj/eEKS/blob/master/css/style.scss
-**********************************************************/
+/*** eEKS styles  ***/
 
 ////////// mixins
 
@@ -612,21 +610,19 @@ label {
 ///////////// EKS
 
 $zoom: 2.5;
-// $zoom_print: 3.8;
-$zoom_print: 3.704;
-$fontsize_screen: 12px;
-$fontsize_print: 16px;
+$zoom_print: 3.79;
+$fontsize_screen: 11px;
+$fontsize_print: 14px;
 
 .portrait{
   height:$zoom *  297px;
    width:$zoom *  210px;
   @media print{
-    // height:297mm;
-    height:296mm;// works with page-break-after:always, breaks some absolute positioning
+    height:297mm;
+    // height:296mm;// works with page-break-after:always, breaks some absolute positioning
     width:210mm;
   }
 }
-/* 
 .landscape{
   height:$zoom *  210px;
    width:$zoom *  297px;
@@ -637,25 +633,7 @@ $fontsize_print: 16px;
     
     // rotate landscape pages because browsers and wkhtmltopdf don't
     // understand mixed orientations (portrait + landsacpe)
-    @include transform(rotate(-90deg) translate(-297mm, 0));
-    @include transform-origin(0 0);
-    margin-top: 87mm;
     
-    &:first-child{
-      // reset margin-top from print rotation hack
-      margin-top:0;
-    }
-  }
-} */
-.landscape{
-  height:$zoom *  210px;
-   width:$zoom *  297px;
-  @media print{
-    height:210mm;
-    // height:209mm;
-    width:297mm;
-    // rotate landscape pages because browsers and wkhtmltopdf don't
-    // understand mixed orientations (portrait + landsacpe)
     @include transform(rotate(-90deg) translate(-297mm, 0));
     @include transform-origin(0 0);
     margin-top:0;
@@ -671,10 +649,19 @@ body.eks{
   main{
     @media print{
       padding:0;//reset 20mm padding to print with full size background-image
+      // background-color:green;// for testing
     }
   }
   .eks_form{
     text-align:center;// centering inline-block pages
+  }
+}
+
+@media print{
+  @page{
+    // size:A4;
+    margin:0;
+    // margin:40mm;
   }
 }
   
@@ -693,7 +680,8 @@ body.eks{
     margin:0;
     padding:0;
     border:none;
-    page-break-after:always; // page is too high if 297mm, maybe rounding issue
+    // page-break-after:always; // page is too high if 297mm, maybe rounding issue
+    // background-color:red;// for testing
   }
   
   fieldset{
@@ -852,7 +840,7 @@ body.eks{
   }
   @media print{
     
-    // background-image:url('../img/eks_1-6_print.png');
+    background-image:url('../img/eks_1-6_print.png');// wkhtmltopdf @media img bug
     
     input[name=title]{
       bottom: $zoom_print * 200px;
@@ -995,16 +983,16 @@ body.eks{
   
   // location and signature
   textarea[name=location]{
-    bottom: $zoom * 71px;
-    left: $zoom * 10px;
+    bottom: $zoom * 68px;
+    left: $zoom * 9.5px;
     width:20.5%;
-    height:$zoom * 12px;
+    height:$zoom * 14px;
     // font-size:.8em;
     line-height:1.2em;
     font-family:inherit;
   }
   textarea[name=signature]{
-    bottom: $zoom * 70.8px;
+    bottom: $zoom * 70px;
     left: $zoom * 54px;
     width: 46%;
     font-size: .7em;
@@ -1013,7 +1001,7 @@ body.eks{
     padding: $zoom * .8px;
   }
   @media print{
-    // background-image:url('../img/eks_2-6_print.png');
+    background-image:url('../img/eks_2-6_print.png');// wkhtmltopdf @media img bug
     
     // subsidies / 5.  Zuschüsse/Beihilfen
     input[name=subsidies_has_subsidies],input[name=subsidies_has_subsidies] + label{
@@ -1061,32 +1049,36 @@ body.eks{
     
     // location and signature
     textarea[name=location]{
-      bottom: $zoom_print * 71px;
-      left: $zoom_print * 10px;
-      height:$zoom_print * 12px;
-      // font-size:.8em;
+      bottom:68mm;
+      left:9.5mm;
+      height:14mm;
+      resize:none;
     }
     textarea[name=signature]{
-      bottom: $zoom_print * 70.8px;
-      left: $zoom_print * 54px;
-      // font-size: .6em;
-      height: $zoom_print * 9.6px;
-      padding: $zoom_print * .8px;
+      bottom:70mm;
+      left:54mm;
+      height:9.6mm;
+      padding:.8mm;
+      resize:none;
     }
   }
 }
 
-////////////// pages 3-6
+////////////////////////////////////////////////////////////////////// pages 3-6
 #eks_page3,#eks_page4,#eks_page5,#eks_page6{
   
   .lm_pagination{display:none;}
+  
   // reset table styles
+  table,tbody{
+    display:block;
+  }
   table{
     position:absolute;
     left:$zoom * 8px;
-    width: 94.6%;
-    table-layout:fixed; // prevent rows from auto height by line break
-    border-collapse:collapse;
+    // table-layout:fixed; // prevent rows from auto height by line break
+    // border-collapse:collapse;
+    width:$zoom * 281.6px;//704
   }
   table,tr,td,th,input,textarea{
     margin:0;
@@ -1106,39 +1098,68 @@ body.eks{
     }
   }
   td,th{
+    display:block;
+    float:left;
+    min-height:1em;// prevent floating under empty zero-height-cells
     padding:0 ($zoom * .8px);
-    line-height:1em;
     &:nth-child(1){display:none;}//ID
     &:nth-child(2){//type_of_costs
-      width:23%;
+      width:$zoom * 64.4px;//161
       font-size:.7em;
       overflow: hidden; // prevent rows from auto height by line break
       white-space: nowrap; // prevent rows from auto height by line break
+      opacity:0;// hide, but preserve the space
     }
-    &:nth-child(n+3):nth-child(-n+8){width: 8.56%;}//months
+    &:nth-child(n+3):nth-child(-n+8){//months
+      width:$zoom * 24px;//60
+    }
     &:nth-child(9){//sum
-      width:9%;
+      width:$zoom * 26px;//65
       font-weight:bold;
       border-left:1px solid $clr_grey;
     }
+    &:nth-child(10){//average
+      width:$zoom * 46.4px;//116
+      font-weight:bold;
+    }
   }
+  tr{
+    // height:$zoom * 5.4px;//13.5
+    // line-height:$zoom * 5.4px;//13.5
+    height:$zoom * 5.42px;//13.5
+    line-height:$zoom * 5.42px;//13.5
+    display:block;
+    width:100%;
+    &:nth-child(1){//table header
+      height:$zoom * 7.2px;//18
+      line-height:$zoom * 7.2px;//18
+    }
+  }
+  
   @media print{
     table{
-      left:$zoom_print * 8px;
+      left:8mm;
+      width:281.6mm;
     }
     table,tr,td,th,input,textarea{
       font-size:$fontsize_print;
+      background-color:transparent;// activate again after testing !
     }
     td,th{
-      padding:0 ($zoom_print * .8px);
+      padding:0 8mm;
       &:nth-child(2){//type_of_costs
-        opacity:0;// hide, but preserve the space
+        width:64.4mm;
+      }
+      &:nth-child(n+3):nth-child(-n+8){//months
+        width:24mm;//60
       }
       &:nth-child(9){//sum
+        width:26mm;
         border:none;
       }
       &:nth-child(10){//average
         opacity:0;
+        width:46.4mm;
       }
     }
     th{
@@ -1147,21 +1168,31 @@ body.eks{
         opacity:0;
       }
     }
+    tr{
+      // height:5.4mm;//13.5
+      // line-height:5.4mm;//13.5
+      height:5.42mm;//13.5
+      line-height:5.42mm;//13.5
+      &:nth-child(1){//table header
+        height:7.2mm;//18
+        line-height:7.2mm;
+      }
+    }
   }
 }
 
-////////////// page 3
+////////////////////////////////////////////////////////////////////// page 3
 #eks_page3{
   background-image:url('../img/eks_3-6_web.png');
   
   input[name=last_first_name]{
     bottom: $zoom * 167px;
-    left: $zoom * 8px;
+    left: $zoom * 10px;
     width:95%;
   }
   input[name=page3_bg_number]{
     bottom: $zoom * 155px;
-    left: $zoom * 8px;
+    left: $zoom * 10px;
     width:95%;
   }
   input[name=page3_estimated],input[name=page3_estimated] + label{
@@ -1178,248 +1209,221 @@ body.eks{
   }
   
   table{
-    bottom:$zoom * 16px;
-    height: 37.3%;
+    bottom:$zoom * 16.5px;
+    height:$zoom * 78px;//195
   }
   tr{
-    &:nth-child(1) th{
-      height:$zoom * 7.2px;
+    &:nth-child(n+2):nth-child(-n+6),&:last-child{
+      height:$zoom * 8px;//20
+      line-height:$zoom * 8px;//20
     }
-    &:nth-child(n+2):nth-child(-n+6) td{
-      height:$zoom * 8px;
-    }
-    &:nth-child(n+7):nth-child(-n+8) td{
-      height:$zoom * 11.2px;
+    &:nth-child(n+7):nth-child(-n+8){
+      height:$zoom * 11.6px;//29
+      line-height:$zoom * 11.6px;//29
     }
   }
   td,th{
     &:nth-child(9){//sum
-      width:11.5%;
+      width:$zoom * 33.2px;//83
+    }
+    &:nth-child(10){//average
+      width:$zoom * 38.4px;//96
     }
   }
+  
   @media print{
-    // background-image:url('../img/eks_3-6_print.png');// wkhtmltopdf @media img bug
+    background-image:url('../img/eks_3-6_print.png');// wkhtmltopdf @media img bug
     
     input[name=last_first_name]{
-      bottom: $zoom_print * 167px;
-      left: $zoom_print * 8px;
+      bottom:167mm;
+      left:8mm;
     }
     input[name=page3_bg_number]{
-      bottom: $zoom_print * 155px;
-      left: $zoom_print * 8px;
+      bottom:155mm;
+      left:8mm;
     }
     input[name=page3_estimated],input[name=page3_estimated] + label{
-      bottom: $zoom_print * 142.4px;
-      left: $zoom_print * 8.8px;
+      bottom:142.4mm;
+      left:8.8mm;
     }
     input[name=page3_calculated],input[name=page3_calculated] + label{
-      bottom: $zoom_print * 142.4px;
-      left: $zoom_print * 148.4px;
+      bottom:142.4mm;
+      left:148.4mm;
     }
     input[name=small_business],input[name=small_business] + label{
-      bottom: $zoom_print * 121.2px;
-      left: $zoom_print * 8.8px;
+      bottom:121.2mm;
+      left:8.8mm;
     }
     
     table{
-      bottom:$zoom_print * 16px;
+      // bottom:$zoom_print * 16px;
+      bottom:16.5mm;
+      height:78mm;//195
     }
     tr{
-      &:nth-child(1) th{
-        height:$zoom_print * 7.2px;
+      &:nth-child(n+2):nth-child(-n+6),&:last-child{
+        height:8mm;//20
+        line-height:8mm;//20
       }
-      &:nth-child(n+2):nth-child(-n+6) td{
-        height:$zoom_print * 8px;
+      &:nth-child(n+7):nth-child(-n+8){
+        height:11.6mm;//29
+        line-height:11.6mm;//29
       }
-      &:nth-child(n+7):nth-child(-n+8) td{
-        height:$zoom_print * 11.2px;
+    }
+    td,th{
+      &:nth-child(9){//sum
+        width:33.2mm;//83
+      }
+      &:nth-child(10){//average
+        width:38.4mm;//96
       }
     }
   }
 }
-////////////// page 4
+////////////////////////////////////////////////////////////////////// page 4
 #eks_page4{
   background-image:url('../img/eks_4-6_web.png');
   table{
-    bottom:$zoom * 16.8px;
-    height: 82.1%;
+    bottom:$zoom * 16.8px;//42
+    height:$zoom * 172.4px;//431
   }
   tr{
-    &:nth-child(1) th{
-      height:$zoom * 7.6px;
+    &:nth-child(3){// space for empty row
+      margin-top:$zoom * 9px;//22.5
     }
-    &:nth-child(3) td{
-      padding-top:$zoom * 9px;// space for empty row
-      line-height:$zoom * 5.4px;
+    &:nth-child(n+5):nth-child(-n+8){
+      height:$zoom * 9px;//22.5
+      line-height:$zoom * 9px;//22.5
     }
-    &:nth-child(n+2):nth-child(-n+4) td
-    ,&:nth-child(n+9):nth-child(-n+12) td
-    ,&:nth-child(n+14):nth-child(-n+17) td
-    {
-      height:$zoom * 5.4px;
+    &:nth-child(9){// space for driver's log
+      margin-top:$zoom * 21.3px;//53+?
     }
-    &:nth-child(n+5):nth-child(-n+8) td{
-      height:$zoom * 9px;
+    &:nth-child(13){// space for driver's log (private rides)
+      margin-top:$zoom * 9px;//22.5
+      height:$zoom * 11.8px;//?+?
+      line-height:$zoom * 11.8px;//?+?
     }
-    &:nth-child(9) td{
-      padding-top:$zoom * 20.8px;// space for driver's log
-      line-height:$zoom * 5.4px;
+    &:nth-child(14),&:nth-child(15){ // space for comments above, 
+      margin-top:$zoom * 5.4px;//13.5
     }
-    &:nth-child(13) td{
-      height:$zoom * 12px;
-      line-height:$zoom * 12px;
-      padding-top:$zoom * 9px;// space for driver's log (private rides)
+    &:nth-child(18){// last row
+      height:$zoom * 8px;//20
+      line-height:$zoom * 8px;//20
     }
-    &:nth-child(14) td // space for comment above
-    , &:nth-child(15) td{ // space for comment above
-      padding-top:$zoom * 5.4px;
-      line-height:$zoom * 5.4px;
-    }
-    &:nth-child(18) td{// last row
-      height:$zoom * 8px;
-    }
+  
   }
   @media print{
-    // background-image:url('../img/eks_4-6_print.png');// wkhtmltopdf @media img bug
+    background-image:url('../img/eks_4-6_print.png');// wkhtmltopdf @media img bug
     
     table{
-      bottom:$zoom_print * 16.8px + 2px;
+      bottom:16.8mm;
+      height:172.4mm;
     }
     tr{
-      &:nth-child(1) th{
-        height:$zoom_print * 7.6px;
+      &:nth-child(3){// space for empty row
+        margin-top:9mm;//22.5
       }
-      &:nth-child(3) td{
-        padding-top:$zoom_print * 9px;// space for empty row
-        line-height:$zoom_print * 5.4px;
+      &:nth-child(n+5):nth-child(-n+8){
+        height:9mm;//22.5
+        line-height:9mm;//22.5
       }
-      &:nth-child(n+2):nth-child(-n+4) td
-      ,&:nth-child(n+9):nth-child(-n+12) td
-      ,&:nth-child(n+14):nth-child(-n+17) td
-      {
-        height:$zoom_print * 5.4px;
+      &:nth-child(9){// space for driver's log
+        margin-top:21.3mm;//53
       }
-      &:nth-child(n+5):nth-child(-n+8) td{
-        height:$zoom_print * 9px;
+      &:nth-child(13){// space for driver's log (private rides)
+        margin-top:9mm;//22.5
+        height:11.8mm;
+        line-height:11.8mm;
       }
-      &:nth-child(9) td{
-        padding-top:$zoom_print * 20.8px;// space for driver's log
-        line-height:$zoom_print * 5.4px;
+      &:nth-child(14),&:nth-child(15){ // space for comments above, 
+        margin-top:5.4mm;//13.5
       }
-      &:nth-child(13) td{
-        height:$zoom_print * 12px;
-        line-height:$zoom_print * 12px;
-        padding-top:$zoom_print * 9px;// space for driver's log (private rides)
-      }
-      &:nth-child(14) td // space for comment above
-      , &:nth-child(15) td{ // space for comment above
-        padding-top:$zoom_print * 5.4px;
-        line-height:$zoom_print * 5.4px;
-      }
-      &:nth-child(18) td{// last row
-        height:$zoom_print * 8px;
+      &:nth-child(18){// last row
+        height:8mm;
+        line-height:8mm;
       }
     }
   }
 }
-////////////// page 5
+////////////////////////////////////////////////////////////////////// page 5
 #eks_page5{
   background-image:url('../img/eks_5-6_web.png');
+  
   table{
-    bottom:$zoom * 21.8px;
-    height: 78%;
+    bottom:$zoom * 21.9px;//54.75
+    height:$zoom * 164.8px;//412
   }
   tr{
+    &:nth-child(2){
+      height:$zoom * 10px;//25
+      line-height:$zoom * 10px;//25
+    }
+    &:nth-child(3),&:nth-child(9){// space for comments above
+      margin-top:$zoom * 5.4px;//13.5
+    }
+    &:nth-child(4){
+      margin-top:$zoom * 8.8px;//22
+    }
+    &:nth-child(19),&:nth-child(21){
+      height:$zoom * 9.2px;//23
+      line-height:$zoom * 9.2px;//23
+    }
+    // missing row 22
+    &:last-child{// last row right now 22, should be 23
+      margin-top:$zoom * 10px;//25
+      height:$zoom * 7.6px;//19
+      line-height:$zoom * 7.6px;//19
+    }
     
-    &:nth-child(1) th{ // carryover
-      height:$zoom * 7.2px;
-    }
-    &:nth-child(2) td{ // carryover
-      height:$zoom * 10px;
-    }
-    &:nth-child(n+3):nth-child(-n+18) td
-    ,&:nth-child(20) td
-    {
-      height:$zoom * 5.4px;
-    }
-    &:nth-child(19) td
-    ,&:nth-child(21) td
-    {
-      height:$zoom * 9px;
-    }
-    &:nth-child(3) td{
-      padding-top:$zoom * 5.4px; // space for comment above
-      line-height:$zoom * 5.4px;
-    }
-    &:nth-child(4) td{
-      padding-top:$zoom * 9.2px; // space for comment above
-      line-height:$zoom * 5.4px;
-    }
-    &:nth-child(9) td{
-      padding-top:$zoom * 5.4px; // space for comment above
-      line-height:$zoom * 5.4px;
-    }
-    &:nth-child(20) td{
-    }
-    &:last-child td{// last row right now 22, should be 23
-      padding-top:$zoom * 10px;
-      height:$zoom * 8px;
-      line-height:$zoom * 8px;
+    &:nth-child(n+13):nth-child(-n+17) td:nth-child(2){ // display custom types of costs
+      opacity:1;
+      // hacky solution to hide first part of text (until changing database to better names)
+      text-indent:$zoom * -9.8px;//-24.5
+      position: relative;
+      left:$zoom * 13.4px;//33.5
+      background-color:transparent;
     }
   }
+  
   @media print{
-    // background-image:url('../img/eks_5-6_print.png');// wkhtmltopdf @media img bug
+    background-image:url('../img/eks_5-6_print.png');// wkhtmltopdf @media img bug
+    
     table{
-      bottom:$zoom_print * 21.8px + 4px;
+      bottom:21.9mm;//54.75
+      height:164.8mm;//412
     }
     tr{
+      &:nth-child(2){
+        height:10mm;//25
+        line-height:10mm;//25
+      }
+      &:nth-child(3),&:nth-child(9){// space for comments above
+        margin-top:5.4mm;//13.5
+      }
+      &:nth-child(4){
+        margin-top:8.8mm;//22
+      }
+      &:nth-child(19),&:nth-child(21){
+        height:9.2mm;//23
+        line-height:9.2mm;//23
+      }
+      // missing row 22
+      &:last-child{// last row right now 22, should be 23
+        margin-top:10mm;//25
+        height:7.6mm;//19
+        line-height:7.6mm;//19
+      }
       
-      &:nth-child(1) th{ // carryover
-        height:$zoom_print * 7.2px;
-      }
-      &:nth-child(2) td{ // carryover
-        height:$zoom_print * 10px;
-      }
-      &:nth-child(n+3):nth-child(-n+18) td
-      ,&:nth-child(20) td
-      {
-        height:$zoom_print * 5.4px;
-      }
-      &:nth-child(19) td
-      ,&:nth-child(21) td
-      {
-        height:$zoom_print * 9px;
-      }
-      &:nth-child(3) td{
-        padding-top:$zoom_print * 5.4px; // space for comment above
-        line-height:$zoom_print * 5.4px;
-      }
-      &:nth-child(4) td{
-        padding-top:$zoom_print * 9.2px; // space for comment above
-        line-height:$zoom_print * 5.4px;
-      }
-      &:nth-child(9) td{
-        padding-top:$zoom_print * 5.4px; // space for comment above
-        line-height:$zoom_print * 5.4px;
-      }
-      &:nth-child(20) td{
-      }
-      &:last-child td{// last row right now 22, should be 23
-        padding-top:$zoom_print * 10px;
-        height:$zoom_print * 8px;
-        line-height:$zoom_print * 8px;
-      }
       &:nth-child(n+13):nth-child(-n+17) td:nth-child(2){ // display custom types of costs
         opacity:1;
         // hacky solution to hide first part of text (until changing database to better names)
-        text-indent: -3.2em;
-        position: relative;
-        left: 52px;
+        text-indent:-9.8mm;//-24.5
+        left:13.4mm;//33.5
       }
     }
   }
 }
-////////////// page 6
+////////////////////////////////////////////////////////////////////// page 6
 #eks_page6{
   background-image:url('../img/eks_6-6_web.png');
   
@@ -1432,7 +1436,7 @@ body.eks{
     font-family:inherit;
   }
   textarea[name=signature]{
-    bottom: $zoom * 20px;
+    bottom: $zoom * 19px;
     left: $zoom * 199px;
     width: 30%;
     font-size: .7em;
@@ -1441,19 +1445,21 @@ body.eks{
     padding: $zoom * .8px;
   }
   @media print{
-    // background-image:url('../img/eks_6-6_print.png');// wkhtmltopdf @media img bug
+    background-image:url('../img/eks_6-6_print.png');// wkhtmltopdf @media img bug
     
     textarea[name=location]{
-      bottom: $zoom_print * 20px;
-      left: $zoom_print * 119px;
-      height:$zoom_print * 7px;
+      bottom:20mm;
+      left:119mm;
+      height:7mm;
+      resize:none;
     }
     textarea[name=signature]{
-      bottom: $zoom_print * 20px;
-      left: $zoom_print * 199px;
-      font-size: .7em;
-      height: $zoom_print * 8.8px;
-      padding: $zoom_print * .8px;
+      bottom:19mm;
+      left:199mm;
+      font-size:.7em;
+      height:8.8mm;
+      padding:.8mm;
+      resize:none;
     }
   }
 }

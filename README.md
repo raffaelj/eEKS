@@ -150,7 +150,7 @@ coming soon
   * [x] background-image not loading inside @media print, [wkhtmltopdf issue](https://github.com/wkhtmltopdf/wkhtmltopdf/issues/3126)
 * [x] I really have to figure out how `$this->query_string_list` works for _view, _lang, _action
 * [x] escape ampersands in links
-* [ ] optional: disable links in column headers
+* [ ] optional: disable links in column headers (for EKS to prevent unwanted sorting)
 
 ### searchbox
 
@@ -179,7 +179,7 @@ monthly view needs filters, too
 
 * [ ] views need their own config file or section in config.ini
 * [ ] dashboard (with views)
-  * [ ] move to action or somewhere else, it contains views and shouldn't be a view itself
+  * [x] move to action or somewhere else, it contains views and shouldn't be a view itself
 * [ ] monthly sums
   * [ ] only income
   * [ ] only costs
@@ -214,8 +214,23 @@ monthly view needs filters, too
 * [ ] cross browser print CSS - Oh my god!
   * `white-space:nowrap` seems to break layout in FF and wkhtmltopdf
   * rotate hack - page-break with margin-top breaks in Opera
+  * print preview EKS seems to work in (System: Win7Pro, 64bit)
+    * [x] wkhtmltopdf
+    * [x] Firefox 56.0.2 (64-Bit)
+    * [x] Google Chrome 62.0.3202.89 (64-Bit)
+    * [x] Opera 49.0
+    * [ ] Internet Explorer 11 --> Don't use this damn browser!
+      * margin:0 not possible - Why?
+      * --> page sizes and input fields break
+      * svg background icon not correct
+    * ... Safari, Edge etc. not tested yet
 
+### validation
 
+* [ ] gross_aout must be negative if type_of_costs != is_income
+* [ ] date formats
+* [ ] number formats
+* [ ] no text in numerical or date fields
 
 
 
