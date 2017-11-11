@@ -121,16 +121,6 @@ class eEKS extends lazy_mofo{
       <input type='hidden' name='' value=''>[query_string_list]
     </fieldset>
   </form>";
-  public $eks_search_box = "
-  <form action='[script_name]' class='lm_search_box'>
-    [filters]
-    <fieldset>
-      <input type='text' name='_search' value='[_search]' size='20' class='lm_search_input'>
-      <a href='[script_name]' title='[grid_search_box_clear]' class='button_clear_search'>x</a>
-      <input type='submit' class='lm_button lm_search_button' value='[grid_search_box_search]'>
-      <input type='hidden' name='' value=''>[query_string_list]
-    </fieldset>
-  </form>";
   
   /**
    * query string list for search filters
@@ -693,7 +683,7 @@ class eEKS extends lazy_mofo{
       $html .= '<label for="page3_calculated"></label>';
       $html .= "</fieldset>";
       
-      // small business / Kleinunternehmer/in (19 UStG)
+      // small business / Kleinunternehmer/in (§19 UStG)
       $html .= "<fieldset>";
       $eks['eks']['small_business'] ? $checked = " checked='checked'" : $checked = "";
       $html .= '<input type="checkbox" id="small_business" name="small_business"'.$checked.' />';
@@ -763,8 +753,8 @@ class eEKS extends lazy_mofo{
       $html .= "<page id='eks_page6' class='eks_page landscape'>";
       
       // grid
-      $this->grid_sql = $this->generate_grid_sql_eks(6);
-      $html .= $this->grid('', true);
+      // $this->grid_sql = $this->generate_grid_sql_eks(6);
+      // $html .= $this->grid('', true);
       
       // signature
       $html .= "<fieldset>";
@@ -1717,7 +1707,7 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
     
   }// end of generate_grid_sql_eks()
   //////////////////////////////////////////////////////////////////////////////
-  function search_box_filters(){
+  function search_box_filters($view = ""){
     
     // purpose: more filters for searching
     // output: html
@@ -1813,6 +1803,24 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
       
     }
     
+    // eks pages filter
+    if($view == "eks"){
+      
+      $html .= "<fieldset>\r\n";
+      $html .= "EKS pages: ";
+      
+      for($i=1; $i <=6; $i++){
+        $checked = "";
+        if(empty($_GET['_eks_pages']) || ( !empty($_GET['_eks_pages']) && in_array($i, $_GET['_eks_pages']) ) )
+          $checked .= " checked=checked";
+        $html .= "$i: <input type='checkbox' value='$i' name='_eks_pages[]'$checked />\r\n";
+      }
+      
+      
+      $html .= "</fieldset>\r\n";
+    }
+    
+    
     return $html;
     
   }// end of search_box_filters()
@@ -1856,7 +1864,7 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
       $search_box = str_replace('[query_string_list]', $query_string_list_inputs, $search_box);
       $search_box = str_replace('[grid_search_box_clear]', $this->grid_search_box_clear, $search_box);
       $search_box = str_replace('[grid_search_box_search]', $this->grid_search_box_search, $search_box);
-      $search_box = str_replace('[filters]', $this->search_box_filters(), $search_box);
+      $search_box = str_replace('[filters]', $this->search_box_filters($this->get_view()), $search_box);
     }
 
     $add_record_search_bar = "<div class='lm_add_search'>$search_box</div>\r\n";
