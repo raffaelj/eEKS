@@ -634,6 +634,34 @@ class eEKS extends lazy_mofo{
       
       $html .= "</fieldset>";
       
+      // 6. loan
+      $html .= "<fieldset>";
+      foreach($eks['loan'] as $key=>$val){
+        if( is_bool($val) ){
+            $val ? $checked = ' checked="checked"' : $checked = '';
+            $html .= '<input type="checkbox" id="loan_'.$key.'" name="loan_'.$key.'"'.$checked.'>';
+            $html .= '<label for="loan_'.$key.'"></label>';
+          }
+        else
+          $html .= '<input type="text" value="'.htmlspecialchars($val).'" name="loan_'.$key.'">';
+      }
+      
+      $html .= "</fieldset>";
+      
+      // 7. home office
+      $html .= "<fieldset>";
+      foreach($eks['home_office'] as $key=>$val){
+        if( is_bool($val) ){
+            $val ? $checked = ' checked="checked"' : $checked = '';
+            $html .= '<input type="checkbox" id="home_office_'.$key.'" name="home_office_'.$key.'"'.$checked.'>';
+            $html .= '<label for="home_office_'.$key.'"></label>';
+          }
+        else
+          $html .= '<input type="text" value="'.htmlspecialchars($val).'" name="home_office_'.$key.'">';
+      }
+      
+      $html .= "</fieldset>";
+      
       
       // signature
       $html .= "<fieldset>";

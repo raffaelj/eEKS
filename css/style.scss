@@ -610,7 +610,6 @@ label {
 ///////////// EKS
 
 $zoom: 2.5;
-$zoom_print: 3.79;
 $fontsize_screen: 11px;
 $fontsize_print: 14px;
 
@@ -728,8 +727,8 @@ body.eks{
     }
     @media print{
       + label{
-        width: $zoom_print * 5px;
-        height: $zoom_print * 5px;
+        width:5mm;
+        height:5mm;
         border: none;
         background-color: transparent;
       }
@@ -789,7 +788,7 @@ $size: 1.5em;
 #_hide_page_5:checked ~ #eks_page5{display:none;}
 #_hide_page_6:checked ~ #eks_page6{display:none;}
 
-////////////// page 1
+////////////////////////////////////////////////////////////////////// page 1
 #eks_page1{
   background-image:url('../img/eks_1-6_web.png');
   
@@ -885,7 +884,6 @@ $size: 1.5em;
     bottom: $zoom * 15px;
     left: $zoom * 58px;
     width: 1.5em;
-    // font-size:$fontsize_screen;
   }
   input[name=has_employees],input[name=has_employees] + label{
     bottom: $zoom * 16.6px;
@@ -896,96 +894,95 @@ $size: 1.5em;
     background-image:url('../img/eks_1-6_print.png');// wkhtmltopdf @media img bug
     
     input[name=title]{
-      bottom: $zoom_print * 200px;
-      left: $zoom_print * 20px;
+      bottom:200mm;
+      left:20mm;
     }
     input[name=first_name]{
-      bottom: $zoom_print * 200px;
-      left: $zoom_print * 60px;
+      bottom:200mm;
+      left:60mm;
     }
     input[name=last_name]{
-      bottom: $zoom_print * 188px;
-      left: $zoom_print * 20px;
+      bottom:188mm;
+      left:20mm;
     }
     input[name=birthday]{
-      bottom: $zoom_print * 188px;
-      left: $zoom_print * 100px;
+      bottom:188mm;
+      left:100mm;
     }
     input[name=bg_number]{
-      bottom: $zoom_print * 176px;
-      left: $zoom_print * 20px;
+      bottom:176mm;
+      left:20mm;
     }
     input[name=title_refer]{
-      bottom: $zoom_print * 154px;
-      left: $zoom_print * 20px;
+      bottom:154mm;
+      left:20mm;
     }
     input[name=first_name_refer]{
-      bottom: $zoom_print * 154px;
-      left: $zoom_print * 60px;
+      bottom:154mm;
+      left:60mm;
     }
     input[name=last_name_refer]{
-      bottom: $zoom_print * 142px;
-      left: $zoom_print * 20px;
+      bottom:142mm;
+      left:20mm;
     }
     input[name=birthday_refer]{
-      bottom: $zoom_print * 142px;
-      left: $zoom_print * 100px;
+      bottom:142mm;
+      left:100mm;
     }
     input[name=calculated],input[name=calculated] + label{
-      bottom: $zoom_print * 124px;
-      left: $zoom_print * 77px;
+      bottom:124mm;
+      left:77mm;
     }
     input[name=estimated],input[name=estimated] + label{
-      bottom: $zoom_print * 124px;
-      left: $zoom_print * 21px;
+      bottom:124mm;
+      left:21mm;
     }
     input[name=period]{
-      bottom: $zoom_print * 104px;
-      left: $zoom_print * 26px;
+      bottom:104mm;
+      left:26mm;
     }
     input[name=activity]{
-      bottom: $zoom_print * 67px;
-      left: $zoom_print * 26px;
+      bottom:67mm;
+      left:26mm;
     }
     input[name=activity]{
-      bottom: $zoom_print * 67px;
-      left: $zoom_print * 26px;
+      bottom:67mm;
+      left:26mm;
     }
     input[name=start_date]{
-      bottom: $zoom_print * 55px;
-      left: $zoom_print * 26px;
+      bottom:55mm;
+      left:26mm;
     }
     input[name=end_date]{
-      bottom: $zoom_print * 55px;
-      left: $zoom_print * 26px + 112px
+      bottom:55mm;
+      left:26mm + 112mm
     }
     input[name=company_location]{
-      bottom: $zoom_print * 43px;
-      left: $zoom_print * 26px;
+      bottom:43mm;
+      left:26mm;
     }
     input[name=legal_form]{
-      bottom: $zoom_print * 31px;
-      left: $zoom_print * 26px;
+      bottom:31mm;
+      left:26mm;
     }
     input[name=number_of_employees]{
-      bottom: $zoom_print * 15px;
-      left: $zoom_print * 58px;
-      width: 1.5em;
+      bottom:15mm;
+      left:58mm;
     }
     input[name=has_employees],input[name=has_employees] + label{
-      bottom: $zoom_print * 16.6px;
-      left: $zoom_print * 20.6px;
+      bottom:16.6mm;
+      left:20.6mm;
     }
   }
 }
 
-////////////// page 2
+////////////////////////////////////////////////////////////////////// page 2
 #eks_page2{
   background-image:url('../img/eks_2-6_web.png');
   
   // subsidies / 5.  Zuschüsse/Beihilfen
   input[name=subsidies_has_subsidies],input[name=subsidies_has_subsidies] + label{
-    bottom: $zoom * 267px;
+    bottom: $zoom * 268px;
     left: $zoom * 10px;
   }
   input[name=subsidies_payer]{
@@ -1009,7 +1006,7 @@ $size: 1.5em;
     width:30%;
   }
   input[name=subsidies_applied_subsidies],input[name=subsidies_applied_subsidies] + label{
-    bottom: $zoom * 224.7px;
+    bottom: $zoom * 225.6px;
     left: $zoom * 10px;
   }
   input[name=subsidies_applied_payer]{
@@ -1029,10 +1026,56 @@ $size: 1.5em;
   }
   
   // loan / 6.  Darlehen
+  input[name=loan_has_loan],input[name=loan_has_loan] + label{
+    bottom: $zoom * 182.2px;
+    left: $zoom * 10px;
+  }
+  input[name=loan_amount]{
+    bottom: $zoom * 166.8px;
+    left: $zoom * 15px;
+    width:15%;
+  }
+  input[name=loan_value_date]{
+    bottom: $zoom * 166.8px;
+    left: $zoom * 47.4px;
+    width:20.8%;
+  }
+  input[name=loan_date_refund]{
+    bottom: $zoom * 166.8px;
+    left: $zoom * 92.6px;
+    width:24%;
+  }
+  input[name=loan_monthly_repayment_rate]{
+    bottom: $zoom * 150.8px;
+    left: $zoom * 15px;
+    width:15%;
+  }
+  input[name=loan_financed_type_of_costs]{
+    bottom: $zoom * 150.8px;
+    left: $zoom * 47.4px;
+    width:20.8%;
+  }
+  input[name=loan_financed_amount_of_costs]{
+    bottom: $zoom * 150.8px;
+    left: $zoom * 92.6px;
+    width:24%;
+  }
   
-  
-  // operations rooms / 7.  Angaben zu den Betriebsräumen
-  
+  // home office / 7.  Angaben zu den Betriebsräumen
+  input[name=home_office_has_home_office],input[name=home_office_has_home_office] + label{
+    bottom: $zoom * 127.4px;
+    left: $zoom * 10px;
+  }
+  input[name=home_office_quantity]{
+    bottom: $zoom * 113.2px;
+    left: $zoom * 15px;
+    width:6%;
+  }
+  input[name=home_office_square_meter]{
+    bottom: $zoom * 113.2px;
+    left: $zoom * 80px;
+    width:10%;
+  }
   
   // location and signature
   textarea[name=location]{
@@ -1040,7 +1083,6 @@ $size: 1.5em;
     left: $zoom * 9.5px;
     width:20.5%;
     height:$zoom * 14px;
-    // font-size:.8em;
     line-height:1.2em;
     font-family:inherit;
   }
@@ -1058,46 +1100,86 @@ $size: 1.5em;
     
     // subsidies / 5.  Zuschüsse/Beihilfen
     input[name=subsidies_has_subsidies],input[name=subsidies_has_subsidies] + label{
-      bottom: $zoom_print * 267px;
-      left: $zoom_print * 10px;
+      bottom:268mm;
+      left:10mm;
     }
     input[name=subsidies_payer]{
-      bottom: $zoom_print * 254px;
-      left: $zoom_print * 15px;
+      bottom:254mm;
+      left:15mm;
     }
     input[name=subsidies_start_date]{
-      bottom: $zoom_print * 238px;
-      left: $zoom_print * 15px;
+      bottom:238mm;
+      left:15mm;
     }
     input[name=subsidies_end_date]{
-      bottom: $zoom_print * 238px;
-      left: $zoom_print * 49px;
+      bottom:238mm;
+      left:49mm;
     }
     input[name=subsidies_monthly_amount]{
-      bottom: $zoom_print * 238px;
-      left: $zoom_print * 80px;
+      bottom:238mm;
+      left:80mm;
     }
     input[name=subsidies_applied_subsidies],input[name=subsidies_applied_subsidies] + label{
-      bottom: $zoom_print * 224.7px;
-      left: $zoom_print * 10px;
+      bottom:225.6mm;
+      left:10mm;
     }
     input[name=subsidies_applied_payer]{
-      bottom: $zoom_print * 214px;
-      left: $zoom_print * 15px;
+      bottom:214mm;
+      left:15mm;
     }
     input[name=subsidies_apply_date]{
-      bottom: $zoom_print * 201px;
-      left: $zoom_print * 15px;
+      bottom:201mm;
+      left:15mm;
     }
     input[name=subsidies_apply_start_date]{
-      bottom: $zoom_print * 201px;
-      left: $zoom_print * 80px;
+      bottom:201mm;
+      left:80mm;
     }
     
     // loan / 6.  Darlehen
+    input[name=loan_has_loan],input[name=loan_has_loan] + label{
+      bottom:182.2mm;
+      left:10mm;
+    }
+    input[name=loan_amount]{
+      bottom:166.8mm;
+      left:15mm;
+    }
+    input[name=loan_value_date]{
+      bottom:166.8mm;
+      left:47.4mm;
+    }
+    input[name=loan_date_refund]{
+      bottom:166.8mm;
+      left:92.6mm;
+    }
+    input[name=loan_monthly_repayment_rate]{
+      bottom:150.8mm;
+      left:15mm;
+    }
+    input[name=loan_financed_type_of_costs]{
+      bottom:150.8mm;
+      left:47.4mm;
+    }
+    input[name=loan_financed_amount_of_costs]{
+      bottom:150.8mm;
+      left:92.6mm;
+    }
     
     
-    // operations rooms / 7.  Angaben zu den Betriebsräumen
+    // home office / 7.  Angaben zu den Betriebsräumen
+    input[name=home_office_has_home_office],input[name=home_office_has_home_office] + label{
+      bottom:127.4mm;
+      left:10mm;
+    }
+    input[name=home_office_quantity]{
+      bottom:113.2mm;
+      left:15mm;
+    }
+    input[name=home_office_square_meter]{
+      bottom:113.2mm;
+      left:80mm;
+    }
     
     
     // location and signature
@@ -1309,7 +1391,6 @@ $size: 1.5em;
     }
     
     table{
-      // bottom:$zoom_print * 16px;
       bottom:16.5mm;
       height:78mm;//195
     }
