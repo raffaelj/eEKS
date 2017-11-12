@@ -1421,9 +1421,11 @@ $size: 1.5em;
       height:$zoom * 9.2px;//23
       line-height:$zoom * 9.2px;//23
     }
-    // missing row 22
+    &:nth-child(22){
+      height:$zoom * 10px;//25;
+      line-height:$zoom * 10px;//25;
+    }
     &:last-child{// last row right now 22, should be 23
-      margin-top:$zoom * 10px;//25
       height:$zoom * 7.6px;//19
       line-height:$zoom * 7.6px;//19
     }
@@ -1460,9 +1462,11 @@ $size: 1.5em;
         height:9.2mm;//23
         line-height:9.2mm;//23
       }
-      // missing row 22
+    &:nth-child(22){
+      height:10mm;//25;
+      line-height:10mm;//25;
+    }
       &:last-child{// last row right now 22, should be 23
-        margin-top:10mm;//25
         height:7.6mm;//19
         line-height:7.6mm;//19
       }

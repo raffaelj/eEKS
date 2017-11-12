@@ -48,13 +48,10 @@ class eEKS extends lazy_mofo{
   // define columns for full text search
   public $search_in_columns = array();
   
-  // optional sums in last row (monthly view)
-  public $grid_show_column_sums = false;
-  // automated sums in grid
-  public $column_sums = array();
-  public $carryover = "";
-  public $grid_show_carryover = false;
+  // inject rows into grid for column sums, carryovers, additional infos etc.
+  public $inject_rows = array();
   
+  // rename column headers to nice names instead of original database headers
   public $rename_csv_headers = false;
   
   // folder for pdf creation
@@ -258,8 +255,6 @@ class eEKS extends lazy_mofo{
     $html .= $this->grid('', true);
     
     unset($_GET['_from']);
-    unset($this->column_sums);
-    
     
     $html .= "</div>";
     
@@ -283,7 +278,6 @@ class eEKS extends lazy_mofo{
     
     unset($_GET['_from']);
     unset($_GET['_to']);
-    unset($this->column_sums);
     
     $html .= "</div>";
     
@@ -306,7 +300,6 @@ class eEKS extends lazy_mofo{
     $html .= $this->grid('', true);
     
     unset($_GET['_view']);
-    unset($this->column_sums);
     
     $html .= "</div>";
     
@@ -443,7 +436,6 @@ class eEKS extends lazy_mofo{
     if($view == "eks"){
       
       $_POST['action'] = "eks";
-      $this->eks();
       
     }
     
@@ -692,17 +684,16 @@ class eEKS extends lazy_mofo{
       $html .= '<label for="small_business"></label>';
       $html .= "</fieldset>";
       
-      // reset $this->column_sums
-      $this->column_sums = array();
+      // inject rows with sums/carryover
+      $sql = $this->generate_grid_sql_eks(3, true);
+      $this->inject_rows['last'] = $this->query($sql, $this->grid_sql_param);
       
       // grid
       $this->grid_sql = $this->generate_grid_sql_eks(3);
       $html .= $this->grid('', true);
       
-      // store $this->column_sums for carryover
-      $sum['page3'] = $this->column_sums;
-      // reset $this->column_sums
-      $this->column_sums = array();
+      // reset row injection
+      $this->inject_rows = array();
       
       $html .= "</page>";
       
@@ -710,14 +701,18 @@ class eEKS extends lazy_mofo{
     ///////////////// EKS page 4
       $html .= "<page id='eks_page4' class='eks_page landscape'>";
       
+      // inject rows with sums/carryover
+      $sql = $this->generate_grid_sql_eks(4, true); // sum of page 4
+      $sum_page_4 = $this->query($sql, $this->grid_sql_param);
+      $this->inject_rows["last"] = $sum_page_4;
+      
+      
       // grid
       $this->grid_sql = $this->generate_grid_sql_eks(4);
       $html .= $this->grid('', true);
       
-      // store $this->column_sums for carryover
-      $sum['page4'] = $this->column_sums;
-      // reset $this->column_sums
-      // $this->column_sums = array();
+      // reset row injection
+      $this->inject_rows = array();
       
       $html .= "</page>";
 
@@ -725,23 +720,22 @@ class eEKS extends lazy_mofo{
     ///////////////// EKS page 5
       $html .= "<page id='eks_page5' class='eks_page landscape'>";
       
-      // set carryover
-      $this->grid_show_carryover = true;
+      // inject rows with sums/carryover
+      $this->inject_rows[1] = $sum_page_4; // carryover from page 4
       
-      // sum pages
-      $this->column_sums = $sum['page3'];
+      $sql = $this->generate_grid_sql_eks("4,5", true); // sum of all costs
+      $this->inject_rows[22] = $this->query($sql, $this->grid_sql_param);
       
-      
-      // There is a second sum of all costs in this form, which breaks my logic
-      // about injecting sums and carryovers into grid()
-      
+      $sql = $this->generate_grid_sql_eks("3,4,5", true); // total income - costs
+      $this->inject_rows[23] = $this->query($sql, $this->grid_sql_param);
       
       // grid
       $this->grid_sql = $this->generate_grid_sql_eks(5);
       $html .= $this->grid('', true);
       
-      // unset carryover
-      $this->grid_show_carryover = false;
+      // reset row injection
+      $this->inject_rows = array();
+      
       
       $html .= "</page>";
       
@@ -1140,7 +1134,7 @@ class eEKS extends lazy_mofo{
     $result = $this->query($sql, $sql_param, 'grid() run query');
     if(!is_array($result))
       $result = array();
-
+    
     // get count
     $count = 0;
     $sql = 'select found_rows() as cnt';
@@ -1190,7 +1184,6 @@ class eEKS extends lazy_mofo{
       if($column_name == $this->identity_name && $i == ($column_count - 1))
         $edit_delete = "    <th class='col_edit'></th>\n"; // if identity is last column then this is the column with the edit and delete links
       elseif( $this->multi_column_on ){ // experimental multi-value column active
-        // if( !in_array($column_name, $this->config['multi_column']) )
         if( !in_array($column_name, $this->multi_column) )
           $head .= "    <th><a href='{$uri_path}_order_by=" . ($i + 1) . "&amp;_desc=$_desc_invert&amp;" . $this->get_qs('_search,_view,_lang') . "' class='lm_$column_name'>$title</a></th>\n";
       }
@@ -1241,9 +1234,9 @@ class eEKS extends lazy_mofo{
     $html .= "<table class='lm_grid'>\r\n";
     $html .= $head;
     
-    // optional carryover
-    if($this->grid_show_carryover && mb_strlen($this->carryover) > 0)
-      $html .= "<tr class='carryover'>".$this->carryover."</tr>\r\n";
+    // optional: inject rows at specified positions into $result
+    if(count($this->inject_rows) > 0)
+      $result = $this->inject_rows_into_result($result);
 
     // print rows
     $j = 0;
@@ -1274,25 +1267,6 @@ class eEKS extends lazy_mofo{
         $title = $this->format_title($column_name, @$this->rename[$column_name]);
 
         $value = $row[$column_name];
-        
-        // column sums
-        if($this->grid_show_column_sums){
-          
-          if(!$this->multi_column_on || ( $this->multi_column_on && !in_array($column_name, $this->multi_column) ) ){
-            // set sums
-            if( !isset($this->column_sums[$column_name]) ){
-              if( is_numeric($value) && $column_name != $this->identity_name )
-                $this->column_sums[$column_name] = $value;
-              else
-                $this->column_sums[$column_name] = "";
-            }
-            else{
-              if( is_numeric($value) && $column_name != $this->identity_name )
-                $this->column_sums[$column_name] = $this->column_sums[$column_name] + $value;
-            }
-          }
-          
-        }
 
         // edit & delete links
         if($column_name == $this->identity_name && $i == ($column_count - 1))
@@ -1339,25 +1313,6 @@ class eEKS extends lazy_mofo{
           
       // row counter    
       $j++;
-    }
-    
-    // column sums
-    if($this->grid_show_column_sums){
-      $html .= '<tr class="column_sums">';
-      
-      $this->carryover = "";
-      foreach($this->column_sums as $column_name=>$value)
-        $this->carryover .= '    <td data-coltitle="'.htmlspecialchars($column_name).'" data-col="'.htmlspecialchars($column_name).'">' . $this->get_output_control($column_name . '-' . $row[$this->identity_name], $value, '--number', 'grid') . "</td>\r\n";
-      
-      // add empty cells
-      if($this->multi_column_on)
-        $this->carryover .= "    <td></td>\r\n";
-      if($columns[count($columns) -1] == $this->identity_name)
-        $this->carryover .= "    <td class='col_edit'></td>\r\n";
-      
-      $html .= $this->carryover;
-      
-      $html .= '</tr>';
     }
 
     $html .= "</table>\n";
@@ -1636,7 +1591,7 @@ class eEKS extends lazy_mofo{
   
   
   //////////////////////////////////////////////////////////////////////////////
-  function generate_grid_sql_eks($pages = "1,2,3,4,5,6"){
+  function generate_grid_sql_eks($pages = "1,2,3,4,5,6", $no_group_by = false){
     
     $date = "value_date";
     
@@ -1691,7 +1646,8 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
     $query .= "WHERE c.page IN ($pages)\r\n";
     
 // AND a.value_date BETWEEN '2016-06-01' AND '2016-12-31'
-    $query .= "GROUP BY c.type_of_costs\r\n";
+    if(!$no_group_by)
+      $query .= "GROUP BY c.type_of_costs\r\n";
     
     $query .= "ORDER BY ID\r\n";
     
@@ -2655,6 +2611,28 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
     header("Location: $protocol$host$port$url");
     die;
   
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////
+  function inject_rows_into_result( $result = array() ){
+    
+    // purpose: add arrays/rows into result from query() to display extra rows in grid
+    // for example: sums of all columns, carryover
+    // the keys of $this->inject_rows define the position
+    // if string "last" is given --> push
+    
+    foreach($this->inject_rows as $key=>$val){
+      
+      if($key != "last")
+        array_splice( $result, $key-1, 0, $val );
+    
+    }
+    
+    if(isset($this->inject_rows['last']))
+      $result[] = $this->inject_rows['last'][0];
+    
+    return $result;
+    
   }
   
   
