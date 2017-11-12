@@ -80,12 +80,14 @@ views[] = monthly_sums
 views[] = edit_tables
 views[] = eks
 
+;;;; search filters
+
 ;; date filters
 date_filters[] = value_date
 date_filters[] = voucher_date
 
 ;; column names for full text search in search box
-search_in_columns[] = from_to
+search_in_columns[] = customer_supplier
 search_in_columns[] = object
 
 ;; column names of category filters in search box
@@ -99,6 +101,11 @@ multi_column[] = account
 multi_column[] = cat_02
 multi_column[] = cat_03
 multi_column[] = notes_02
+
+;; filters per view
+[view_filter]
+eks[] = eks_date_range
+eks[] = choose_eks_profile
 
 ;; dashboard
 [dashboard]
@@ -123,7 +130,6 @@ invoice_number = true
 customer_supplier = true
 posting_text = false
 object = true
-type_of_costs = false
 type_of_costs = true
 mode_of_employment = true
 cat_01 = true
