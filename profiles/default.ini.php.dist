@@ -105,10 +105,10 @@ monthly_repayment_rate =
 financed_type_of_costs = 
 financed_amount_of_costs = 
 
-;; operations rooms
+;; home office
 ;; 7.  Angaben zu den Betriebsräumen
-[operations_rooms_in_flat]
-has_operations_rooms = true
+[home_office]
+has_home_office = true
 quantity = 1
 square_meter = "12,32"
 
