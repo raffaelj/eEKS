@@ -66,6 +66,9 @@ class eEKS extends lazy_mofo{
   // optional configuration via ini file
   private $config = array();
   
+  // EKS profile via ini file
+  private $eks_config = array();
+  
   // public variable to overwrite i18n
   public $i18n = "";
   
@@ -112,8 +115,6 @@ class eEKS extends lazy_mofo{
   <form action='[script_name]' class='lm_search_box'>
     [filters]
     <fieldset>
-      <input type='text' name='_search' value='[_search]' size='20' class='lm_search_input'>
-      <a href='[script_name]' title='[grid_search_box_clear]' class='button_clear_search'>x</a>
       <input type='submit' class='lm_button lm_search_button' value='[grid_search_box_search]'>
       <input type='hidden' name='' value=''>[query_string_list]
     </fieldset>
@@ -307,7 +308,7 @@ class eEKS extends lazy_mofo{
     
     return $html;
     
-  }
+  }// end of dashboard()
   
   //////////////////////////////////////////////////////////////////////////////
   function settings(){
@@ -432,7 +433,7 @@ class eEKS extends lazy_mofo{
         $view = $this->clean_out($_GET['_view']);
     
     
-    // EKS
+    // EKS --> seems to be a bit unnecessary
     if($view == "eks"){
       
       $_POST['action'] = "eks";
@@ -485,41 +486,39 @@ class eEKS extends lazy_mofo{
   //////////////////////////////////////////////////////////////////////////////
   function eks(){
     
+    // purpose: set some parameters and call eks_form()
+    
     // parse profile
-    $eks = parse_ini_file('profiles/default.ini.php', true, INI_SCANNER_TYPED);
+    $this->eks_config = parse_ini_file('profiles/default.ini.php', true, INI_SCANNER_TYPED);
     
     // set date range
-    if( empty($_GET['_from']) || empty($_GET['_to']) ){
-      $from = new DateTime( $this->date_in($eks['eks']['eks_start_date']) );
+    if( empty($_GET['_from']) ){
+      $from = new DateTime( $this->date_in($this->eks_config['eks']['eks_start_date']) );
     }
     else{
       $from = new DateTime( $this->date_in($_GET['_from']) );
     }
     
-    
-    // temporary  - set dates in $_GET
+    // set dates in $_GET
     $_GET['_from'] = $from->modify('first day of this month')->format('d.m.Y');
     $_GET['_to'] = $from->modify('+ 5 months')->modify('last day of this month')->format('d.m.Y');
     
     
-    
     // set default mode_of_employment
     if( empty($_GET['_mode_of_employment']) )
-      $_GET['_mode_of_employment'] = $eks['eks']['default_mode_of_employment'];
+      $_GET['_mode_of_employment'] = $this->eks_config['eks']['default_mode_of_employment'];
     
     $this->grid_sql = $this->generate_grid_sql_eks();
     
     // reset some grid features
     $this->multi_column_on = false;
     $this->grid_repeat_header_at = false;
-    // $this->grid_search_box = "";
     
     $html = "";
     
-    $html .= $this->eks_form($eks);
+    $html .= $this->eks_form($this->eks_config);
     
     return $html;
-    
     
   }
   
@@ -1684,42 +1683,16 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
     return $query;
     
   }// end of generate_grid_sql_eks()
+  
   //////////////////////////////////////////////////////////////////////////////
-  function search_box_filters($view = ""){
+  function search_box_filter_between_dates(){
     
-    // purpose: more filters for searching
-    // output: html
+    // purpose: return inputs for date filter
     
-    // $date_filters = $this->config['date_filters'];
     $date_filters = $this->date_filters;
-    $category_filters = $this->category_filters;
-    
     $_from = $this->clean_out(@$_GET['_from']);
     $_to = $this->clean_out(@$_GET['_to']);
-    
     $html = "";
-    
-    //// view filter
-    
-    // pos/neg filter
-    
-    $html .= "<select name='_amount'>";
-    $selected = "";
-    if( !empty($_GET["_amount"]) && $_GET["_amount"] != "pos" && $_GET["_amount"] != "neg" )
-      $selected = " selected='selected'";
-    $html .= "<option value=''$selected>".$this->translate('all')."</option>";
-    $selected = "";
-    if( !empty($_GET["_amount"]) && $_GET["_amount"] == "pos" )
-      $selected = " selected='selected'";
-    $html .= "<option value='pos'$selected>".$this->translate('income')."</option>";
-    $selected = "";
-    if( !empty($_GET["_amount"]) && $_GET["_amount"] == "neg" )
-      $selected = " selected='selected'";
-    $html .= "<option value='neg'$selected>".$this->translate('costs')."</option>";
-    $html .= "</select>";
-    
-    
-    // date filter
     $count = count($date_filters);
     if($count > 0){
       $html .= "<fieldset>\r\n";
@@ -1738,17 +1711,24 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
         $html .= "  </select>\r\n";
       }
       
-      
       $html .= "<input type='text' name='_from' value='".$_from."' placeholder='$this->date_filter_from' size='10' class='lm_search_between_input'>";
       $html .= "<input type='text' name='_to' value='".$_to."' placeholder='$this->date_filter_to' size='10' class='lm_search_between_input'>";
       
       $html .= "</fieldset>\r\n";
       
     }
+    return $html;
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////
+  function search_box_filter_by_category(){
     
-    // category filter
-    //
+    // purpose: return select box(es) with category filters
+    
     // needs better sorting
+    
+    $category_filters = $this->category_filters;
+    $html = "";
     $count = count($category_filters);
     if($count > 0){
       $html .= "<fieldset>\r\n";
@@ -1781,6 +1761,123 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
       
     }
     
+    return $html;
+    
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////
+  function search_box_filter_by_pos_neg_amount(){
+    
+    // purpose: return selectbox to filter by positive/negative/all amounts
+    
+    $html = "";
+    
+    $html .= "<fieldset>\r\n";
+    
+    $html .= "<select name='_amount'>";
+    $selected = "";
+    if( !empty($_GET["_amount"]) && $_GET["_amount"] != "pos" && $_GET["_amount"] != "neg" )
+      $selected = " selected='selected'";
+    $html .= "<option value=''$selected>".$this->translate('all')."</option>";
+    $selected = "";
+    if( !empty($_GET["_amount"]) && $_GET["_amount"] == "pos" )
+      $selected = " selected='selected'";
+    $html .= "<option value='pos'$selected>".$this->translate('income')."</option>";
+    $selected = "";
+    if( !empty($_GET["_amount"]) && $_GET["_amount"] == "neg" )
+      $selected = " selected='selected'";
+    $html .= "<option value='neg'$selected>".$this->translate('costs')."</option>";
+    $html .= "</select>";
+    
+    $html .= "</fieldset>\r\n";
+    
+    return $html;
+    
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////
+  function search_box_filter_full_text_search(){
+    
+    // purpose: return input field for full text search
+    
+    // get input
+    $_search = $this->clean_out(@$_REQUEST['_search']);
+    $script_name = $this->get_uri_path() . $this->get_qs('_view,_lang');
+    
+    $html = "";
+    $html .= "<input type='text' name='_search' value='$_search' size='20' class='lm_search_input'>";
+    $html .= "<a href='$script_name' title='$this->grid_search_box_clear' class='button_clear_search'>x</a>";
+    
+    return $html;
+    
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////
+  function search_box_filter_eks_date_range(){
+    
+    // purpose: return select box with possible date ranges
+    // used in EKS view
+    
+    $search_box = "";
+    $start = new DateTime( $this->date_in($this->eks_config['eks']['eks_start_date']) );
+    
+    $today = new DateTime();
+    
+    $interval = DateInterval::createFromDateString('6 month');
+    $period   = new DatePeriod($start, $interval, $today);
+    
+    $search_box .= "<select name='_from'>";
+    foreach ($period as $dt) {
+      $selected = "";
+      if( !empty($_GET['_from']) && $dt->format($this->date_out) == $_GET['_from'] )
+        $selected = " selected='selected'";
+        
+      $search_box .= "<option$selected>" . $dt->format($this->date_out) . "</option>";
+    }
+    $search_box .= "</select>";
+    
+    return $search_box;
+    
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////
+  function search_box_filter_choose_eks_profile(){
+    
+    // purpose: return selectbox to choose EKS profiles
+    
+    return;
+    
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////
+  function search_box_filters(){
+    
+    // purpose: more filters for searching and choose filters per view
+    
+    $html = "";
+    
+    $view = $this->get_view();
+    
+    // filter per view
+    if( isset($this->config['view_filter'][$view]) ){
+      
+      // call filter function if it exists
+      foreach($this->config['view_filter'][$view] as $filter){
+        $function_name = "search_box_filter_".$filter;
+        if( method_exists( $this, $function_name ) )
+          $html .= $this->$function_name();
+      }
+      
+    }
+    else{
+      
+      // use all default filters
+      $html .= $this->search_box_filter_by_pos_neg_amount();
+      $html .= $this->search_box_filter_between_dates();
+      $html .= $this->search_box_filter_by_category();
+      $html .= $this->search_box_filter_full_text_search();
+      
+    }
     
     return $html;
     
@@ -1794,9 +1891,6 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
     
     // local copies 
     $uri_path = $this->get_uri_path();
-    
-    // get input
-    $_search = $this->clean_out(@$_REQUEST['_search']);
     
     // search bar
     $search_box = '';
@@ -1820,10 +1914,8 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
           
       $search_box = $this->grid_search_box;
       $search_box = str_replace('[script_name]', $uri_path . $this->get_qs('_view,_lang') , $search_box); // for 'x' cancel do add get_qs('') to carry query_string_list
-      $search_box = str_replace('[_search]', $_search, $search_box);
       $search_box = str_replace('[_csrf]', $_SESSION['_csrf'], $search_box);
       $search_box = str_replace('[query_string_list]', $query_string_list_inputs, $search_box);
-      $search_box = str_replace('[grid_search_box_clear]', $this->grid_search_box_clear, $search_box);
       $search_box = str_replace('[grid_search_box_search]', $this->grid_search_box_search, $search_box);
       $search_box = str_replace('[filters]', $this->search_box_filters($this->get_view()), $search_box);
     }

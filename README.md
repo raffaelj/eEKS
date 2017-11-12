@@ -79,13 +79,14 @@ coming soon
 ### top priority
 
 * invoices (needs customer database)
-* concluded EKS
+* [x] concluded EKS (part A and B, without driver's log)
 * custom filters in search bar for EKS
 * estimated EKS
 * discuss porting features to lm
 
 ### lower priority
 
+* concluded EKS (part C)
 * customer database
 * product database
 * dashboard
@@ -156,7 +157,7 @@ coming soon
 
 * [x] not in grid
 * [x] add filters
-* [ ] custom searchbox per view
+* [x] custom searchbox per view
 
 ### filters
 
