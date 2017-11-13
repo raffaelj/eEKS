@@ -549,6 +549,7 @@ fieldset{
   display:inline-block;
   margin: .2em .1em;
   padding: .1em;
+  line-height:1.5em;
   border: 1px solid $clr_grey_light;
   border-radius: 2px;
   .lm_button{
@@ -556,9 +557,7 @@ fieldset{
     padding:.2em;
   }
 }
-input
-,select
-,textarea
+input,select,textarea,label
 {
   margin:0 .1em;
   padding: .2em;
@@ -566,7 +565,7 @@ input
   @include box-sizing(border-box);
 }
 input[type="checkbox"], input[type="radio"]{
-  margin: -2px .2em 0 0;
+  // margin: 2px .2em 0 0;
   vertical-align: middle;
   width:auto;
 }
@@ -584,11 +583,44 @@ option{
   }
 }
 label {
-  display: inline-block;
-  vertical-align: middle;
-  font-size: .9em;
-  line-height: 1em;
-  margin: 0 .2em 0 0;
+  // display: inline-block;
+  // vertical-align: middle;
+  // font-size: .9em;
+  // line-height: 1em;
+  // margin: 0 .2em 0 0;
+  border-radius:1px;
+}
+// checkboxes for missing date filter
+input[name=_missing_date_on]{
+  display:none;
+  + label:hover{
+    background-color:$clr_confirm;
+    color:$clr_grey_dark;
+  }
+  ~ input[name^=_missing_date]{
+    display:none;
+    + label{
+      display:none;
+    }
+  }
+  &:checked{
+    + label{
+      background-color:$clr_confirm;
+      color:$clr_grey_dark;
+    }
+    ~ input[name^=_missing_date]{
+      display:inline;
+      + label{
+        display:inline;
+      }
+      &:checked{
+        + label{
+          background-color:$clr_confirm;
+          color:$clr_grey_dark;
+        }
+      }
+    }
+  }
 }
 
 

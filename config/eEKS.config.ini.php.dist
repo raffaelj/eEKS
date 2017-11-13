@@ -57,16 +57,9 @@ slogan = "Don't worry, be happy ;-)"
 background_image = ""
 
 
-
 ;; turn multi-value column on
 multi_column_on = true
 ; multi_column_on = false
-
-;; optional sums in last row (monthly view)
-grid_show_column_sums = true
-
-;; for multiple grids in one page its possible to use the carryover from the last grid
-grid_show_carryover = false
 
 ;; use renamed column names for CSV export
 rename_csv_headers = true
@@ -79,6 +72,13 @@ views[] = missing_date
 views[] = monthly_sums
 views[] = edit_tables
 views[] = eks
+
+;; column names in this array are shown together in a multi-value column
+multi_column[] = invoice_number
+multi_column[] = account
+multi_column[] = cat_02
+multi_column[] = cat_03
+multi_column[] = notes_02
 
 ;;;; search filters
 
@@ -95,12 +95,8 @@ category_filters[] = type_of_costs
 category_filters[] = mode_of_employment
 ; category_filters[] = cat_01
 
-;; column names in this array are shown together in a multi-value column
-multi_column[] = invoice_number
-multi_column[] = account
-multi_column[] = cat_02
-multi_column[] = cat_03
-multi_column[] = notes_02
+;; filter by positive/negative amounts in the following column
+amount_filter = gross_amount
 
 ;; filters per view
 [view_filter]

@@ -178,6 +178,7 @@ monthly view needs filters, too
 
 ### views/pages
 
+* [ ] think about restructuring views and actions
 * [ ] views need their own config file or section in config.ini
 * [ ] dashboard (with views)
   * [x] move to action or somewhere else, it contains views and shouldn't be a view itself

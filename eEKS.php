@@ -38,15 +38,14 @@ class eEKS extends lazy_mofo{
   // options: missing_date, monthly, edit, eks
   public $views = array();
   
-  // active date filters
-  // contain column names containing dates
-  public $date_filters = array();
   
-  // column names of category filters in search box
-  public $category_filters = array();
-  
-  // define columns for full text search
-  public $search_in_columns = array();
+  // filter settings for search bar and configurable grid sql
+  // Set column names to use for filtering
+  // Arrays can contain multiple columns, variables can contain one column name
+  public $date_filters = array();       // date range filter(s)
+  public $category_filters = array();   // category filters
+  public $search_in_columns = array();  // full text search
+  public $amount_filter = "";           // positive/negative/all amounts
   
   // inject rows into grid for column sums, carryovers, additional infos etc.
   public $inject_rows = array();
@@ -172,7 +171,7 @@ class eEKS extends lazy_mofo{
 
     // purpose: built-in controller
     
-    // load internationalization file if it exists, en-us (default) is defined this class
+    // load internationalization file if it exists, en-us (default) is defined in this class
     $this->set_language();
     
     // set commands and grid_sql
@@ -295,7 +294,7 @@ class eEKS extends lazy_mofo{
     $html .= "<h2>another table with a lot of columns</h2>";
     
     $_GET['_view'] = "missing_date";
-    $this->set_grid_view_parameters();
+    $this->set_grid_view_parameters("missing_date");
     $this->multi_column_on = true;
     
     $html .= $this->grid('', true);
@@ -433,7 +432,7 @@ class eEKS extends lazy_mofo{
         $view = $this->clean_out($_GET['_view']);
     
     
-    // EKS --> seems to be a bit unnecessary
+    // EKS --> seems to be a bit unnecessary, but prevents from setting defaults
     if($view == "eks"){
       
       $_POST['action'] = "eks";
@@ -473,7 +472,16 @@ class eEKS extends lazy_mofo{
     
     
     // missing_date
-    // needs some declaration - right now it behaves lake a filter in generate_grid_sql()
+    elseif($view == "missing_date"){
+      $_GET['_missing_date_on'] = 1;
+      if( !empty($_GET['_missing_date']) )
+        foreach($_GET['_missing_date'] as $val)
+          $_GET['_missing_date'][] = $val;
+      else
+        foreach($this->date_filters as $val)
+          $_GET['_missing_date'][] = $val;
+      $this->grid_sql = $this->generate_grid_sql();
+    }
     
     
     // default: accounting with generate_grid_sql()
@@ -1473,13 +1481,16 @@ class eEKS extends lazy_mofo{
     }
     
     // add AND clause for negative/positive amounts
-    $amount = "";
-    if(!empty($_GET["_amount"]))
-      $amount = $this->clean_out($_GET["_amount"]);
-    if($amount == "pos")
-      $query .= "AND a.gross_amount >= 0\r\n";
-    if($amount == "neg")
-      $query .= "AND a.gross_amount < 0\r\n";
+    if(mb_strlen($this->amount_filter) > 0){
+      $column = $this->amount_filter;
+      $amount = "";
+      if(!empty($_GET["_amount"]))
+        $amount = $this->clean_out($_GET["_amount"]);
+      if($amount == "pos")
+        $query .= "AND a.$column >= 0\r\n";
+      if($amount == "neg")
+        $query .= "AND a.$column < 0\r\n";
+    }
     
     
     // add AND clause for date filters
@@ -1496,8 +1507,19 @@ class eEKS extends lazy_mofo{
     }
     
     // add AND clause for no-date filter
-    if(isset($_GET['_view']) && $_GET['_view'] == 'missing_date')
-      $query .= "AND (value_date IS NULL OR voucher_date IS NULL)";
+    if( !empty($_GET['_missing_date_on']) && !empty($_GET['_missing_date'])==1 && !empty($_GET['_missing_date']) ){
+      $query .= "AND (";
+      
+      foreach($_GET['_missing_date'] as $key=>$val){
+        if($key == 0)
+          $query .= "$val IS NULL";
+        else
+          $query .= " OR $val IS NULL";
+      }
+      
+      $query .= ")";
+    }
+    
     
     // add ORDER BY
     $sort_order = $this->config['sort_order'];
@@ -1519,7 +1541,7 @@ class eEKS extends lazy_mofo{
   }//end of generate_grid_sql
   
   //////////////////////////////////////////////////////////////////////////////
-  function generate_grid_sql_monthly($date = "value_date", $group = "type_of_costs"){
+  function generate_grid_sql_monthly($date = "value_date", $group = "type_of_costs", $no_group_by = false){
     
     // purpose: sql query for monthly sums of amounts with $date, grouped by $group
     
@@ -1717,7 +1739,40 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
       $html .= "</fieldset>\r\n";
       
     }
+    
     return $html;
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////
+  function search_box_filter_missing_date(){
+    
+    // purpose: return checkboxes to filter by missing date(s)
+    
+    $date_filters = $this->date_filters;
+    
+    $html = "";
+    $html .= "<fieldset>\r\n";
+    
+    // checkbox filter by missing date
+    $checked = "";
+    if( !empty($_GET['_missing_date_on']) && $_GET['_missing_date_on'] == 1 )
+      $checked = " checked='checked'";
+    $html .= "<input type='checkbox' id='_missing_date_on' name='_missing_date_on' value='1'$checked />";
+    $html .= "<label for='_missing_date_on'>".$this->translate("missing_date", "pretty")."</label>";
+    
+    // checkboxes foreach date column (unvisible via CSS until checkbox above is selected)
+    foreach($date_filters as $val){
+      $checked = "";
+      if( !empty($_GET['_missing_date']) && in_array($val, $_GET['_missing_date']) )
+        $checked = " checked='checked'";
+      $html .= "<input type='checkbox' name='_missing_date[]' id='_missing_date_$val' value='$val'$checked />";
+      $html .= "<label for='_missing_date_$val'>".$this->rename[$val]."</label>";
+    }
+    
+    $html .= "</fieldset>\r\n";
+    
+    return $html;
+    
   }
   
   //////////////////////////////////////////////////////////////////////////////
@@ -1824,7 +1879,7 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
     $today = new DateTime();
     
     $interval = DateInterval::createFromDateString('6 month');
-    $period   = new DatePeriod($start, $interval, $today);
+    $period   = new DatePeriod($start, $interval, $today->modify("+6month"));
     
     $search_box .= "<select name='_from'>";
     foreach ($period as $dt) {
@@ -1874,6 +1929,7 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
       // use all default filters
       $html .= $this->search_box_filter_by_pos_neg_amount();
       $html .= $this->search_box_filter_between_dates();
+      $html .= $this->search_box_filter_missing_date();
       $html .= $this->search_box_filter_by_category();
       $html .= $this->search_box_filter_full_text_search();
       
