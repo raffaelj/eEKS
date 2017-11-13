@@ -63,7 +63,7 @@ class eEKS extends lazy_mofo{
   public $wkhtmltopdf_path = 'wkhtmltopdf';
   
   // optional configuration via ini file
-  private $config = array();
+  public $config = array();
   
   // EKS profile via ini file
   private $eks_config = array();
@@ -128,8 +128,8 @@ class eEKS extends lazy_mofo{
    * custom category filters: _cat_01... - coming soon
    */
   
-  public $query_string_list = "_date_between,_from,_to,_amount,_type_of_costs,_mode_of_employment,_edit_table";
-  public $query_string_list_post = "_edit_table";
+  public $query_string_list = "";
+  public $query_string_list_post = "";
   
   
   //////////////////////////////////////////////////////////////////////////////
@@ -241,69 +241,107 @@ class eEKS extends lazy_mofo{
     
     $html .= "<div class='lm_error'><p>Dashboard - coming soon</p></div>";
     
+    //// unpayed invoices
+    
+    // income
+    $_GET['_missing_date_on'] = "1";
+    $_GET['_missing_date'][] = "value_date";
+    $_GET['_amount'] = "pos";
+    
+    $this->multi_column_on = false;
+    $tmp_active_columns = $this->config['active_columns'];
+    $this->config['active_columns'] = array(
+      "ID" => 1
+      ,"invoice_number" => 1
+      ,"value_date" => 1
+      ,"voucher_date" => 1
+      ,"gross_amount" => 1
+      ,"customer_supplier" => 1
+      ,"object" => 1
+      ,"edit_delete_column" => 1
+    );
+    
+    $this->set_grid_view_parameters();
+    $link = $this->get_uri_path() . $this->get_qs();
+    
+    $html .= "<div class='dash_box'>";
+    $html .= "<a href='$link'>";
+    $html .= "<h2>Do I have to send an admonition?</h2>";
+    $html .= "</a>";
+    
+    $html .= $this->grid('', true);
+    
+    $html .= "</div>";
+    
+    
+    // unpayed invoices - costs
+    $_GET['_amount'] = "neg";
+    
+    $this->config['active_columns'] = array(
+      "ID" => 1
+      ,"value_date" => 1
+      ,"voucher_date" => 1
+      ,"gross_amount" => 1
+      ,"customer_supplier" => 1
+      ,"object" => 1
+      ,"edit_delete_column" => 1
+    );
+    
+    $this->set_grid_view_parameters();
+    $link = $this->get_uri_path() . $this->get_qs();
+    
+    $html .= "<div class='dash_box'>";
+    $html .= "<a href='$link'>";
+    $html .= "<h2>Hey, don't forget to pay your crazy stuff!</h2>";
+    $html .= "</a>";
+    
+    $html .= $this->grid('', true);
+    
+    // reset variables
+    unset($_GET['_missing_date_on']);
+    unset($_GET['_missing_date']);
+    unset($_GET['_amount']);
+    $this->config['active_columns'] = $tmp_active_columns;
+    
+    $html .= "</div>";
+    
     $html .= "<div class='center'>";
     
-    // sums of last three months
-    $html .= "<div class='dash_box'>";
-    $html .= "<h2>last three months</h2>";
+    //// sums of last three months
     
     // set only _from, if _to is not set `generate_grid_sql_monthly()` expects _to = today
     $_GET['_from'] = (new DateTime())->modify("- 3 months")->modify("first day of this month")->format($this->date_out);
+    $_GET['_view'] = "monthly_sums";
     
-    $this->set_grid_view_parameters("monthly_sums");
+    $this->set_grid_view_parameters();
+    $link = $this->get_uri_path() . $this->get_qs();
+    
+    $html .= "<div class='dash_box'>";
+    $html .= "<a href='$link'>";
+    $html .= "<h2>last three months</h2>";
+    $html .= "</a>";
     
     $html .= $this->grid('', true);
     
     unset($_GET['_from']);
-    
-    $html .= "</div>";
-    
-    // custom sorted, filtered, grouped grid(s)
-    $html .= "<div class='dash_box'>";
-    $html .= "<h2>something with filters</h2>";
-    
-    $html .= "</div>";
-    
-    // graphs
-    $html .= "<div class='dash_box graph'>";
-    $html .= "<h2>maybe a graph, because it looks cool</h2>";
-    
-    
-    $_GET['_from'] = "01.06.2016";
-    $_GET['_to'] = "31.12.2016";
-    
-    $this->set_grid_view_parameters("monthly_sums");
-    
-    $html .= $this->grid('', true);
-    
-    unset($_GET['_from']);
-    unset($_GET['_to']);
-    
-    $html .= "</div>";
-    
-    
-    // notes
-    $html .= "<div class='dash_box'>";
-    $html .= "<h2>unpayed invoices</h2>";
-    
-    
-    $html .= "</div>";
-    
-    // a wide one - unpayed invoices
-    $html .= "<div class='dash_box wide'>";
-    $html .= "<h2>another table with a lot of columns</h2>";
-    
-    $_GET['_view'] = "missing_date";
-    $this->set_grid_view_parameters("missing_date");
-    $this->multi_column_on = true;
-    
-    $html .= $this->grid('', true);
-    
     unset($_GET['_view']);
     
     $html .= "</div>";
     
+    // graphs
+    $html .= "<div class='dash_box'>";
+    $html .= "<h2>maybe a graph, because it looks cool</h2>";
+    
+    
     $html .= "</div>";
+    
+    // a wide one
+    $html .= "<div class='dash_box wide'>";
+    $html .= "<h2>another table with a lot of columns</h2>";
+    
+    $html .= "</div>";
+    
+    $html .= "</div>";// close surrounding div
     
     return $html;
     
@@ -460,7 +498,6 @@ class eEKS extends lazy_mofo{
       $this->grid_input_control[$this->table] = "--text";
       
       $this->grid_input_control['coa_jobcenter_eks_01_2017'] = 'SELECT ID AS val, type_of_costs AS opt FROM coa_jobcenter_eks_01_2017 ORDER BY ID ASC;--select';
-      // $this->grid_input_control['coa_jobcenter_eks_01_2017'] = 'SELECT ID AS val, ID AS opt FROM coa_jobcenter_eks_01_2017 ORDER BY ID ASC;--select';
       
     }
     
@@ -1766,7 +1803,7 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
       if( !empty($_GET['_missing_date']) && in_array($val, $_GET['_missing_date']) )
         $checked = " checked='checked'";
       $html .= "<input type='checkbox' name='_missing_date[]' id='_missing_date_$val' value='$val'$checked />";
-      $html .= "<label for='_missing_date_$val'>".$this->rename[$val]."</label>";
+      $html .= "<label for='_missing_date_$val'>".$this->translate($val, "pretty")."</label>";
     }
     
     $html .= "</fieldset>\r\n";
@@ -2745,8 +2782,13 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
     $get = '';
     $arr = explode(',', trim($query_string_list, ','));
     foreach($arr as $var){
-      if(mb_strlen(@$_REQUEST[$var]) > 0)
-        $get .= "&amp;$var=" . urlencode($_REQUEST[$var]);
+      if( !empty($_GET[$var]) ){
+        if(!is_array($_GET[$var]))
+          $get .= "&amp;$var=" . urlencode($_GET[$var]);
+        else
+          foreach($_GET[$var] as $key=>$val)
+            $get .= "&amp;{$var}[]=" . urlencode($_GET[$var][$key]);
+      }
     }
 
     return mb_substr($get, 5);

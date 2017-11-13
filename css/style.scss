@@ -428,6 +428,7 @@ tr {
   display:none;
   + label{
     display: inline-block;
+    @include box-sizing(unset);
     &:hover, &:focus{
       background-color:$clr_alarm_dark;
       color:$clr_white;
@@ -1638,8 +1639,10 @@ $size: 1.5em;
 ////// dashboard
 .dash_box{
   display: inline-block;
-  width:24%;
-  height:300px;
+  // width:24%;
+  width:49%;
+  height:auto;
+  max-height:300px;
   margin: .5%;
   padding: 0;
   @include box-sizing(border-box);

@@ -107,6 +107,8 @@ $eeks->run();
 // print_r($eeks->view_filter);
 // print_r($eeks->get_qs('_order_by,_desc,_offset,_search,_pagination_off,_view,_lang'));
 // print_r($eeks->get_qs('_view,_lang'));
+// var_dump($eeks->config['active_columns']);
+// print_r($_GET);
 // echo "</pre></code>";
 
 ?>

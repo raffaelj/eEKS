@@ -93,6 +93,8 @@ $this->translate['missing_date'] = "ohne Datum";
 $this->translate['edit_tables'] = "Tabellen bearbeiten";
 $this->translate['hide'] = "ausblenden";
 $this->translate['show'] = "anzeigen";
+$this->translate['value_date'] = 'Zahlungsdatum';
+$this->translate['voucher_date'] = 'Belegdatum';
 
 // number format
 $this->decimals = 2;

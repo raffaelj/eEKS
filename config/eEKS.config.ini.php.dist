@@ -29,6 +29,12 @@ grid_repeat_header_at = 25
 ;; activate checkboxes for multiple deletions
 grid_multi_delete = false
 
+;; 
+query_string_list = "_date_between,_from,_to,_amount,_type_of_costs,_mode_of_employment,_edit_table,_missing_date_on,_missing_date"
+
+;; 
+query_string_list_post = "_edit_table"
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; eEKS specific config
 
@@ -114,7 +120,7 @@ notices = true
 graphs = true
 
 ;; active columns in default table to show in grid
-;; comment or uncomment the following lines for your needs
+;; set to true to activate or to false to deactivate
 [active_columns]
 ID = true
 value_date = true
