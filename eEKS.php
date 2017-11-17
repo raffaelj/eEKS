@@ -47,6 +47,10 @@ class eEKS extends lazy_mofo{
   public $search_in_columns = array();  // full text search
   public $amount_filter = "";           // positive/negative/all amounts
   
+  // display sums of columns in the last row of the grid
+  public $grid_show_column_sums = false;
+  public $sum_these_columns = array();
+  
   // inject rows into grid for column sums, carryovers, additional infos etc.
   public $inject_rows = array();
   
@@ -482,6 +486,7 @@ class eEKS extends lazy_mofo{
       
       // disable multi-value column
       $this->multi_column_on = false;
+      $this->grid_show_column_sums = false;
       
       $this->form_sql = "";
       $this->grid_sql = "";
@@ -511,10 +516,7 @@ class eEKS extends lazy_mofo{
     // missing_date
     elseif($view == "missing_date"){
       $_GET['_missing_date_on'] = 1;
-      if( !empty($_GET['_missing_date']) )
-        foreach($_GET['_missing_date'] as $val)
-          $_GET['_missing_date'][] = $val;
-      else
+      if( empty($_GET['_missing_date']) )
         foreach($this->date_filters as $val)
           $_GET['_missing_date'][] = $val;
       $this->grid_sql = $this->generate_grid_sql();
@@ -522,7 +524,6 @@ class eEKS extends lazy_mofo{
     
     
     // default: accounting with generate_grid_sql()
-    // else default, missing_date, null
     else
       $this->grid_sql = $this->generate_grid_sql();
     
@@ -558,6 +559,7 @@ class eEKS extends lazy_mofo{
     // reset some grid features
     $this->multi_column_on = false;
     $this->grid_repeat_header_at = false;
+    $this->grid_show_column_sums = false; // disable column sums
     
     $html = "";
     
@@ -759,6 +761,8 @@ class eEKS extends lazy_mofo{
       // inject rows with sums/carryover
       $sql = $this->generate_grid_sql_eks(3, true);
       $this->inject_rows['last'] = $this->query($sql, $this->grid_sql_param);
+      $this->inject_rows['last'][0]['ID'] = "";
+      $this->inject_rows['last'][0]['type_of_costs'] = "Summe A1-A7";
       
       // grid
       $this->grid_sql = $this->generate_grid_sql_eks(3);
@@ -777,6 +781,8 @@ class eEKS extends lazy_mofo{
       $sql = $this->generate_grid_sql_eks(4, true); // sum of page 4
       $sum_page_4 = $this->query($sql, $this->grid_sql_param);
       $this->inject_rows["last"] = $sum_page_4;
+      $this->inject_rows['last'][0]['ID'] = "";
+      $this->inject_rows['last'][0]['type_of_costs'] = "Zwischensumme B1-B7";
       
       
       // grid
@@ -794,12 +800,18 @@ class eEKS extends lazy_mofo{
       
       // inject rows with sums/carryover
       $this->inject_rows[1] = $sum_page_4; // carryover from page 4
+      $this->inject_rows[1][0]['ID'] = "";
+      $this->inject_rows[1][0]['type_of_costs'] = "Übertrag B1-B7";
       
       $sql = $this->generate_grid_sql_eks("4,5", true); // sum of all costs
       $this->inject_rows[22] = $this->query($sql, $this->grid_sql_param);
+      $this->inject_rows[22][0]['ID'] = "";
+      $this->inject_rows[22][0]['type_of_costs'] = "Summe B1-B18";
       
       $sql = $this->generate_grid_sql_eks("3,4,5", true); // total income - costs
       $this->inject_rows[23] = $this->query($sql, $this->grid_sql_param);
+      $this->inject_rows[23][0]['ID'] = "";
+      $this->inject_rows[23][0]['type_of_costs'] = "Gewinn";
       
       // grid
       $this->grid_sql = $this->generate_grid_sql_eks(5);
@@ -1306,10 +1318,32 @@ class eEKS extends lazy_mofo{
     $html .= "<table class='lm_grid'>\r\n";
     $html .= $head;
     
+    // optional: sums of results
+    $sum = array();
+    if($this->grid_show_column_sums){
+      foreach($columns as $col){
+        // no settings: sum everything except identity_name
+        if(!$this->sum_these_columns && $col != $this->identity_name)
+          $sum[$col] = array_sum(array_column($result, $col));
+        // with settings: sum defined column(s)
+        elseif( in_array($col, $this->sum_these_columns) ){
+          $sum[$col] = array_sum(array_column($result, $col));
+        }
+        else
+          $sum[$col] = "";
+      }
+      // inject row with sums into result
+      $this->inject_rows['last'][0] = $sum;
+      $this->inject_rows['last'][0]["ID"] = $this->translate("sum");
+    }
+      
     // optional: inject rows at specified positions into $result
-    if(count($this->inject_rows) > 0)
+    $count_inject_rows = count($this->inject_rows);
+    if($count_inject_rows > 0)
       $result = $this->inject_rows_into_result($result);
-
+    
+    $count_result = count($result);
+    
     // print rows
     $j = 0;
     foreach($result as $row){
@@ -1319,8 +1353,15 @@ class eEKS extends lazy_mofo{
       if(@$_GET[$this->identity_name] == @$row[$this->identity_name] && mb_strlen(@$_GET[$this->identity_name]) > 0)
         $shaded = " class='lm_active'";
       
-      // print a row
-      $html .= "<tr$shaded>\r\n";
+      
+      // add class to column sums
+      if($this->grid_show_column_sums && $j == $count_result - 1){
+        $shaded = " class='column_sums'";
+      }
+      
+      
+      $html .= "<tr$shaded>\r\n";// print a row
+      
 
       // delete selection checkbox
       if($this->grid_multi_delete){
@@ -1339,12 +1380,15 @@ class eEKS extends lazy_mofo{
         $title = $this->format_title($column_name, @$this->rename[$column_name]);
 
         $value = $row[$column_name];
-
+        
         // edit & delete links
         if($column_name == $this->identity_name && $i == ($column_count - 1))
-          $edit_delete .= "    <td class='col_edit'>" . str_replace('[identity_id]', $value, $links) . "</td>\n";
+          if($this->grid_show_column_sums && $j == $count_result - 1)
+            $edit_delete .= "<td class='col_edit'></td>";
+          else
+            $edit_delete .= "    <td class='col_edit'>" . str_replace('[identity_id]', $value, $links) . "</td>\n";
         
-        // test with multi-value column
+        // experimental multi-value column
         elseif(in_array($column_name, $this->multi_column) && $this->multi_column_on){
           $multi_column_content .= "<div>";
           if(mb_strlen($value) > 0) $multi_column_content .= "$title: ";
@@ -1382,7 +1426,7 @@ class eEKS extends lazy_mofo{
       if($this->grid_repeat_header_at > 0)
         if($j % $this->grid_repeat_header_at == 0 && $j < $count && $j > 0)
           $html .= str_replace('<tr', '<tr class="grid_repeat_header"',$head);
-          
+      
       // row counter    
       $j++;
     }
@@ -1492,13 +1536,13 @@ class eEKS extends lazy_mofo{
     // add WHERE clause for full text search
     if(!empty($where)){
       
-      $query .= "WHERE (";
+      $query .= "WHERE (\r\n";
       
       $i = 0;
       foreach($where as $val){
         if($i != 0)
-          $query .= "OR ";
-        $query .= "COALESCE(a.$val, '') LIKE :_search\r\n";
+          $query .= "  OR\r\n";
+        $query .= "  COALESCE(a.$val, '') LIKE :_search\r\n";
         $i++;
       }
       
@@ -1554,7 +1598,7 @@ class eEKS extends lazy_mofo{
           $query .= " OR $val IS NULL";
       }
       
-      $query .= ")";
+      $query .= ")\r\n";
     }
     
     
@@ -1578,13 +1622,22 @@ class eEKS extends lazy_mofo{
   }//end of generate_grid_sql
   
   //////////////////////////////////////////////////////////////////////////////
-  function generate_grid_sql_monthly($date = "value_date", $group = "type_of_costs", $no_group_by = false){
+  function generate_grid_sql_monthly($date = "", $group = "", $no_group_by = false){
     
     // purpose: sql query for monthly sums of amounts with $date, grouped by $group
     
     // needs some more work to make it portable without joins or tables with different identity_names
     
     // expected default dates need some adjusting and/or user definable variables
+    if(isset($this->date_filters[0]))
+      $date = $this->date_filters[0];
+    else
+      $this->display_error("specify a column in your date filter", "generate_grid_sql_monthly()");
+    
+    if(isset($this->category_filters[0]))
+      $group = $this->category_filters[0];
+    else
+      $this->display_error("specify a column in your category filter", "generate_grid_sql_monthly()");
     
     // start query
     $query = "";
@@ -1633,14 +1686,21 @@ class eEKS extends lazy_mofo{
       $month = $dt->format('m');
       $year = $dt->format('Y');
       $col = $dt->format('M (y)');
-      $query .= ",SUM( CASE WHEN extract(month from a.$date) = $month AND extract(year from a.$date) = $year THEN a.gross_amount ELSE 0 END ) AS '$col'\r\n";
+      $query .= ",SUM( CASE WHEN EXTRACT(MONTH FROM a.$date) = $month AND EXTRACT(YEAR FROM a.$date) = $year THEN a.gross_amount ELSE 0 END ) AS '$col'\r\n";
       
-      // grid output control
+      // set grid output control
       $this->grid_output_control[$col] = '--number';
-      $this->grid_output_control['sum'] = '--number';
+      
+      // set column sums
+      $this->sum_these_columns[] = $col;
       
       $count_months++;
     }
+    // set grid output control
+    $this->grid_output_control['sum'] = '--number';
+    // set column sums
+    $this->sum_these_columns[] = "sum";
+    $this->sum_these_columns[] = "average";
     
     // sum
     $query .= ",SUM(COALESCE(NULLIF(a.gross_amount, ''), 0)) as sum\r\n";
@@ -1652,19 +1712,29 @@ class eEKS extends lazy_mofo{
     $query .= "RIGHT OUTER JOIN $group t\r\n";
     $query .= "ON a.$group = t.ID\r\n";
     
+    // add WHERE clause(s) for negative/positive amounts
+    if(mb_strlen($this->amount_filter) > 0){
+      $column = $this->amount_filter;
+      $amount = "";
+      if(!empty($_GET["_amount"]))
+        $amount = $this->clean_out($_GET["_amount"]);
+      if($amount == "pos")
+        $query .= "WHERE a.$column >= 0\r\n";
+      if($amount == "neg")
+        $query .= "WHERE a.$column < 0\r\n";
+    }
+    
     // add AND clause for filter by category
     foreach($this->category_filters as $val){
       if(!empty($_GET["_$val"])){
-        if( $val == 'type_of_costs' )
-          $query .= "WHERE( a.$val LIKE :_$val)\r\n";
-        else
-          $query .= "AND a.$val LIKE :_$val\r\n";
+        $query .= "AND a.$val LIKE :_$val\r\n";
         $this->grid_sql_param[":_$val"] = $this->clean_out(@$_GET["_$val"]);
       }
     }
     
     $query .= "AND a.$date BETWEEN '$from' AND '$to'\r\n";
-    $query .= "GROUP BY t.$group\r\n";
+    if(!$no_group_by)
+      $query .= "GROUP BY t.$group\r\n";
     
     $query .= "ORDER BY t.is_income DESC, t.sort_order ASC, t.$group ASC\r\n";
     
@@ -1701,7 +1771,7 @@ class eEKS extends lazy_mofo{
       $month = $dt->format('m');
       $year = $dt->format('Y');
       $col = $dt->format('M (y)');
-      $query .= ",SUM( CASE WHEN extract(month from a.$date) = $month AND extract(year from a.$date) = $year THEN a.gross_amount ELSE 0 END ) AS '$col'\r\n";
+      $query .= ",SUM( CASE WHEN EXTRACT(MONTH FROM a.$date) = $month AND EXTRACT(YEAR FROM a.$date) = $year THEN a.gross_amount ELSE 0 END ) AS '$col'\r\n";
       
       // grid output control
       $this->grid_output_control[$col] = '--number';
@@ -2555,7 +2625,7 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
 
     $msg = nl2br($this->clean_out("Error: $error\nSent From: $source_function"));
     
-    $this->error = "<div class='lm_error'><p>$msg</p></div>" ;
+    $this->error .= "<div class='lm_error'><p>$msg</p></div>" ;
 
   }
   
@@ -2853,6 +2923,92 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
     
   }
   
+  //////////////////////////////////////////////////////////////////////////////
+  private $debug_count = 0;
+  function debug($var, $str = "", $out = "print"){
+    
+    // purpose: output of readable content for arrays and variables
+
+    $str = $this->debug_count.": $str";
+        
+    $html = "";
+    $html .= "<div class='debug'>";
+    $html .= "<input type='checkbox' id='debug$this->debug_count' /><label for='debug$this->debug_count' class='lm_button'>$str</label>";
+    $html .= "<pre>";
+    if($out == "export")
+      $html .= var_export($var, true);
+    elseif($out == "dump"){
+      ob_start();
+      var_dump($var);
+      $html .= ob_get_clean();
+    }
+    else
+      $html .= print_r($var, true);
+    $html .= "</pre>";
+    $html .= "</div>";
+    
+    $this->debug_count++;
+    
+    echo $html;
+  }
+  
+  function get_pagination($count, $limit, $_offset, $_pagination_off){
+
+        // purpose: pagination for grid
+        
+        // changes: added only ',_view,_lang' to get_qs()
+
+        static $id = 0;    // for unique active page input id
+        $get = $this->get_qs('_order_by,_desc,_search,_view,_lang');
+        $active_page = floor($_offset / $limit) + 1; 
+        $total_page = ceil($count / $limit);
+        $uri_path = $this->get_uri_path();
+
+        if($count <= 0)
+            return;
+
+        $use_paging_link = '';
+        if($_pagination_off == 1)
+            $use_paging_link = "<a href='{$uri_path}_pagination_off=0&amp;$get' rel='nofollow'>$this->pagination_text_use_paging</a>";
+
+        if($_pagination_off == 1 || $count <= $limit) 
+            return number_format($count) . " $this->pagination_text_records $use_paging_link";
+
+        // simple text input for page number on giant datasets. use drop-down for smaller datasets.
+        if($count > 100000){
+            $input = "<input type='text' size='7' id='active_page_$id' value='$active_page' ><input type='button' value='$this->pagination_text_go' onclick='window.location.href=\"{$uri_path}_offset=\" + ((document.getElementById(\"active_page_$id\").value * $limit) - $limit) + \"&amp;$get\"'>";
+        }
+        else
+        {
+            $input = "<select onchange='window.location.href=\"{$uri_path}_offset=\" + this.options[this.selectedIndex].value + \"&amp;$get\"'>";
+            for($i = 0, $p = 1; $i < $count; $i += $limit, $p++){
+                $sel = '';
+                if($p == $active_page)
+                    $sel .= "selected='selected'";
+
+                $input .= "<option value='$i' $sel>$p</option>";
+            }
+            $input .= "</select>";
+        }        
+
+        $pagination = "$this->pagination_text_page: $input $this->pagination_text_of $total_page &nbsp; ";
+        
+        if($_offset == 0)
+            $pagination .= " $this->pagination_text_back ";
+        else
+            $pagination .= " <a href='{$uri_path}_offset=" . ($_offset - $limit) . "&amp;$get'>$this->pagination_text_back</a> ";
+
+        if($active_page >= $total_page)
+            $pagination  .= " $this->pagination_text_next ";
+        else
+            $pagination  .= " <a href='{$uri_path}_offset=" . ($_offset + $limit) . "&amp;$get'>$this->pagination_text_next</a> ";
+
+        $pagination .= " &nbsp; " . number_format($count) . " $this->pagination_text_records <a href='{$uri_path}_pagination_off=1&amp;$get' rel='nofollow'>$this->pagination_text_show_all</a> ";
+
+        $id++;
+        return $pagination;
+
+  }
   
   
   

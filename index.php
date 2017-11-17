@@ -95,20 +95,15 @@ $eeks->grid_output_control['gross_amount'] = '--number'; //
 // run eEKS/LM
 $eeks->run();
 
-// echo "<pre><code style='font-size: .7em;'>";
-// print_r($eeks->get_action());
-// echo "\r\n";
-// print_r($eeks->grid_sql);
-// echo "<hr>";
-// print_r($eeks->grid_sql_param);
-// echo "<hr>";
-// print_r($eeks->inject_rows);
-// print_r($eeks->column_sums);
-// print_r($eeks->view_filter);
-// print_r($eeks->get_qs('_order_by,_desc,_offset,_search,_pagination_off,_view,_lang'));
-// print_r($eeks->get_qs('_view,_lang'));
-// var_dump($eeks->config['active_columns']);
-// print_r($_GET);
-// echo "</pre></code>";
+$eeks->debug($eeks->get_action(),"action");
+$eeks->debug($eeks->inject_rows,"inject_rows");
+// $eeks->debug($eeks->view_filter,"view_filter");
+// $eeks->debug($eeks->get_qs('_order_by,_desc,_offset,_search,_pagination_off,_view,_lang'));
+// $eeks->debug($eeks->get_qs('_view,_lang'));
+// $eeks->debug($eeks->config['active_columns'],"columns");
+$eeks->debug($eeks->grid_show_column_sums,"column sums on");
+$eeks->debug($_GET,"GET");
+$eeks->debug($eeks->grid_sql, "sql");
+$eeks->debug($eeks->grid_sql_param,"sql param");
 
 ?>

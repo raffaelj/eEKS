@@ -306,11 +306,12 @@ tr {
   // different colors for even and odd rows
   &:nth-child(even) td {background-color: $clr_white_tr;}
   &:nth-child(odd) td {background-color: $clr_grey_light_tr;}
+  &:nth-child(odd):last-child td {border-bottom-color:transparent;}
   // highlight hover and current row edited
   &.lm_active td, &:hover td {background: $clr_confirm_tr;}
   &.column_sums td{
     font-weight:bold;
-    border-top:1px solid $clr_grey_dark;
+    border-top:1px dotted $clr_grey_dark;
     word-break: normal;
     @include hyphens(none);
   }
@@ -1381,6 +1382,9 @@ $size: 1.5em;
     height:$zoom * 78px;//195
   }
   tr{
+    &:last-child{
+      font-weight:bold;
+    }
     &:nth-child(n+2):nth-child(-n+6),&:last-child{
       height:$zoom * 8px;//20
       line-height:$zoom * 8px;//20
@@ -1476,6 +1480,7 @@ $size: 1.5em;
     &:nth-child(18){// last row
       height:$zoom * 8px;//20
       line-height:$zoom * 8px;//20
+      font-weight:bold;
     }
   
   }
@@ -1524,6 +1529,7 @@ $size: 1.5em;
     &:nth-child(2){
       height:$zoom * 10px;//25
       line-height:$zoom * 10px;//25
+      font-weight:bold;
     }
     &:nth-child(3),&:nth-child(9){// space for comments above
       margin-top:$zoom * 5.4px;//13.5
@@ -1538,10 +1544,12 @@ $size: 1.5em;
     &:nth-child(22){
       height:$zoom * 10px;//25;
       line-height:$zoom * 10px;//25;
+      font-weight:bold;
     }
     &:last-child{// last row right now 22, should be 23
       height:$zoom * 7.6px;//19
       line-height:$zoom * 7.6px;//19
+      font-weight:bold;
     }
     
     &:nth-child(n+13):nth-child(-n+17) td:nth-child(2){ // display custom types of costs
@@ -1664,4 +1672,29 @@ $size: 1.5em;
   }
 }
 
-
+////// debug helper
+.debug{
+  display:inline-block;
+  margin-right: .1em;
+  padding: .1em .5em;
+  border: 1px solid #ccc;
+  vertical-align:top;
+  @media print{display:none;}
+  input{
+    display:none;
+    + label{
+      display:block;
+      margin-left:0;
+      padding:2px;
+      vertical-align:top;
+      + pre{
+        display:none;
+        margin:0;
+      }
+    }
+    &:checked + label + pre{
+      display:block;
+      font-size: .7em;
+    }
+  }
+}

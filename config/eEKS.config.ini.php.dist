@@ -24,7 +24,7 @@ grid_limit = 50
 grid_ellipse_at = 80
 
 ;; interval of records to repeat header column titles at
-grid_repeat_header_at = 25
+grid_repeat_header_at = 26
 
 ;; activate checkboxes for multiple deletions
 grid_multi_delete = false
@@ -65,7 +65,10 @@ background_image = ""
 
 ;; turn multi-value column on
 multi_column_on = true
-; multi_column_on = false
+
+;; display sums of columns in the last row of the grid
+grid_show_column_sums = true
+sum_these_columns[] = gross_amount
 
 ;; use renamed column names for CSV export
 rename_csv_headers = true
@@ -89,6 +92,7 @@ multi_column[] = notes_02
 ;;;; search filters
 
 ;; date filters
+;; the first one is used as default in monthly_sums
 date_filters[] = value_date
 date_filters[] = voucher_date
 
@@ -97,6 +101,7 @@ search_in_columns[] = customer_supplier
 search_in_columns[] = object
 
 ;; column names of category filters in search box
+;; the first one is used as default in monthly_sums
 category_filters[] = type_of_costs
 category_filters[] = mode_of_employment
 ; category_filters[] = cat_01
@@ -105,9 +110,21 @@ category_filters[] = mode_of_employment
 amount_filter = gross_amount
 
 ;; filters per view
+;; options:
+;; by_pos_neg_amount
+;; between_dates
+;; missing_date
+;; by_category
+;; full_text_search
+;; eks_date_range
+;; choose_eks_profile
 [view_filter]
 eks[] = eks_date_range
 eks[] = choose_eks_profile
+monthly_sums[] = by_pos_neg_amount
+monthly_sums[] = between_dates
+monthly_sums[] = by_category
+edit_tables[] =
 
 ;; dashboard
 [dashboard]
