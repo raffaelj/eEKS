@@ -9,6 +9,44 @@ if(!ob_start('ob_gzhandler'))
 
 header('Content-Type: text/html; charset=utf-8');
 
+
+//////////////////////////////////////////////////////////////////////////////
+function is_income(){
+  
+  // purpose: check for correct sign of amount in form if type_of_costs is set
+  // returns true if is income, else false
+  
+  global $eeks;
+  
+  $toc = $eeks->clean_out(@$_POST['type_of_costs']);
+  
+  if(mb_strlen($toc) == 0) // can't validate without type_of_costs
+    return true;
+  else{
+    $sql = "SELECT ID FROM type_of_costs WHERE ID = $toc AND is_income = true";
+    $result = $eeks->query($sql);
+    
+    $amount = $eeks->clean_out(@$_POST['gross_amount']);
+    
+    // reimbursements
+    $is_reimbursement = false;
+    if( $eeks->clean_out(@$_POST['is_reimbursement']) == 1 )
+      $is_reimbursement = true;
+    
+    if( !empty($result) && $amount >= 0 && !$is_reimbursement )
+      return true; // is income and has plus sign
+    elseif( empty($result) && $amount <= 0 && !$is_reimbursement )
+      return true; // is cost and has minus sign
+    elseif( !empty($result) && $amount <= 0 && $is_reimbursement )
+      return true; // is income, has minus sign, but is reimbursement
+    elseif( empty($result) && $amount >= 0 && $is_reimbursement )
+      return true; // is cost, has plus sign, but is reimbursement
+    else
+      return false;
+  }
+  
+}
+
 // enter your database host, name, username, and password in
 // 'eEKS.db.ini.php.dist' and rename the file to 'eEKS.db.ini.php'
 // change the path to '../eEKS.db.ini.php' if you want to
@@ -27,8 +65,11 @@ catch(PDOException $e) {
 	die('pdo connection error: ' . $e->getMessage());
 }
 
+
+
 // create LM/eEKS object, pass in PDO connection and i18n code
 $eeks = new eEKS($dbh, '', 'eEKS.config.ini.php');
+
 
 $eeks->form_sql = "
 SELECT
@@ -40,14 +81,15 @@ SELECT
 , a.account
 , a.invoice_number
 , a.customer_supplier
-, a.posting_text
-, a.object
+/* , a.posting_text */
+, a.item
 , a.type_of_costs
 , a.mode_of_employment
-, a.cat_01
-, a.cat_02
-, a.cat_03
-, a.cat_04
+, a.scope
+, a.project
+/* , a.cat_01 */
+/* , a.cat_02 */
+/* , a.cat_03 */
 /* , a.cat_05 */
 , a.notes_01
 , a.notes_02
@@ -57,6 +99,7 @@ SELECT
 , a.file_01
 /* , a.file_02 */
 /* , a.file_03 */
+, a.is_reimbursement
 FROM accounting a
 WHERE a.ID = :ID
 ";
@@ -69,8 +112,12 @@ $eeks->form_input_control['file_01'] = '--image';
 $eeks->form_input_control['file_02'] = '--image';
 $eeks->form_input_control['file_03'] = '--image';
 
+$eeks->form_input_control['is_reimbursement'] = '--checkbox';
+
 $eeks->form_input_control['type_of_costs'] = 'SELECT ID AS val, type_of_costs AS opt FROM type_of_costs ORDER BY is_income DESC, sort_order ASC, type_of_costs ASC;--select';
-$eeks->form_input_control['mode_of_employment'] = 'SELECT ID, mode_of_employment FROM mode_of_employment;--select';
+$eeks->form_input_control['mode_of_employment'] = 'SELECT ID, mode_of_employment FROM mode_of_employment ORDER BY sort_order ASC, mode_of_employment ASC;--select';
+$eeks->form_input_control['scope'] = 'SELECT ID, scope FROM scope ORDER BY sort_order ASC, scope ASC;--select';
+$eeks->form_input_control['project'] = 'SELECT ID, project FROM project ORDER BY sort_order ASC, project ASC;--select';
 $eeks->form_input_control['account'] = 'SELECT NULL, "nicht angegeben" UNION SELECT "Girokonto", "Girokonto" UNION SELECT "Barkasse", "Barkasse"; --radio';
 
 $eeks->grid_output_control['file_01'] = '--image'; // image clickable
@@ -78,6 +125,11 @@ $eeks->grid_output_control['file_02'] = '--image'; // image clickable
 $eeks->grid_output_control['file_03'] = '--image'; // image clickable
 
 $eeks->grid_output_control['gross_amount'] = '--number'; // 
+
+
+$eeks->on_insert_validate['gross_amount'] = array('is_income', 'Only costs have negative signs.', '-0'.$eeks->dec_point.'00');
+// copy validation rules to update - same rules
+$eeks->on_update_validate = $eeks->on_insert_validate;
 
 // $eeks->grid_input_control['value_date'] = '--date';
 // $eeks->grid_input_control['voucher_date'] = '--date';
@@ -95,15 +147,15 @@ $eeks->grid_output_control['gross_amount'] = '--number'; //
 // run eEKS/LM
 $eeks->run();
 
-$eeks->debug($eeks->get_action(),"action");
-$eeks->debug($eeks->inject_rows,"inject_rows");
+// $eeks->debug($eeks->get_action(),"action");
+// $eeks->debug($eeks->inject_rows,"inject_rows");
 // $eeks->debug($eeks->view_filter,"view_filter");
 // $eeks->debug($eeks->get_qs('_order_by,_desc,_offset,_search,_pagination_off,_view,_lang'));
 // $eeks->debug($eeks->get_qs('_view,_lang'));
-$eeks->debug($eeks->config['active_columns'],"columns");
+// $eeks->debug($eeks->config['active_columns'],"columns");
 // $eeks->debug($eeks->grid_show_column_sums,"column sums on");
-$eeks->debug($_GET,"GET");
-$eeks->debug($eeks->grid_sql, "sql");
-$eeks->debug($eeks->grid_sql_param,"sql param");
+// $eeks->debug($_GET,"GET");
+// $eeks->debug($eeks->grid_sql, "sql");
+// $eeks->debug($eeks->grid_sql_param,"sql param");
 
 ?>

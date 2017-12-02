@@ -7,9 +7,6 @@ ID                ID --> evtl. = Beleg-Nr.
 date_created      ErstellDatum
 date_last_changed ÄnderungsDatum
 
-date_created      ErstellDatum
-date_last_changed ÄnderungsDatum
-
 value_date        ZahlDatum
 voucher_date      BelegDatum/Rechnungsdatum
 gross_amount      Bruttobetrag
@@ -18,15 +15,14 @@ account           Konto
 invoice_number    RechnungsNr
 customer_supplier Auftraggeber/Empfänger, Händler/Kunde
 posting_text      Buchungstext
-object            Zusatztext (was)
+item              Zusatztext (was)
 type_of_costs     KostenErloesArt
 mode_of_employment  ArtDerBeschaeftigung
-
-cat_01            Geschaeftsbereich
-cat_02            Projekt
-cat_03            Foerdermittelgeber_in
-cat_04            
-cat_05            
+scope             Geschaeftsbereich
+project           Projekt
+cat_01            Foerdermittelgeber_in
+cat_02            
+cat_03            
 
 notes_01          Notizen
 notes_02          Garantie

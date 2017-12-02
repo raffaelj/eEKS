@@ -84,7 +84,7 @@ $this->date_filter_to = "bis";
 // other words that need translation and may appear somewhere
 $this->translate['all'] = "alle";
 $this->translate['edit'] = "bearbeiten";
-$this->translate['income'] = "Einkommen";
+$this->translate['income'] = "Einnahmen";
 $this->translate['costs'] = "Ausgaben";
 $this->translate['settings'] = "Einstellungen";
 $this->translate['monthly'] = "monatlich";
@@ -95,6 +95,21 @@ $this->translate['hide'] = "ausblenden";
 $this->translate['show'] = "anzeigen";
 $this->translate['value_date'] = 'Zahlungsdatum';
 $this->translate['voucher_date'] = 'Belegdatum';
+$this->translate['sum'] = 'Summe';
+
+// month names (short)
+$this->translate['Jan'] = 'Jan';
+$this->translate['Feb'] = 'Feb';
+$this->translate['Mar'] = 'Mär';
+$this->translate['Apr'] = 'Apr';
+$this->translate['May'] = 'Mai';
+$this->translate['Jun'] = 'Jun';
+$this->translate['Jul'] = 'Jul';
+$this->translate['Aug'] = 'Aug';
+$this->translate['Sep'] = 'Sep';
+$this->translate['Oct'] = 'Okt';
+$this->translate['Nov'] = 'Nov';
+$this->translate['Dec'] = 'Dez';
 
 // number format
 $this->decimals = 2;
@@ -117,14 +132,14 @@ $this->rename['account'] = 'Konto';
 $this->rename['invoice_number'] = 'Rechnungs-Nr.';
 $this->rename['customer_supplier'] = 'Auftraggeber/ Zulieferer';
 $this->rename['posting_text'] = 'Buchungstext';
-$this->rename['object'] = 'Gegenstand';
+$this->rename['item'] = 'Gegenstand';
 $this->rename['type_of_costs'] = 'Kosten-/Erlösart';
 $this->rename['mode_of_employment'] = 'Beschäftigungsart';
-$this->rename['cat_01'] = 'Geschäftsbereich';
-$this->rename['cat_02'] = 'Projekt';
-$this->rename['cat_03'] = 'Fördermittelgeber_in';
-$this->rename['cat_04'] = 'Kategorie 4';
-$this->rename['cat_05'] = 'Kategorie 5';
+$this->rename['scope'] = 'Sparte';
+$this->rename['project'] = 'Projekt';
+$this->rename['cat_01'] = 'Fördermittelgeber_in';
+$this->rename['cat_02'] = 'Kategorie 2';
+$this->rename['cat_03'] = 'Kategorie 3';
 // $this->rename['cat_06'] = 'Kategorie 6';
 // $this->rename['cat_07'] = 'Kategorie 7';
 // $this->rename['cat_08'] = 'Kategorie 8';

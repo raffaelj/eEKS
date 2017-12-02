@@ -19,3 +19,10 @@ Besides eEKS uses other libraries or needs external software to be installed:
 * Author(s): Project maintained by [Ashish Kulkarni](https://github.com/ashkulz), originally created by [Jakob Truelsen](https://github.com/antialize). - [list of authors](https://github.com/wkhtmltopdf/wkhtmltopdf/blob/master/AUTHORS)
 * Use case: PDF export
 * [License](https://github.com/wkhtmltopdf/wkhtmltopdf/blob/master/LICENSE): GNU Lesser General Public License v3.0
+
+## Pikaday
+
+* [Source](https://github.com/dbushell/Pikaday)
+* Author(s): [David Bushell](), [Ramiro Rikkert]()
+* Use case: date picker for date date input fields
+* [License](https://github.com/dbushell/Pikaday/blob/master/LICENSE): Copyright © 2014 David Bushell | BSD & MIT license

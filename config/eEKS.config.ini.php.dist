@@ -35,6 +35,9 @@ query_string_list = "_date_between,_from,_to,_amount,_type_of_costs,_mode_of_emp
 ;; 
 query_string_list_post = "_edit_table"
 
+;; allow javascript
+allow_javascript = true
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; eEKS specific config
 
@@ -88,6 +91,7 @@ multi_column[] = account
 multi_column[] = cat_02
 multi_column[] = cat_03
 multi_column[] = notes_02
+; multi_column[] = is_reimbursement
 
 ;;;; search filters
 
@@ -98,7 +102,8 @@ date_filters[] = voucher_date
 
 ;; column names for full text search in search box
 search_in_columns[] = customer_supplier
-search_in_columns[] = object
+search_in_columns[] = item
+search_in_columns[] = notes_01
 
 ;; column names of category filters in search box
 ;; the first one is used as default in monthly_sums
@@ -110,14 +115,7 @@ category_filters[] = mode_of_employment
 amount_filter = gross_amount
 
 ;; filters per view
-;; options:
-;; by_pos_neg_amount
-;; between_dates
-;; missing_date
-;; by_category
-;; full_text_search
-;; eks_date_range
-;; choose_eks_profile
+;; options: by_pos_neg_amount, between_dates, missing_date, by_category, full_text_search, eks_date_range, choose_eks_profile
 [view_filter]
 eks[] = eks_date_range
 eks[] = choose_eks_profile
@@ -148,22 +146,23 @@ account = true
 invoice_number = true
 customer_supplier = true
 posting_text = false
-object = true
+item = true
 type_of_costs = true
 mode_of_employment = true
-cat_01 = true
+scope = false
+project = false
+cat_01 = false
 cat_02 = false
 cat_03 = false
-cat_04 = false
-cat_05 = false
 notes_01 = true
 notes_02 = true
 notes_03 = false
 notes_04 = false
 notes_05 = false
-file_01 = true
+file_01 = false
 file_02 = false
 file_03 = false
+is_reimbursement = false
 edit_delete_column = true
 
 
@@ -175,6 +174,7 @@ edit_delete_column = true
 
 
 ;; joins for sql query
+;; alias `a` is used for default table accounting
 ;; description coming soon
 [sql_joins]
 type_of_costs[table] = type_of_costs
@@ -185,6 +185,14 @@ mode_of_employment[table] = mode_of_employment
 mode_of_employment[ID] = ID
 mode_of_employment[column] = mode_of_employment
 mode_of_employment[alias] = m
+scope[table] = scope
+scope[ID] = ID
+scope[column] = scope
+scope[alias] = s
+project[table] = project
+project[ID] = ID
+project[column] = project
+project[alias] = p
 
 
 ;; don't change anything below this line

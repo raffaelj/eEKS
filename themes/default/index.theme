@@ -3,7 +3,7 @@
 
 return
 "<!DOCTYPE html>
-<html lang='$lang'>
+<html lang='$html_lang'>
 <head>
 	<meta charset='UTF-8'>
   <meta name='viewport' content='width=device-width, initial-scale=1.0'>
@@ -16,6 +16,7 @@ return
   <header>
     <h1><a href='$uri'>$software_name</a></h1>
     $add_button
+    $language_button
     <nav>
       $dashboard_button
       $list_of_views
@@ -23,7 +24,6 @@ return
     </nav>
     $export_button_pdf
     $export_button_csv
-    $language_button
     $searchbox
     $list_of_editable_tables
   </header>
@@ -36,5 +36,6 @@ return
     <p><a href='https://github.com/raffaelj/eeks'>Sourcecode on Github</a></p>
     <p>$version</p>
   </footer>
+  $js
 </body>
 </html>";

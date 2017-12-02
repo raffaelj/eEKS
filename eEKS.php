@@ -75,6 +75,8 @@ class eEKS extends lazy_mofo{
   // public variable to overwrite i18n
   public $i18n = "";
   
+  // allow javascript - if enabled scripts are added at bottom of template
+  public $allow_javascript = false;
   
   
   /////////////// overwrite LM variables
@@ -168,15 +170,15 @@ class eEKS extends lazy_mofo{
       $this->config_from_ini();
     }
     
+    // load internationalization file if it exists, en-us (default) is defined in this class
+    $this->set_language();
+    
   }
   
   //////////////////////////////////////////////////////////////////////////////
   function run(){
 
     // purpose: built-in controller
-    
-    // load internationalization file if it exists, en-us (default) is defined in this class
-    $this->set_language();
     
     // set commands and grid_sql
     $this->set_grid_view_parameters();
@@ -186,7 +188,7 @@ class eEKS extends lazy_mofo{
       case "insert":        $this->insert();      break;
       case "update":        $this->update();      break;
       case "update_grid":   $this->update_grid(); break;
-      case "delete":        $this->template($this->delete());      break;
+      case "delete":        $this->delete();      break;
       case "eks":           $this->template($this->eks());         break;
       case "settings":      $this->template($this->settings());    break;
       case "dashboard":     $this->template($this->dashboard());    break;
@@ -201,9 +203,9 @@ class eEKS extends lazy_mofo{
     // purpose: load internationalization file, default: en-us
     
     if(strlen(@$_GET['_lang']) == 5 && !strpos(@$_GET['_lang'], '/'))
-      $i18n = $_GET['_lang'];
-    else
-      $i18n = $this->i18n;
+      $this->i18n = $_GET['_lang'];
+    
+    $i18n = $this->i18n;
     
     if(strlen($i18n) > 0 && $i18n != 'en-us'){
       if(!file_exists("i18n/{$i18n}.php"))
@@ -261,7 +263,7 @@ class eEKS extends lazy_mofo{
       ,"voucher_date" => 1
       ,"gross_amount" => 1
       ,"customer_supplier" => 1
-      ,"object" => 1
+      ,"item" => 1
       ,"edit_delete_column" => 1
     );
     
@@ -287,7 +289,7 @@ class eEKS extends lazy_mofo{
       ,"voucher_date" => 1
       ,"gross_amount" => 1
       ,"customer_supplier" => 1
-      ,"object" => 1
+      ,"item" => 1
       ,"edit_delete_column" => 1
     );
     
@@ -414,11 +416,10 @@ class eEKS extends lazy_mofo{
     
     // purpose: buttons/navigation with different views
     
-    // $active_view = @$_GET['_view'];
-    $active_view = @$_REQUEST['_view'];
+    $active_view = $this->get_view();
     
     $class = "";
-    if($active_view == "default" || $active_view == null)
+    if($active_view == "default")
         $class = " active";
     
     $uri = $this->get_uri_path();
@@ -917,15 +918,14 @@ class eEKS extends lazy_mofo{
 
     $uri = $this->get_uri_path();
     $qs = $this->get_qs();
-    $qs_without_lang = $this->get_qs('_order_by,_desc,_offset,_search,_pagination_off,_view');
+    $qs_without_lang = $this->get_qs('_order_by,_desc,_offset,_search,_pagination_off,_view,action');// + action
 
     // optional background image
     $background_image = "";
     if (mb_strlen($this->background_image) > 0)
       $background_image = " style='background-image:url($this->background_image)' ";
     
-    $lang = $this->html_lang;
-    // $title = $this->get_page_name()." - ".htmlspecialchars($this->software_name);
+    $html_lang = substr($this->i18n,0,2);
     $title = $this->get_page_name();
     $software_name = htmlspecialchars($this->software_name);
     $slogan = htmlspecialchars($this->slogan);
@@ -945,11 +945,20 @@ class eEKS extends lazy_mofo{
     $langs = array("de-de", "en-us");
     $language_button = "";
     foreach($langs as $lang)
-      $language_button .= "<a href='{$uri}_lang=$lang&amp;$qs_without_lang' class='lm_button lang_button'>".substr($lang,0,2)."</a>";
+      if($lang != $this->i18n)
+        $language_button .= "<a href='{$uri}_lang=$lang&amp;$qs_without_lang' class='lang_button'>".substr($lang,0,2)."</a>";
     
     $list_of_views = $this->list_of_views();
     $searchbox = $this->search_box();
     $list_of_editable_tables = $this->list_of_editable_tables(); // empty if _view != "edit_tables"
+    
+    // javascript
+    $js = "";
+    if($this->allow_javascript){
+      $js = "<script src='js/pikaday.js'></script>";
+      $js .= "<script>var lang = '$this->i18n', date_out = '$this->date_out'</script>";
+      $js .= "<script src='js/eEKS.js'></script>";
+    }
     
     $error = $this->error;
     
@@ -1251,7 +1260,7 @@ class eEKS extends lazy_mofo{
     $button = '';
     if(count($this->grid_input_control) > 0 || $this->grid_multi_delete == true)
       $button = "<input type='submit' name='__update_grid' value='$this->grid_text_save_changes' class='lm_button lm_save_changes_button'>";
-    $pagination_button_bar = "<div class='lm_pagination'><p>$pagination </p></div>\n";
+    $pagination_button_bar = "<div class='lm_pagination'>$pagination</div>\n";
     
     // generate table header
     $head = "<tr>\n";
@@ -1568,9 +1577,9 @@ class eEKS extends lazy_mofo{
       if(!empty($_GET["_amount"]))
         $amount = $this->clean_out($_GET["_amount"]);
       if($amount == "pos")
-        $query .= "AND a.$column >= 0\r\n";
+        $query .= "AND ( a.$column >= 0 AND a.is_reimbursement = 0 OR ( a.$column < 0 AND a.is_reimbursement = 1 ) )\r\n";
       if($amount == "neg")
-        $query .= "AND a.$column < 0\r\n";
+        $query .= "AND ( a.$column < 0 AND a.is_reimbursement = 0 OR ( a.$column >= 0 AND a.is_reimbursement = 1 ) )\r\n";
     }
     
     
@@ -1593,9 +1602,9 @@ class eEKS extends lazy_mofo{
       
       foreach($_GET['_missing_date'] as $key=>$val){
         if($key == 0)
-          $query .= "$val IS NULL";
+          $query .= "a.$val IS NULL";
         else
-          $query .= " OR $val IS NULL";
+          $query .= " OR a.$val IS NULL";
       }
       
       $query .= ")\r\n";
@@ -1685,7 +1694,8 @@ class eEKS extends lazy_mofo{
       
       $month = $dt->format('m');
       $year = $dt->format('Y');
-      $col = $dt->format('M (y)');
+      // $col = $dt->format('M (y)');
+      $col = $this->translate($dt->format('M')) . $dt->format(' (y)');
       $query .= ",SUM( CASE WHEN EXTRACT(MONTH FROM a.$date) = $month AND EXTRACT(YEAR FROM a.$date) = $year THEN a.gross_amount ELSE 0 END ) AS '$col'\r\n";
       
       // set grid output control
@@ -1719,9 +1729,9 @@ class eEKS extends lazy_mofo{
       if(!empty($_GET["_amount"]))
         $amount = $this->clean_out($_GET["_amount"]);
       if($amount == "pos")
-        $query .= "WHERE a.$column >= 0\r\n";
+        $query .= "WHERE ( a.$column >= 0 AND a.is_reimbursement = 0 OR ( a.$column < 0 AND a.is_reimbursement = 1 ) )\r\n";
       if($amount == "neg")
-        $query .= "WHERE a.$column < 0\r\n";
+        $query .= "WHERE ( a.$column < 0 AND a.is_reimbursement = 0 OR ( a.$column >= 0 AND a.is_reimbursement = 1 ) )\r\n";
     }
     
     // add AND clause for filter by category
@@ -1840,8 +1850,8 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
         $html .= "  </select>\r\n";
       }
       
-      $html .= "<input type='text' name='_from' value='".$_from."' placeholder='$this->date_filter_from' size='10' class='lm_search_between_input'>";
-      $html .= "<input type='text' name='_to' value='".$_to."' placeholder='$this->date_filter_to' size='10' class='lm_search_between_input'>";
+      $html .= "<input type='text' name='_from' value='".$_from."' placeholder='$this->date_filter_from' size='10' class='lm_search_between_input date'>";
+      $html .= "<input type='text' name='_to' value='".$_to."' placeholder='$this->date_filter_to' size='10' class='lm_search_between_input date'>";
       
       $html .= "</fieldset>\r\n";
       
@@ -2102,9 +2112,9 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
     // go back on validation error
     if($error != ''){
       if($_POST['_called_from'] == 'form')
-        $this->edit($error);
+        $this->template($this->edit($error));
       else
-        $this->index($error);
+        $this->template($this->index($error));
 
       return;
     }
@@ -2164,7 +2174,7 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
 
     // go back on validation error
     if($error != ''){
-      $this->index($error);
+      $this->template($this->index($error));
       return;
     }
     
@@ -2214,7 +2224,7 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
 
     // go back on validation error
     if($error != '' || !$is_valid){
-      $this->edit($error);
+      $this->template($this->edit($error));
       return;
     }
     
@@ -2234,6 +2244,47 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
 
     // redirect user
     $url = $this->get_uri_path() . "{$action}_success=2&$this->identity_name=$id&" . $this->get_qs();
+    $this->redirect($url, $id);
+
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////
+  function insert(){
+
+    // purpose: called from contoller to display insert() data
+    // differences to lm: changed qs
+    
+    $error = '';
+
+    // validation system
+    $is_valid = $this->validate($this->on_insert_validate);
+    if(!$is_valid)
+      $error = $this->validate_text_general; //optional general error at the top
+
+    // call user function to validate or whatever
+    if($is_valid && $this->on_insert_user_function != '')
+      $error = call_user_func($this->on_insert_user_function);
+
+    // go back on validation error
+    if($error != '' || !$is_valid){
+      $this->template($this->edit($error));
+      return;
+    }
+
+    // insert data
+    $id = $this->sql_insert();
+
+    // user function after insert
+    if($this->after_insert_user_function != '')
+      call_user_func($this->after_insert_user_function, $id);
+    
+    // send user back to edit screen if desired
+    $action = '';
+    if($this->return_to_edit_after_insert)
+      $action = 'action=edit&';
+
+    // redirect user
+    $url = $this->get_uri_path() . "{$action}_success=1&$this->identity_name=$id&" . $this->get_qs('_view,_lang'); // do carry items defined in query_string_list, '' removes the default
     $this->redirect($url, $id);
 
   }
@@ -2267,7 +2318,7 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
 
     // go back on validation error
     if($error != '' || !$is_valid){
-      $this->edit($error);
+      $this->template($this->edit($error));
       return;
     }
 
@@ -2287,7 +2338,7 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
     $url = $this->get_uri_path() . "{$action}_success=1&$this->identity_name=$id&" . $this->get_qs('_view,_lang'); // do carry items defined in query_string_list, '' removes the default
     $this->redirect($url, $id);
 
-  }
+  }// end of duplicate()
   
   //////////////////////////////////////////////////////////////////////////////
   function cast_value($val, $column_name = '', $posted_from = 'form'){
@@ -2793,6 +2844,8 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
     
     if( !empty($_GET['_view']) && in_array($_GET['_view'], $this->views) )
       return $_GET['_view'];
+    elseif( !empty($_GET['action']) && $_GET['action'] == 'dashboard' )
+      return "";
     else
       return "default";
   }
@@ -2876,13 +2929,14 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
     $url = str_replace('&amp;', '&', $url);
 
     if($automatic === false){
-      echo("<center><a href='$url'>Continue</a></center>");    
+      // echo("<center><a href='$url'>Continue</a></center>");
+      $this->template("<center><a href='$url'>Continue</a></center>");
       return;
     }
     
     // this feature is only used used with WordPress plugins - use a simple js redirect for WP
     if(mb_strlen($this->uri_path) > 0 || $this->redirect_using_js){
-      echo "<script>window.location.href='$url';</script><noscript><a href='$url'>Continue</a></noscript>";
+      $this->template("<script>window.location.href='$url';</script><noscript><a href='$url'>Continue</a></noscript>");
       return;
     }
 
@@ -2952,6 +3006,7 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
     echo $html;
   }
   
+  //////////////////////////////////////////////////////////////////////////////
   function get_pagination($count, $limit, $_offset, $_pagination_off){
 
         // purpose: pagination for grid
@@ -2980,18 +3035,20 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
         }
         else
         {
-            $input = "<select onchange='window.location.href=\"{$uri_path}_offset=\" + this.options[this.selectedIndex].value + \"&amp;$get\"'>";
-            for($i = 0, $p = 1; $i < $count; $i += $limit, $p++){
-                $sel = '';
-                if($p == $active_page)
-                    $sel .= "selected='selected'";
-
-                $input .= "<option value='$i' $sel>$p</option>";
-            }
-            $input .= "</select>";
+          $input = "";
+          $input .= "<ul>";
+          
+          for($i = 0, $p = 1; $i < $count; $i += $limit, $p++){
+            $sel = "";
+            if($p == $active_page)
+              $sel .= " class='active'";
+            $input .= "<li$sel><a href='{$uri_path}_offset=$i&amp;$get'>$p</a></li>";
+          }
+          
+          $input .= "</ul>";
         }        
 
-        $pagination = "$this->pagination_text_page: $input $this->pagination_text_of $total_page &nbsp; ";
+        $pagination = "<p>$this->pagination_text_page: </p>$input <p>$this->pagination_text_of $total_page &nbsp; ";
         
         if($_offset == 0)
             $pagination .= " $this->pagination_text_back ";
@@ -3003,12 +3060,15 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
         else
             $pagination  .= " <a href='{$uri_path}_offset=" . ($_offset + $limit) . "&amp;$get'>$this->pagination_text_next</a> ";
 
-        $pagination .= " &nbsp; " . number_format($count) . " $this->pagination_text_records <a href='{$uri_path}_pagination_off=1&amp;$get' rel='nofollow'>$this->pagination_text_show_all</a> ";
+        $pagination .= " &nbsp; " . number_format($count) . " $this->pagination_text_records <a href='{$uri_path}_pagination_off=1&amp;$get' rel='nofollow'>$this->pagination_text_show_all</a></p>";
 
         $id++;
         return $pagination;
 
   }
+  
+  
+  
   
   
   
