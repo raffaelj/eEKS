@@ -2,7 +2,7 @@
 
 Simple accounting software with automation for "[Anlage EKS][1]" (a document needed in Germany for freelancers with unemployment benefits)
 
-Alternative pronounciation ([IPA][2]): [iːks] ;-)
+Pronounciation ([IPA][2]): [iːks] ;-)
 
 __EKS__ = income from self-employment (German: Einkommen aus selbständiger Tätigkeit)  
 __e__ = easy, electronic... or in German: einfach, erledigt, elektronisch...
@@ -43,7 +43,7 @@ coming soon
 ## Features of eEKS
 
 * all accounting data in one table with customizable categorization
-* basic overviews with filter functions (coming soon)
+* basic overviews with filter functions
 * automation of "Anlage EKS" (coming soon)
 * ...
 
@@ -59,10 +59,6 @@ coming soon
 * automatic generation of grid_sql (with config in ini file)
 * filters in search box
 
-## Notes
-
-* grid_multi_delete works, but has no confirmation message
-
 ## Requirements and restrictions
 
 * based on [lazy_mofo/datagrid][3], which requires
@@ -74,167 +70,14 @@ coming soon
 * PDF export requires [wkhtmltopdf](https://wkhtmltopdf.org/downloads.html)
 * y10k bug ;-)
 
+## Notes, known bugs
+
+* grid_multi_delete works, but has no confirmation message
+* changing language works, but doesn't change posted dates in date filter
+
 ## To do
 
-### top priority
-
-* invoices (needs customer database)
-* [x] concluded EKS (part A and B, without driver's log)
-* custom filters in search bar for EKS
-* estimated EKS
-* discuss porting features to lm
-
-### lower priority
-
-* concluded EKS (part C)
-* customer database
-* product database
-* dashboard
-* better GUI (navigation, search bar, settings)
-* icons
-* save user authentication
-* translate GUI
-* translate everything
-* driver's log
-* print CSS for (large) tables
-
-### revise lm code, structural changes and features
-
-* grid - set class names (or data attributes) for data types
-  * [x] get rid of javascript inside code
-  * [x] get rid of inline styles (nowrap, align...)
-  * [x] position of edit link, export link and searchbox should be defined in template file; div instead of table
-  * extra classes like
-      * [x] <del>with_rollup</del> optional column with sums (last row bold)
-      * [x] positive/negative numbers (colors/backgrounds)
-      * [x] number (text-align:right)
-      * [x] number, date, datetime
-  * [x] HTML5 data attributes for easier evaluation with javascript or styling for small screens
-  * nice to have:
-    * [ ] info about column on th:hover (or click?)
-* i18n number format (dot, comma)
-  * [x] number_in()
-  * [x] number_out()
-  * [x] Bug: int output as float, should be int
-* [x] custom search box
-* [x] filter functions (for search box)
-* [x] custom function cast_value (i18n number format)
-* custom function get_input_control
-  * [x] i18n number format
-  * [x] no inline styles
-* [x] no inline styles
-* no javascript for basic usage
-  * delete dataset without javascript
-    * [x] single from grid
-    * [x] multi from grid (without confirmation)
-    * [ ] multi from grid (with confirmation)
-    * [x] single from form
-  * [x] back
-  * [ ] multi delete
-  * [ ] go button on giant datasets
-* [x] output via template file
-* CSV export
-  * [x] optional renaming of column headers
-  * [ ] needs i18n number_format
-  * [ ] doesn't work with multiple grids (chooses first grid)
-  * [ ] trigger for export should be outside of grid
-* experimental multi-value column
-  * [x] grid
-  * [ ] with grid_input_control
-  * [x] with column sums
-* [x] PDF export
-  * [x] trigger for export must be outside of grid ! --> also for pdf background fix
-  * [x] mixed landscape/portrait (EKS)
-  * [ ] user should choose if landscape or portrait
-  * [ ] use different margins for EKS and all other pages
-  * [ ] doesn't recognize changed input fields, expected: output same as screen, should submit form data to querystring
-  * [x] background-image not loading inside @media print, [wkhtmltopdf issue](https://github.com/wkhtmltopdf/wkhtmltopdf/issues/3126)
-* [x] I really have to figure out how `$this->query_string_list` works for _view, _lang, _action
-* [x] escape ampersands in links
-* [ ] optional: disable links in column headers (for EKS to prevent unwanted sorting)
-
-### searchbox
-
-* [x] not in grid
-* [x] add filters
-* [x] custom searchbox per view
-
-### filters
-
-monthly view needs filters, too 
-
-* [ ] income/costs
-  * [x] default + no_date
-  * [ ] monthly view
-* [x] value_date (from - to)
-* [x] voucher_date (from - to)
-* [x] without value_date
-* [x] type_of_costs
-* [x] mode_of_employment
-* [ ] account
-* [ ] filter by custom category
-* [x] full text search
-* [ ] GROUP BY something (except notes, files) --> see views->monthly sums
-
-### views/pages
-
-* [ ] think about restructuring views and actions
-* [ ] views need their own config file or section in config.ini
-* [ ] dashboard (with views)
-  * [x] move to action or somewhere else, it contains views and shouldn't be a view itself
-* [ ] monthly sums
-  * [ ] only income
-  * [ ] only costs
-  * [ ] join chart_of_accounts (EKS)
-  * [ ] cash basis accounting (German: EÜR)
-* [ ] EKS preview
-* [ ] charts --> maybe with javascript
-* [x] accounting (default page)
-  * [ ] extra: records without value_date
-* [ ] settings
-  * [x] change content of tables (as view with table name via $_GET and some input controls)
-  * [ ] change (some) content of ini files
-
-### EKS preview
-
-* [x] configuration file for not changing/ personal data
-* [ ] choose profiles
-* [ ] edit profiles in form
-* [ ] concluded
-* [ ] estimated
-  * [ ] automated sums on every page
-  * [ ] save estimated data for comparing in the future
-* [x] rotate landscape pages for printing and PDF export
-* [x] show only one/some pages
-  * [x] table pages require variables from page before (sum, carryover)
-
-
-### GUI and styling
-
-* [ ] CSS for small(er) screens
-* [ ] all select boxes need titles
-* [ ] cross browser print CSS - Oh my god!
-  * `white-space:nowrap` seems to break layout in FF and wkhtmltopdf
-  * rotate hack - page-break with margin-top breaks in Opera
-  * print preview EKS seems to work in (System: Win7Pro, 64bit)
-    * [x] wkhtmltopdf
-    * [x] Firefox 56.0.2 (64-Bit)
-    * [x] Google Chrome 62.0.3202.89 (64-Bit)
-    * [x] Opera 49.0
-    * [ ] Internet Explorer 11 --> Don't use this damn browser!
-      * margin:0 not possible - Why?
-      * --> page sizes and input fields break
-      * svg background icon not correct
-    * ... Safari, Edge etc. not tested yet
-
-### validation
-
-* [ ] gross_aout must be negative if type_of_costs != is_income
-* [ ] date formats
-* [ ] number formats
-* [ ] no text in numerical or date fields
-
-
+See [TO_DO.md](TO_DO.md) and [DONE.md](DONE.md).
 
 
  [1]: https://www3.arbeitsagentur.de/web/content/DE/Formulare/Detail/index.htm?dfContentId=L6019022DSTBAI516946
