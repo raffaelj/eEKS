@@ -1,0 +1,1002 @@
+///////////// EKS
+
+$zoom: 2.5;
+$fontsize_screen: 11px;
+$fontsize_print: 14px;
+
+.portrait{
+  height:$zoom *  297px;
+   width:$zoom *  210px;
+  @media print{
+    height:297mm;
+    // height:296mm;// works with page-break-after:always, breaks some absolute positioning
+    width:210mm;
+  }
+}
+.landscape{
+  height:$zoom *  210px;
+   width:$zoom *  297px;
+  @media print{
+    height:210mm;
+    // height:209mm;
+    width:297mm;
+    
+    // rotate landscape pages because browsers and wkhtmltopdf don't
+    // understand mixed orientations (portrait + landsacpe)
+    
+    @include transform(rotate(-90deg) translate(-297mm, 0));
+    @include transform-origin(0 0);
+    margin-top:0;
+    ~ .landscape{// add margin-top for print rotation hack
+      margin-top: 87mm;
+    }
+  }
+}
+
+//////////////// attachment EKS
+body.eks{
+  main{
+    @media print{
+      padding:0;//reset 20mm padding to print with full size background-image
+      // background-color:green;// for testing
+    }
+  }
+  .eks_form{
+    text-align:center;// centering inline-block pages
+    position:relative;// for absolute positioned hide-page-checkboxes
+  }
+}
+
+@media print{
+  @page{
+    // size:A4;
+    margin:0;
+    // margin:40mm;
+  }
+}
+  
+.eks_page{
+  text-align:left;
+  display:inline-block;
+  position:relative;// for absolute positioning of input fields
+  margin: 1em;
+  padding:0;
+  background-repeat:no-repeat;
+  background-size:cover;
+  border:1px solid $clr_grey_light;
+  vertical-align: top;
+  @media print{
+    display:block;
+    margin:0;
+    padding:0;
+    border:none;
+    // page-break-after:always; // page is too high if 297mm, maybe rounding issue
+    // background-color:red;// for testing
+  }
+  
+  fieldset{
+    margin: 0;
+    padding: 0;
+    border: none;
+    font-size:$fontsize_screen;
+    @media print{
+      font-size:$fontsize_print;
+    }
+  }
+  
+  input,textarea,label{
+    position:absolute;
+    background-color:$clr_main_tr;
+    margin:0;
+    padding: 0 3px;
+    border:none;
+    font-size: inherit;
+    @media print{
+      background-color:transparent;
+      font-size:$fontsize_print;
+    }
+  }
+  textarea{
+    font-family:'Courier New', monospace;
+  }
+  input[type=checkbox],input[type=radio]{
+    display:none;
+    + label{
+      display:inline-block;
+      width: $zoom * 5px;
+      height: $zoom * 5px;
+      padding: 0;
+      border: 1px solid #ccc;
+      border-radius: 2px;
+    }
+    &:checked{
+      + label{
+        background-image: url(../img/check.svg);
+        background-size: cover;
+      }
+    }
+    @media print{
+      + label{
+        width:5mm;
+        height:5mm;
+        border: none;
+        background-color: transparent;
+      }
+    }
+  }
+}
+
+// checkboxes to hide selected pages
+$size: 1.5em;
+.hide_page{
+  display:none;
+  + label{
+    display:block;
+    @include box-sizing(border-box);
+    position:fixed;// doesn't work with .eks_page position relative
+    top:30%;
+    width:$size;
+    height:$size;
+    margin:0 5px;
+    padding:0;
+    line-height:$size;
+    border:1px solid #ccc;
+    border-radius:2px;
+    background-color:$clr_confirm;
+    &:nth-of-type(2){margin-top:1.2 * $size;}
+    &:nth-of-type(3){margin-top:2 * 1.2 * $size;}
+    &:nth-of-type(4){margin-top:3 * 1.2 * $size;}
+    &:nth-of-type(5){margin-top:4 * 1.2 * $size;}
+    &:nth-of-type(6){margin-top:5 * 1.2 * $size;}
+    &:hover{
+      background-color:$clr_attention;
+      &:after{
+        content:attr(data-hide);
+        display:block;
+        position:absolute;
+        top:0;
+        left:$size;
+        white-space: nowrap;
+        margin-left:.1em;
+      }
+    }
+    @media print{display:none;}
+  }
+  &:checked + label{
+    background-color:$clr_attention;
+    &:hover{
+      background-color:$clr_confirm;
+      &:after{
+        content:attr(data-show);
+      }
+    }
+  }
+}
+
+#_hide_page_1:checked ~ #eks_page1{display:none;}
+#_hide_page_2:checked ~ #eks_page2{display:none;}
+#_hide_page_3:checked ~ #eks_page3{display:none;}
+#_hide_page_4:checked ~ #eks_page4{display:none;}
+#_hide_page_5:checked ~ #eks_page5{display:none;}
+#_hide_page_6:checked ~ #eks_page6{display:none;}
+
+////////////////////////////////////////////////////////////////////// page 1
+#eks_page1{
+  background-image:url('../img/eks_1-6_web.png');
+  
+  input[name=title]{
+    bottom: $zoom * 200px;
+    left: $zoom * 20px;
+    width:18%;
+  }
+  input[name=first_name]{
+    bottom: $zoom * 200px;
+    left: $zoom * 60px;
+    width:38%;
+  }
+  input[name=last_name]{
+    bottom: $zoom * 188px;
+    left: $zoom * 20px;
+    width:37%;
+  }
+  input[name=birthday]{
+    bottom: $zoom * 188px;
+    left: $zoom * 100px;
+    width:19%;
+  }
+  input[name=bg_number]{
+    bottom: $zoom * 176px;
+    left: $zoom * 20px;
+    width:57%;
+  }
+  input[name=title_refer]{
+    bottom: $zoom * 154px;
+    left: $zoom * 20px;
+    width:18%;
+  }
+  input[name=first_name_refer]{
+    bottom: $zoom * 154px;
+    left: $zoom * 60px;
+    width:38%;
+  }
+  input[name=last_name_refer]{
+    bottom: $zoom * 142px;
+    left: $zoom * 20px;
+    width:37%;
+  }
+  input[name=birthday_refer]{
+    bottom: $zoom * 142px;
+    left: $zoom * 100px;
+    width:19%;
+  }
+  input[name=calculated],input[name=calculated] + label{
+    bottom: $zoom * 124px;
+    left: $zoom * 77px;
+  }
+  input[name=estimated],input[name=estimated] + label{
+    bottom: $zoom * 124px;
+    left: $zoom * 21px;
+  }
+  input[name=period]{
+    bottom: $zoom * 104px;
+    left: $zoom * 26px;
+    width:55%;
+  }
+  input[name=activity]{
+    bottom: $zoom * 67px;
+    left: $zoom * 26px;
+    width:55%;
+  }
+  input[name=activity]{
+    bottom: $zoom * 67px;
+    left: $zoom * 26px;
+    width:55%;
+  }
+  input[name=start_date]{
+    bottom: $zoom * 55px;
+    left: $zoom * 26px;
+    width:6em;
+  }
+  input[name=end_date]{
+    bottom: $zoom * 55px;
+    left: $zoom * 26px + 112px;
+    width:6em;
+  }
+  input[name=company_location]{
+    bottom: $zoom * 43px;
+    left: $zoom * 26px;
+    width:55%;
+  }
+  input[name=legal_form]{
+    bottom: $zoom * 31px;
+    left: $zoom * 26px;
+    width:55%;
+  }
+  input[name=number_of_employees]{
+    bottom: $zoom * 15px;
+    left: $zoom * 58px;
+    width: 1.5em;
+  }
+  input[name=has_employees],input[name=has_employees] + label{
+    bottom: $zoom * 16.6px;
+    left: $zoom * 20.6px;
+  }
+  @media print{
+    
+    background-image:url('../img/eks_1-6_print.png');// wkhtmltopdf @media img bug
+    
+    input[name=title]{
+      bottom:200mm;
+      left:20mm;
+    }
+    input[name=first_name]{
+      bottom:200mm;
+      left:60mm;
+    }
+    input[name=last_name]{
+      bottom:188mm;
+      left:20mm;
+    }
+    input[name=birthday]{
+      bottom:188mm;
+      left:100mm;
+    }
+    input[name=bg_number]{
+      bottom:176mm;
+      left:20mm;
+    }
+    input[name=title_refer]{
+      bottom:154mm;
+      left:20mm;
+    }
+    input[name=first_name_refer]{
+      bottom:154mm;
+      left:60mm;
+    }
+    input[name=last_name_refer]{
+      bottom:142mm;
+      left:20mm;
+    }
+    input[name=birthday_refer]{
+      bottom:142mm;
+      left:100mm;
+    }
+    input[name=calculated],input[name=calculated] + label{
+      bottom:124mm;
+      left:77mm;
+    }
+    input[name=estimated],input[name=estimated] + label{
+      bottom:124mm;
+      left:21mm;
+    }
+    input[name=period]{
+      bottom:104mm;
+      left:26mm;
+    }
+    input[name=activity]{
+      bottom:67mm;
+      left:26mm;
+    }
+    input[name=activity]{
+      bottom:67mm;
+      left:26mm;
+    }
+    input[name=start_date]{
+      bottom:55mm;
+      left:26mm;
+    }
+    input[name=end_date]{
+      bottom:55mm;
+      left:26mm + 112mm
+    }
+    input[name=company_location]{
+      bottom:43mm;
+      left:26mm;
+    }
+    input[name=legal_form]{
+      bottom:31mm;
+      left:26mm;
+    }
+    input[name=number_of_employees]{
+      bottom:15mm;
+      left:58mm;
+    }
+    input[name=has_employees],input[name=has_employees] + label{
+      bottom:16.6mm;
+      left:20.6mm;
+    }
+  }
+}
+
+////////////////////////////////////////////////////////////////////// page 2
+#eks_page2{
+  background-image:url('../img/eks_2-6_web.png');
+  
+  // subsidies / 5.  Zuschüsse/Beihilfen
+  input[name=subsidies_has_subsidies],input[name=subsidies_has_subsidies] + label{
+    bottom: $zoom * 268px;
+    left: $zoom * 10px;
+  }
+  input[name=subsidies_payer]{
+    bottom: $zoom * 254px;
+    left: $zoom * 15px;
+    width:61%;
+  }
+  input[name=subsidies_start_date]{
+    bottom: $zoom * 238px;
+    left: $zoom * 15px;
+    width:14%;
+  }
+  input[name=subsidies_end_date]{
+    bottom: $zoom * 238px;
+    left: $zoom * 49px;
+    width:14%;
+  }
+  input[name=subsidies_monthly_amount]{
+    bottom: $zoom * 238px;
+    left: $zoom * 80px;
+    width:30%;
+  }
+  input[name=subsidies_applied_subsidies],input[name=subsidies_applied_subsidies] + label{
+    bottom: $zoom * 225.6px;
+    left: $zoom * 10px;
+  }
+  input[name=subsidies_applied_payer]{
+    bottom: $zoom * 214px;
+    left: $zoom * 15px;
+    width:61%;
+  }
+  input[name=subsidies_apply_date]{
+    bottom: $zoom * 201px;
+    left: $zoom * 15px;
+    width:30%;
+  }
+  input[name=subsidies_apply_start_date]{
+    bottom: $zoom * 201px;
+    left: $zoom * 80px;
+    width:30%;
+  }
+  
+  // loan / 6.  Darlehen
+  input[name=loan_has_loan],input[name=loan_has_loan] + label{
+    bottom: $zoom * 182.2px;
+    left: $zoom * 10px;
+  }
+  input[name=loan_amount]{
+    bottom: $zoom * 166.8px;
+    left: $zoom * 15px;
+    width:15%;
+  }
+  input[name=loan_value_date]{
+    bottom: $zoom * 166.8px;
+    left: $zoom * 47.4px;
+    width:20.8%;
+  }
+  input[name=loan_date_refund]{
+    bottom: $zoom * 166.8px;
+    left: $zoom * 92.6px;
+    width:24%;
+  }
+  input[name=loan_monthly_repayment_rate]{
+    bottom: $zoom * 150.8px;
+    left: $zoom * 15px;
+    width:15%;
+  }
+  input[name=loan_financed_type_of_costs]{
+    bottom: $zoom * 150.8px;
+    left: $zoom * 47.4px;
+    width:20.8%;
+  }
+  input[name=loan_financed_amount_of_costs]{
+    bottom: $zoom * 150.8px;
+    left: $zoom * 92.6px;
+    width:24%;
+  }
+  
+  // home office / 7.  Angaben zu den Betriebsräumen
+  input[name=home_office_has_home_office],input[name=home_office_has_home_office] + label{
+    bottom: $zoom * 127.4px;
+    left: $zoom * 10px;
+  }
+  input[name=home_office_quantity]{
+    bottom: $zoom * 113.2px;
+    left: $zoom * 15px;
+    width:6%;
+  }
+  input[name=home_office_square_meter]{
+    bottom: $zoom * 113.2px;
+    left: $zoom * 80px;
+    width:10%;
+  }
+  
+  // location and signature
+  textarea[name=location]{
+    bottom: $zoom * 68px;
+    left: $zoom * 9.5px;
+    width:20.5%;
+    height:$zoom * 14px;
+    line-height:1.2em;
+    font-family:inherit;
+  }
+  textarea[name=signature]{
+    bottom: $zoom * 70px;
+    left: $zoom * 54px;
+    width: 46%;
+    font-size: .7em;
+    line-height: 1.2em;
+    height: $zoom * 9.6px;
+    padding: $zoom * .8px;
+  }
+  @media print{
+    background-image:url('../img/eks_2-6_print.png');// wkhtmltopdf @media img bug
+    
+    // subsidies / 5.  Zuschüsse/Beihilfen
+    input[name=subsidies_has_subsidies],input[name=subsidies_has_subsidies] + label{
+      bottom:268mm;
+      left:10mm;
+    }
+    input[name=subsidies_payer]{
+      bottom:254mm;
+      left:15mm;
+    }
+    input[name=subsidies_start_date]{
+      bottom:238mm;
+      left:15mm;
+    }
+    input[name=subsidies_end_date]{
+      bottom:238mm;
+      left:49mm;
+    }
+    input[name=subsidies_monthly_amount]{
+      bottom:238mm;
+      left:80mm;
+    }
+    input[name=subsidies_applied_subsidies],input[name=subsidies_applied_subsidies] + label{
+      bottom:225.6mm;
+      left:10mm;
+    }
+    input[name=subsidies_applied_payer]{
+      bottom:214mm;
+      left:15mm;
+    }
+    input[name=subsidies_apply_date]{
+      bottom:201mm;
+      left:15mm;
+    }
+    input[name=subsidies_apply_start_date]{
+      bottom:201mm;
+      left:80mm;
+    }
+    
+    // loan / 6.  Darlehen
+    input[name=loan_has_loan],input[name=loan_has_loan] + label{
+      bottom:182.2mm;
+      left:10mm;
+    }
+    input[name=loan_amount]{
+      bottom:166.8mm;
+      left:15mm;
+    }
+    input[name=loan_value_date]{
+      bottom:166.8mm;
+      left:47.4mm;
+    }
+    input[name=loan_date_refund]{
+      bottom:166.8mm;
+      left:92.6mm;
+    }
+    input[name=loan_monthly_repayment_rate]{
+      bottom:150.8mm;
+      left:15mm;
+    }
+    input[name=loan_financed_type_of_costs]{
+      bottom:150.8mm;
+      left:47.4mm;
+    }
+    input[name=loan_financed_amount_of_costs]{
+      bottom:150.8mm;
+      left:92.6mm;
+    }
+    
+    
+    // home office / 7.  Angaben zu den Betriebsräumen
+    input[name=home_office_has_home_office],input[name=home_office_has_home_office] + label{
+      bottom:127.4mm;
+      left:10mm;
+    }
+    input[name=home_office_quantity]{
+      bottom:113.2mm;
+      left:15mm;
+    }
+    input[name=home_office_square_meter]{
+      bottom:113.2mm;
+      left:80mm;
+    }
+    
+    
+    // location and signature
+    textarea[name=location]{
+      bottom:68mm;
+      left:9.5mm;
+      height:14mm;
+      resize:none;
+    }
+    textarea[name=signature]{
+      bottom:70mm;
+      left:54mm;
+      height:9.6mm;
+      padding:.8mm;
+      resize:none;
+    }
+  }
+}
+
+////////////////////////////////////////////////////////////////////// pages 3-6
+#eks_page3,#eks_page4,#eks_page5,#eks_page6{
+  
+  .lm_pagination{display:none;}
+  
+  // reset table styles
+  table,tbody{
+    display:block;
+  }
+  table{
+    position:absolute;
+    left:$zoom * 8px;
+    // table-layout:fixed; // prevent rows from auto height by line break
+    // border-collapse:collapse;
+    width:$zoom * 281.6px;//704
+  }
+  table,tr,td,th,input,textarea{
+    margin:0;
+    padding:0;
+    border:none;
+    border-radius:0;
+    font-size:$fontsize_screen;
+    @include box-sizing(border-box);
+  }
+  th{
+    background-color:$clr_main_tr;
+    text-align:center;
+    a{// reset link styles (until links in headers are disabled)
+      display:inline;
+      padding:0;
+      font-size:inherit;
+    }
+  }
+  td,th{
+    display:block;
+    float:left;
+    min-height:1em;// prevent floating under empty zero-height-cells
+    padding:0 ($zoom * .8px);
+    &:nth-child(1){display:none;}//ID
+    &:nth-child(2){//type_of_costs
+      width:$zoom * 64.4px;//161
+      font-size:.7em;
+      overflow: hidden; // prevent rows from auto height by line break
+      white-space: nowrap; // prevent rows from auto height by line break
+      opacity:0;// hide, but preserve the space
+    }
+    &:nth-child(n+3):nth-child(-n+8){//months
+      width:$zoom * 24px;//60
+    }
+    &:nth-child(9){//sum
+      width:$zoom * 26px;//65
+      font-weight:bold;
+      border-left:1px solid $clr_grey;
+    }
+    &:nth-child(10){//average
+      width:$zoom * 46.4px;//116
+      font-weight:bold;
+    }
+  }
+  tr{
+    // height:$zoom * 5.4px;//13.5
+    // line-height:$zoom * 5.4px;//13.5
+    height:$zoom * 5.42px;//13.5
+    line-height:$zoom * 5.42px;//13.5
+    display:block;
+    width:100%;
+    &:nth-child(1){//table header
+      height:$zoom * 7.2px;//18
+      line-height:$zoom * 7.2px;//18
+    }
+  }
+  
+  @media print{
+    table{
+      left:8mm;
+      width:281.6mm;
+    }
+    table,tr,td,th,input,textarea{
+      font-size:$fontsize_print;
+      background-color:transparent;// activate again after testing !
+    }
+    td,th{
+      padding:0 .8mm;
+      &:nth-child(2){//type_of_costs
+        width:64.4mm;
+      }
+      &:nth-child(n+3):nth-child(-n+8){//months
+        width:24mm;//60
+      }
+      &:nth-child(9){//sum
+        width:26mm;
+        border:none;
+      }
+      &:nth-child(10){//average
+        opacity:0;
+        width:46.4mm;
+      }
+    }
+    th{
+      background-color:transparent;
+      &:nth-child(9){//sum
+        opacity:0;
+      }
+    }
+    tr{
+      // height:5.4mm;//13.5
+      // line-height:5.4mm;//13.5
+      height:5.42mm;//13.5
+      line-height:5.42mm;//13.5
+      &:nth-child(1){//table header
+        height:7.2mm;//18
+        line-height:7.2mm;
+      }
+    }
+  }
+}
+
+////////////////////////////////////////////////////////////////////// page 3
+#eks_page3{
+  background-image:url('../img/eks_3-6_web.png');
+  
+  input[name=last_first_name]{
+    bottom: $zoom * 167px;
+    left: $zoom * 10px;
+    width:95%;
+  }
+  input[name=page3_bg_number]{
+    bottom: $zoom * 155px;
+    left: $zoom * 10px;
+    width:95%;
+  }
+  input[name=page3_estimated],input[name=page3_estimated] + label{
+    bottom: $zoom * 142.4px;
+    left: $zoom * 8.8px;
+  }
+  input[name=page3_calculated],input[name=page3_calculated] + label{
+    bottom: $zoom * 142.4px;
+    left: $zoom * 148.4px;
+  }
+  input[name=small_business],input[name=small_business] + label{
+    bottom: $zoom * 121.2px;
+    left: $zoom * 8.8px;
+  }
+  
+  table{
+    bottom:$zoom * 16.5px;
+    height:$zoom * 78px;//195
+  }
+  tr{
+    &:last-child{
+      font-weight:bold;
+    }
+    &:nth-child(n+2):nth-child(-n+6),&:last-child{
+      height:$zoom * 8px;//20
+      line-height:$zoom * 8px;//20
+    }
+    &:nth-child(n+7):nth-child(-n+8){
+      height:$zoom * 11.6px;//29
+      line-height:$zoom * 11.6px;//29
+    }
+  }
+  td,th{
+    &:nth-child(9){//sum
+      width:$zoom * 33.2px;//83
+    }
+    &:nth-child(10){//average
+      width:$zoom * 38.4px;//96
+    }
+  }
+  
+  @media print{
+    background-image:url('../img/eks_3-6_print.png');// wkhtmltopdf @media img bug
+    
+    input[name=last_first_name]{
+      bottom:167mm;
+      left:8mm;
+    }
+    input[name=page3_bg_number]{
+      bottom:155mm;
+      left:8mm;
+    }
+    input[name=page3_estimated],input[name=page3_estimated] + label{
+      bottom:142.4mm;
+      left:8.8mm;
+    }
+    input[name=page3_calculated],input[name=page3_calculated] + label{
+      bottom:142.4mm;
+      left:148.4mm;
+    }
+    input[name=small_business],input[name=small_business] + label{
+      bottom:121.2mm;
+      left:8.8mm;
+    }
+    
+    table{
+      bottom:16.5mm;
+      height:78mm;//195
+    }
+    tr{
+      &:nth-child(n+2):nth-child(-n+6),&:last-child{
+        height:8mm;//20
+        line-height:8mm;//20
+      }
+      &:nth-child(n+7):nth-child(-n+8){
+        height:11.6mm;//29
+        line-height:11.6mm;//29
+      }
+    }
+    td,th{
+      &:nth-child(9){//sum
+        width:33.2mm;//83
+      }
+      &:nth-child(10){//average
+        width:38.4mm;//96
+      }
+    }
+  }
+}
+////////////////////////////////////////////////////////////////////// page 4
+#eks_page4{
+  background-image:url('../img/eks_4-6_web.png');
+  table{
+    bottom:$zoom * 16.8px;//42
+    height:$zoom * 172.4px;//431
+  }
+  tr{
+    &:nth-child(3){// space for empty row
+      margin-top:$zoom * 9px;//22.5
+    }
+    &:nth-child(n+5):nth-child(-n+8){
+      height:$zoom * 9px;//22.5
+      line-height:$zoom * 9px;//22.5
+    }
+    &:nth-child(9){// space for driver's log
+      margin-top:$zoom * 21.3px;//53+?
+    }
+    &:nth-child(13){// space for driver's log (private rides)
+      margin-top:$zoom * 9px;//22.5
+      height:$zoom * 11.8px;//?+?
+      line-height:$zoom * 11.8px;//?+?
+    }
+    &:nth-child(14),&:nth-child(15){ // space for comments above, 
+      margin-top:$zoom * 5.4px;//13.5
+    }
+    &:nth-child(18){// last row
+      height:$zoom * 8px;//20
+      line-height:$zoom * 8px;//20
+      font-weight:bold;
+    }
+  
+  }
+  @media print{
+    background-image:url('../img/eks_4-6_print.png');// wkhtmltopdf @media img bug
+    
+    table{
+      bottom:16.8mm;
+      height:172.4mm;
+    }
+    tr{
+      &:nth-child(3){// space for empty row
+        margin-top:9mm;//22.5
+      }
+      &:nth-child(n+5):nth-child(-n+8){
+        height:9mm;//22.5
+        line-height:9mm;//22.5
+      }
+      &:nth-child(9){// space for driver's log
+        margin-top:21.3mm;//53
+      }
+      &:nth-child(13){// space for driver's log (private rides)
+        margin-top:9mm;//22.5
+        height:11.8mm;
+        line-height:11.8mm;
+      }
+      &:nth-child(14),&:nth-child(15){ // space for comments above, 
+        margin-top:5.4mm;//13.5
+      }
+      &:nth-child(18){// last row
+        height:8mm;
+        line-height:8mm;
+      }
+    }
+  }
+}
+////////////////////////////////////////////////////////////////////// page 5
+#eks_page5{
+  background-image:url('../img/eks_5-6_web.png');
+  
+  table{
+    bottom:$zoom * 21.9px;//54.75
+    height:$zoom * 164.8px;//412
+  }
+  tr{
+    &:nth-child(2){
+      height:$zoom * 10px;//25
+      line-height:$zoom * 10px;//25
+      font-weight:bold;
+    }
+    &:nth-child(3),&:nth-child(9){// space for comments above
+      margin-top:$zoom * 5.4px;//13.5
+    }
+    &:nth-child(4){
+      margin-top:$zoom * 8.8px;//22
+    }
+    &:nth-child(19),&:nth-child(21){
+      height:$zoom * 9.2px;//23
+      line-height:$zoom * 9.2px;//23
+    }
+    &:nth-child(22){
+      height:$zoom * 10px;//25;
+      line-height:$zoom * 10px;//25;
+      font-weight:bold;
+    }
+    &:last-child{// last row right now 22, should be 23
+      height:$zoom * 7.6px;//19
+      line-height:$zoom * 7.6px;//19
+      font-weight:bold;
+    }
+    
+    &:nth-child(n+13):nth-child(-n+17) td:nth-child(2){ // display custom types of costs
+      opacity:1;
+      // hacky solution to hide first part of text (until changing database to better names)
+      text-indent:$zoom * -9.8px;//-24.5
+      position: relative;
+      left:$zoom * 13.4px;//33.5
+      background-color:transparent;
+    }
+  }
+  
+  @media print{
+    background-image:url('../img/eks_5-6_print.png');// wkhtmltopdf @media img bug
+    
+    table{
+      bottom:21.9mm;//54.75
+      height:164.8mm;//412
+    }
+    tr{
+      &:nth-child(2){
+        height:10mm;//25
+        line-height:10mm;//25
+      }
+      &:nth-child(3),&:nth-child(9){// space for comments above
+        margin-top:5.4mm;//13.5
+      }
+      &:nth-child(4){
+        margin-top:8.8mm;//22
+      }
+      &:nth-child(19),&:nth-child(21){
+        height:9.2mm;//23
+        line-height:9.2mm;//23
+      }
+    &:nth-child(22){
+      height:10mm;//25;
+      line-height:10mm;//25;
+    }
+      &:last-child{// last row right now 22, should be 23
+        height:7.6mm;//19
+        line-height:7.6mm;//19
+      }
+      
+      &:nth-child(n+13):nth-child(-n+17) td:nth-child(2){ // display custom types of costs
+        opacity:1;
+        // hacky solution to hide first part of text (until changing database to better names)
+        text-indent:-9.8mm;//-24.5
+        left:13.4mm;//33.5
+      }
+    }
+  }
+}
+////////////////////////////////////////////////////////////////////// page 6
+#eks_page6{
+  background-image:url('../img/eks_6-6_web.png');
+  
+  // location and signature
+  textarea[name=location]{
+    bottom: $zoom * 20px;
+    left: $zoom * 119px;
+    width:22%;
+    height:$zoom * 7px;
+    font-family:inherit;
+  }
+  textarea[name=signature]{
+    bottom: $zoom * 19px;
+    left: $zoom * 199px;
+    width: 30%;
+    font-size: .7em;
+    line-height: 1.1em;
+    height: $zoom * 8.8px;
+    padding: $zoom * .8px;
+  }
+  @media print{
+    background-image:url('../img/eks_6-6_print.png');// wkhtmltopdf @media img bug
+    
+    textarea[name=location]{
+      bottom:20mm;
+      left:119mm;
+      height:7mm;
+      resize:none;
+    }
+    textarea[name=signature]{
+      bottom:19mm;
+      left:199mm;
+      font-size:.7em;
+      height:8.8mm;
+      padding:.8mm;
+      resize:none;
+    }
+  }
+}
