@@ -80,7 +80,7 @@ rename_csv_headers = true
 wkhtmltopdf_path = "/home/$USER/bin/wkhtmltopdf"
 
 ;; active views
-views[] = missing_date
+; views[] = missing_date
 views[] = monthly_sums
 views[] = yearly_sums
 views[] = eks

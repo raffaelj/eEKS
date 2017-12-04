@@ -267,7 +267,7 @@ class eEKS extends lazy_mofo{
       ,"edit_delete_column" => 1
     );
     
-    $this->set_grid_view_parameters();
+    $this->set_grid_view_parameters("default");
     $link = $this->get_uri_path() . $this->get_qs();
     
     $html .= "<div class='dash_box'>";
@@ -282,6 +282,8 @@ class eEKS extends lazy_mofo{
     
     // unpayed invoices - costs
     $_GET['_amount'] = "neg";
+    unset($_GET['_missing_date']);
+    $_GET['_missing_date'][] = "voucher_date";
     
     $this->config['active_columns'] = array(
       "ID" => 1
@@ -293,7 +295,7 @@ class eEKS extends lazy_mofo{
       ,"edit_delete_column" => 1
     );
     
-    $this->set_grid_view_parameters();
+    $this->set_grid_view_parameters("default");
     $link = $this->get_uri_path() . $this->get_qs();
     
     $html .= "<div class='dash_box'>";
@@ -431,7 +433,7 @@ class eEKS extends lazy_mofo{
     $html = "";
     
     // default
-    $html .= "<a href='{$uri}_view=default&amp;$qs' class='lm_button view_button$class'>default</a>";
+    $html .= "<a href='{$uri}_view=default&amp;$qs' class='lm_button view_button$class'>".$this->translate("accounting", "pretty")."</a>";
     
     // other options
     foreach($this->views as $val){
