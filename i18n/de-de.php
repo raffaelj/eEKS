@@ -97,6 +97,7 @@ $this->translate['show'] = "anzeigen";
 $this->translate['value_date'] = 'Zahlungsdatum';
 $this->translate['voucher_date'] = 'Belegdatum';
 $this->translate['sum'] = 'Summe';
+$this->translate['accounting'] = 'Buchhaltung';
 
 // month names (short)
 $this->translate['Jan'] = 'Jan';
