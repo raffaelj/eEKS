@@ -156,6 +156,7 @@ $eeks->run();
 // $eeks->debug($eeks->grid_show_column_sums,"column sums on");
 // $eeks->debug($_GET,"GET");
 // $eeks->debug($eeks->grid_sql, "sql");
+// $eeks->debug($eeks->sum_these_columns, "sum cols", "dump");
 // $eeks->debug($eeks->grid_sql_param,"sql param");
 
 ?>

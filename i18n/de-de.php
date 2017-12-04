@@ -89,6 +89,7 @@ $this->translate['costs'] = "Ausgaben";
 $this->translate['settings'] = "Einstellungen";
 $this->translate['monthly'] = "monatlich";
 $this->translate['monthly_sums'] = "monatlich summiert";
+$this->translate['yearly_sums'] = "jährlich summiert";
 $this->translate['missing_date'] = "ohne Datum";
 $this->translate['edit_tables'] = "Tabellen bearbeiten";
 $this->translate['hide'] = "ausblenden";
@@ -164,6 +165,7 @@ $this->rename['notes'] = 'Notizen';
 
 $this->rename['sum'] = 'Summe';
 $this->rename['average'] = 'Ø';
+// $this->rename['average'] = 'Durchschnitt';
 
 $this->rename['topic'] = 'Oberthema';
 $this->rename['page'] = 'Seite';

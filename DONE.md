@@ -24,6 +24,7 @@ see also [TO_DO.md](TO_DO.md)
   * [x] number_in()
   * [x] number_out()
   * [x] Bug: int output as float, should be int
+  * [x] Bug: number format with thousands_sep
 * [x] custom search box
 * [x] filter functions (for search box)
 * [x] custom function cast_value (i18n number format)
@@ -33,6 +34,7 @@ see also [TO_DO.md](TO_DO.md)
 * [x] no inline styles
 * [x] output via template file
 * [x] escape ampersands in links
+* [x] add CSS classes to grid tr/td with user defined functions
 
 ### searchbox
 

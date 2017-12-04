@@ -469,114 +469,26 @@ class eEKS extends lazy_mofo{
   function set_grid_view_parameters($view = ""){
     
     // purpose: show different views with different grids, forms and searchboxes
-    
-    if(!mb_strlen($view) > 0)
-      if(isset($_GET['_view']))
-        $view = $this->clean_out($_GET['_view']);
+    // views must be defined in $this->views or via ini file
+    // for a better overview views are in external files in folder `views`
     
     
-    // EKS --> seems to be a bit unnecessary, but prevents from setting defaults
-    if($view == "eks"){
-      
-      $_POST['action'] = "eks";
-      
-    }
+    if($view == "")
+      $view = $this->get_view();
     
-    // edit tables
-    elseif($view == "edit_tables"){
-      
-      // disable multi-value column
-      $this->multi_column_on = false;
-      $this->grid_show_column_sums = false;
-      
-      $this->form_sql = "";
-      $this->grid_sql = "";
-      $this->table = isset($_REQUEST['_edit_table']) ? $this->clean_out(@$_REQUEST['_edit_table']) : "accounting";
-      
-      $this->form_input_control[$this->table] = "--text";// reset input control from accounting table
-      $this->form_input_control['is_income'] = "--checkbox";
-      $this->form_input_control['sort_order'] = "--integer";
-      $this->form_input_control['notes'] = "--textarea";
-      
-      $this->grid_input_control['is_income'] = "--checkbox";
-      $this->grid_input_control['sort_order'] = "--integer";
-      $this->grid_input_control['notes'] = "--textarea";
-      $this->grid_input_control[$this->table] = "--text";
-      
-      $this->grid_input_control['coa_jobcenter_eks_01_2017'] = 'SELECT ID AS val, type_of_costs AS opt FROM coa_jobcenter_eks_01_2017 ORDER BY ID ASC;--select';
-      
-    }
-    
-    // monthly sums, grouped by type_of_costs or EKS-type_of_costs
-    elseif($view == "monthly_sums"){
-      $this->grid_sql = $this->generate_grid_sql_monthly();
-      $this->multi_column_on = false;
-    }
-    
-    
-    // missing_date
-    elseif($view == "missing_date"){
-      $_GET['_missing_date_on'] = 1;
-      if( empty($_GET['_missing_date']) )
-        foreach($this->date_filters as $val)
-          $_GET['_missing_date'][] = $val;
-      $this->grid_sql = $this->generate_grid_sql();
-    }
-    
-    
-    // default: accounting with generate_grid_sql()
-    else
-      $this->grid_sql = $this->generate_grid_sql();
+    if( file_exists("views/{$view}.inc.php") )
+      include("views/{$view}.inc.php");
     
   }
   
   //////////////////////////////////////////////////////////////////////////////
   function eks(){
     
-    // purpose: set some parameters and call eks_form()
-    
-    // parse profile
-    $this->eks_config = parse_ini_file('profiles/default.ini.php', true, INI_SCANNER_TYPED);
-    
-    // set date range
-    if( empty($_GET['_from']) ){
-      $from = new DateTime( $this->date_in($this->eks_config['eks']['eks_start_date']) );
-    }
-    else{
-      $from = new DateTime( $this->date_in($_GET['_from']) );
-    }
-    
-    // set dates in $_GET
-    $_GET['_from'] = $from->modify('first day of this month')->format('d.m.Y');
-    $_GET['_to'] = $from->modify('+ 5 months')->modify('last day of this month')->format('d.m.Y');
-    
-    
-    // set default mode_of_employment
-    if( empty($_GET['_mode_of_employment']) )
-      $_GET['_mode_of_employment'] = $this->eks_config['eks']['default_mode_of_employment'];
-    
-    $this->grid_sql = $this->generate_grid_sql_eks();
-    
-    // reset some grid features
-    $this->multi_column_on = false;
-    $this->grid_repeat_header_at = false;
-    $this->grid_show_column_sums = false; // disable column sums
-    
-    $html = "";
-    
-    $html .= $this->eks_form($this->eks_config);
-    
-    return $html;
-    
-  }
-  
-  //////////////////////////////////////////////////////////////////////////////
-  function eks_form($eks = array()){
-    
     // purpose: show form with prefilled data to user (attachment EKS)
     
     $uri_path = $this->get_uri_path();
     $qs = $this->get_qs();
+    $eks = $this->eks_config;
     
     // get current date for signatures
     $today = $this->date_out(date('Y-m-d'));
@@ -940,7 +852,7 @@ class eEKS extends lazy_mofo{
     $dashboard_button = "<a href='{$uri}action=dashboard' class='lm_button'>Dashboard</a>";
     $add_button = $this->add_button();
     $export_button_csv = $this->export_button();
-    $export_button_pdf = "<a target='_blank' href='{$uri}_pdf=1&amp;{$qs}' class='lm_button' title='download PDF'>PDF</a>";
+    $export_button_pdf = "<a target='_blank' href='{$uri}_pdf=1&amp;{$qs}' class='lm_button' title='PDF Export'>PDF</a>";
     // language buttons
     $langs = array("de-de", "en-us");
     $language_button = "";
@@ -995,7 +907,6 @@ class eEKS extends lazy_mofo{
     
     // purpose: called from contoller to display form() and add or edit a record
     
-    // $this->template($this->form($error));
     return $this->form($error);
     
   }
@@ -1005,7 +916,6 @@ class eEKS extends lazy_mofo{
     
     // purpose: called from contoller to display update() data
     
-    // $this->template($this->grid($error));
     return $this->grid($error);
     
   }
@@ -1085,14 +995,14 @@ class eEKS extends lazy_mofo{
     
     $str = $this->clean_out($str);
     
-    // if( (float) $str == $str )
+    // delete thousands separator if it exists
+    $str = str_replace(',', '', $str);
+    
+    // format number with local separators
     if( $type == "float" )
       $str = number_format((float)$str, $this->decimals, $this->dec_point, $this->thousands_sep);
     else
       $str = number_format((float)$str, 0, $this->dec_point, $this->thousands_sep);
-    
-    // else
-      // return intval($str);
     
     return $str;
     
@@ -1336,7 +1246,10 @@ class eEKS extends lazy_mofo{
           $sum[$col] = array_sum(array_column($result, $col));
         // with settings: sum defined column(s)
         elseif( in_array($col, $this->sum_these_columns) ){
-          $sum[$col] = array_sum(array_column($result, $col));
+          if(is_numeric($col))
+            $sum[$col] = array_sum( array_column( $result, intval($col) ) );
+          else
+            $sum[$col] = array_sum( array_column($result, $col) );
         }
         else
           $sum[$col] = "";
@@ -1356,18 +1269,26 @@ class eEKS extends lazy_mofo{
     // print rows
     $j = 0;
     foreach($result as $row){
-
+      
+      // add extra classes to rows
+      $class = array();
+      
+      $c = $this->grid_add_css_classes($row);
+      if($c != "")
+        $class[] = $c;
+      
       // highlight last updated or inserted row
       $shaded = '';
       if(@$_GET[$this->identity_name] == @$row[$this->identity_name] && mb_strlen(@$_GET[$this->identity_name]) > 0)
-        $shaded = " class='lm_active'";
+        $class[] = "lm_active'";
       
       
       // add class to column sums
-      if($this->grid_show_column_sums && $j == $count_result - 1){
-        $shaded = " class='column_sums'";
-      }
+      if($this->grid_show_column_sums && $j == $count_result - 1)
+        $class[] = "column_sums";
       
+      if(!empty($class))
+        $shaded = " class='".trim(implode(" ",$class))."'";
       
       $html .= "<tr$shaded>\r\n";// print a row
       
@@ -1631,72 +1552,109 @@ class eEKS extends lazy_mofo{
   }//end of generate_grid_sql
   
   //////////////////////////////////////////////////////////////////////////////
-  function generate_grid_sql_monthly($date = "", $group = "", $no_group_by = false){
+  function expect_sloppy_date_filter_inputs($case = "default"){
     
-    // purpose: sql query for monthly sums of amounts with $date, grouped by $group
+    // purpose: correct sloppy user input for date ranges filter and provide default ranges
     
-    // needs some more work to make it portable without joins or tables with different identity_names
-    
-    // expected default dates need some adjusting and/or user definable variables
-    if(isset($this->date_filters[0]))
-      $date = $this->date_filters[0];
-    else
-      $this->display_error("specify a column in your date filter", "generate_grid_sql_monthly()");
-    
-    if(isset($this->category_filters[0]))
-      $group = $this->category_filters[0];
-    else
-      $this->display_error("specify a column in your category filter", "generate_grid_sql_monthly()");
-    
-    // start query
-    $query = "";
-    
-    $query .= "SELECT\r\n";
-    $query .= "t.ID\r\n";
-    $query .= ",t.$group\r\n";
-    
-    // take care of user input for _from and _to
-    if( !empty($_GET['_from']) && !empty($_GET['_to']) ){
-      // case: _from and _to given
-      // --> set first day of _from and last day of _to
-      $from = (new DateTime($this->date_in($_GET['_from'])))->modify('first day of this month')->format('Y-m-d');
-      $to = (new DateTime($this->date_in($_GET['_to'])))->modify('last day of this month')->format('Y-m-d');
-    }
-    elseif( !empty($_GET['_from']) ){
-      // case: _from given, _to = ""
-      // --> set first day of _from and _to = today
-      $from = (new DateTime($this->date_in($_GET['_from'])))->modify('first day of this month')->format('Y-m-d');
-      $to = (new DateTime())->format('Y-m-d');//today
-    }
-    elseif( !empty($_GET['_to']) ){
-      // case: _to given, _from = ""
-      // --> set last day of _to and _from = first day of to-year
-      $to = $this->date_in($_GET['_to']);
-      $year = (new DateTime($to))->format('Y');
-      $from = (new DateTime())->format("$year-m-d");// first day of to-year
-    }
-    else{// no input, expect this year
-      $now = new DateTime();
-      $from = $now->modify('first day of Jan this year')->format('Y-m-d');
-      $to = $now->modify('last day of Dec this year')->format('Y-m-d');
-    }
-    
-    
-    
-    // add montly summed columns in sql query in date range
-    $start    = (new DateTime($from))->modify('first day of this month');
-    $end      = (new DateTime($to))->modify('first day of next month');
-    $interval = DateInterval::createFromDateString('1 month');
-    $period   = new DatePeriod($start, $interval, $end);
-    
-    $count_months = 0;
-    foreach ($period as $dt) {
+    if($case == "monthly"){
       
+      // take care of user input for _from and _to
+      if( !empty($_GET['_from']) && !empty($_GET['_to']) ){
+        // case: _from and _to given
+        // --> set first day of _from and last day of _to
+        $from = (new DateTime($this->date_in($_GET['_from'])))->modify('first day of this month')->format('Y-m-d');
+        $to = (new DateTime($this->date_in($_GET['_to'])))->modify('last day of this month')->format('Y-m-d');
+      }
+      elseif( !empty($_GET['_from']) ){
+        // case: _from given, _to = ""
+        // --> from = first day of _from-month and to = today
+        $from = (new DateTime($this->date_in($_GET['_from'])))->modify('first day of this month')->format('Y-m-d');
+        $to = (new DateTime())->format('Y-m-d');//today
+      }
+      elseif( !empty($_GET['_to']) ){
+        // case: _to given, _from = ""
+        // --> from = first day of _to-year, to = last day of _to-month
+        $to = (new DateTime($this->date_in($_GET['_to'])))->modify('last day of this month')->format('Y-m-d');
+        $from = (new DateTime($to))->modify('first day of Jan this year')->format("Y-m-d");// first day of to-year
+      }
+      else{// no input, expect this year
+        $now = new DateTime();
+        $from = $now->modify('first day of Jan this year')->format('Y-m-d');
+        $to = $now->modify('last day of Dec this year')->format('Y-m-d');
+      }
+      
+    }
+    elseif($case == "yearly"){
+      if( !empty($_GET['_from']) && !empty($_GET['_to']) ){
+        // case: _from and _to given
+        // --> from = first day of _from-year, to = last day of _to-year
+        $from = (new DateTime($this->date_in($_GET['_from'])))->modify('first day of Jan this year')->format('Y-m-d');
+        $to = (new DateTime($this->date_in($_GET['_to'])))->modify('last day of Dec this year')->format('Y-m-d');
+      }
+      elseif( !empty($_GET['_from']) ){
+        // case: _from given, _to = ""
+        // --> from = first day of _from-year, to = today
+        $from = (new DateTime($this->date_in($_GET['_from'])))->modify('first day of Jan this year')->format('Y-m-d');
+        $to = (new DateTime())->modify('last day of Dec this year')->format('Y-m-d');//Dec this year
+      }
+      elseif( !empty($_GET['_to']) ){
+        // case: _to given, _from = ""
+        // --> from = first day of _to-year, to = last day of _to-year
+        $to = (new DateTime($this->date_in($_GET['_to'])))->modify('last day of Dec this year')->format('Y-m-d');
+        $from = (new DateTime($to))->modify('first day of Jan this year')->modify('- 2 years')->format("Y-m-d");// first day of to-year
+      }
+      else{// no input, expect this year and last two years
+        // $now = new DateTime();
+        $from = (new DateTime())->modify('first day of Jan this year')->modify('- 2 years')->format('Y-m-d');
+        $to = (new DateTime())->modify('last day of Dec this year')->format('Y-m-d');
+      }
+    }
+    else{
+      $from = @$_GET['_from'];
+      $to = @$_GET['_to'];
+    }
+    
+    // set GET parameters to calculated params
+    // --> pro: params are visible
+    // --> contra: overwriting existing params
+    // $_GET['_from'] = $from;
+    // $_GET['_to'] = $to;
+    
+    return array($from, $to);
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////
+  function select_interval($interval = "monthly", $from, $to, $date){
+    
+    if($interval == "monthly"){
+      // add montly summed columns in sql query in date range
+      $start    = (new DateTime($from))->modify('first day of this month');
+      $end      = (new DateTime($to))->modify('first day of next month');
+      $inter = DateInterval::createFromDateString('1 month');
+    }
+    if($interval == "yearly"){
+      // add montly summed columns in sql query in date range
+      $start    = (new DateTime($from))->modify('first day of this year');
+      $end      = (new DateTime($to))->modify('last day of this year');
+      $inter = DateInterval::createFromDateString('1 year');
+    }
+    
+    $period = new DatePeriod($start, $inter, $end);
+    
+    $query = "";
+    $count_cols = 0;
+    foreach ($period as $dt) {
       $month = $dt->format('m');
       $year = $dt->format('Y');
-      // $col = $dt->format('M (y)');
-      $col = $this->translate($dt->format('M')) . $dt->format(' (y)');
-      $query .= ",SUM( CASE WHEN EXTRACT(MONTH FROM a.$date) = $month AND EXTRACT(YEAR FROM a.$date) = $year THEN a.gross_amount ELSE 0 END ) AS '$col'\r\n";
+      
+      if( $interval == "monthly" ){
+        $col = $this->translate($dt->format('M')) . $dt->format(' (y)');
+        $query .= ", SUM( CASE WHEN EXTRACT(MONTH FROM a.$date) = $month AND EXTRACT(YEAR FROM a.$date) = $year THEN a.gross_amount ELSE 0 END ) AS '$col'\r\n";
+      }
+      elseif($interval == "yearly"){
+        $col = $dt->format('Y');
+        $query .= ", SUM( CASE WHEN EXTRACT(YEAR FROM a.$date) = $year THEN a.gross_amount ELSE 0 END ) AS '$col'\r\n";
+      }
       
       // set grid output control
       $this->grid_output_control[$col] = '--number';
@@ -1704,19 +1662,67 @@ class eEKS extends lazy_mofo{
       // set column sums
       $this->sum_these_columns[] = $col;
       
-      $count_months++;
+      $count_cols++;
     }
+    
     // set grid output control
     $this->grid_output_control['sum'] = '--number';
+    $this->grid_output_control['average'] = '--number';
+    
     // set column sums
     $this->sum_these_columns[] = "sum";
     $this->sum_these_columns[] = "average";
     
     // sum
-    $query .= ",SUM(COALESCE(NULLIF(a.gross_amount, ''), 0)) as sum\r\n";
+    if( $interval == "monthly" )
+      $query .= ", SUM(COALESCE(NULLIF(a.gross_amount, ''), 0)) as sum\r\n";
     
     // average
-    $query .= ", FORMAT( COALESCE(SUM( a.gross_amount / $count_months ), 0), 2 ) AS average\r\n";
+    $query .= ", FORMAT( COALESCE(SUM( a.gross_amount / $count_cols ), 0), 2 ) AS average\r\n";
+    
+    return $query;
+    
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////
+  function generate_grid_sql_interval($interval = "monthly", $date = "", $group = "", $no_group_by = false){
+    
+    // purpose: sql query for monthly sums of amounts with $date, grouped by $group
+    
+    // needs some more work to make it portable without joins or tables with different identity_names
+    
+    // expected default dates need some adjusting and/or user definable variables
+    if($date == ""){
+      if(isset($this->date_filters[0]))
+        $date = $this->date_filters[0];
+      else
+        $this->display_error("specify a column in your date filter", "generate_grid_sql_interval()");
+    }
+    
+    if($group == ""){
+      if(isset($this->category_filters[0]))
+        $group = $this->category_filters[0];
+      else
+        $this->display_error("specify a column in your category filter", "generate_grid_sql_interval()");
+    }
+    
+    // start query
+    $query = "";
+    
+    $query .= "SELECT\r\n";
+    $query .= "  t.ID\r\n";
+    
+    // add column with type income/cost in interval view
+    // $query .= ", CASE WHEN t.is_income = true THEN '".$this->translate("income")."' ELSE '".$this->translate("costs")."' END AS income_costs\r\n";
+    
+    $query .= ", t.$group\r\n";
+    
+    $from_to = $this->expect_sloppy_date_filter_inputs($interval);
+    $from = $from_to[0];
+    $to = $from_to[1];
+    
+    // add select summed columns in month/year interval
+    $query .= $this->select_interval($interval, $from, $to, $date);
     
     $query .= "FROM $this->table a\r\n";
     $query .= "RIGHT OUTER JOIN $group t\r\n";
@@ -1748,13 +1754,9 @@ class eEKS extends lazy_mofo{
     
     $query .= "ORDER BY t.is_income DESC, t.sort_order ASC, t.$group ASC\r\n";
     
-    $this->grid_output_control['average'] = '--number';
-    
     return $query;
     
   }// end of generate_grid_sql_monthly()
-  
-  
   
   //////////////////////////////////////////////////////////////////////////////
   function generate_grid_sql_eks($pages = "1,2,3,4,5,6", $no_group_by = false){
@@ -1780,7 +1782,7 @@ class eEKS extends lazy_mofo{
       
       $month = $dt->format('m');
       $year = $dt->format('Y');
-      $col = $dt->format('M (y)');
+      $col = $this->translate($dt->format('M')) . $dt->format(' (y)');
       $query .= ",SUM( CASE WHEN EXTRACT(MONTH FROM a.$date) = $month AND EXTRACT(YEAR FROM a.$date) = $year THEN a.gross_amount ELSE 0 END ) AS '$col'\r\n";
       
       // grid output control
@@ -2844,7 +2846,7 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
     
     if( !empty($_GET['_view']) && in_array($_GET['_view'], $this->views) )
       return $_GET['_view'];
-    elseif( !empty($_GET['action']) && $_GET['action'] == 'dashboard' )
+    elseif( $this->get_action() == 'dashboard' || $this->get_action() == 'settings' )
       return "";
     else
       return "default";
@@ -3065,6 +3067,31 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
         $id++;
         return $pagination;
 
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////
+  function grid_add_css_classes($row){
+    
+    // purpose: add CSS classes to rows and/or cells
+    
+    $class = "";
+    
+    if( isset($row['type_of_costs']) ){
+      $sql = "SELECT COALESCE(is_income, 0) AS is_income FROM type_of_costs WHERE type_of_costs = '" . $row['type_of_costs']."'";
+      $result = $this->query($sql);
+      // $this->debug($result);
+      
+      
+      if(isset($result[0]['is_income']) && $result[0]['is_income'] == 1)
+        $class .= "is_income";
+      elseif(isset($result[0]['is_income']))
+        $class .= "is_cost";
+      
+    }
+      // $class .= "test";
+      
+    return $class;
+    
   }
   
   

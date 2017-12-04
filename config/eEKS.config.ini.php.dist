@@ -82,8 +82,9 @@ wkhtmltopdf_path = "/home/$USER/bin/wkhtmltopdf"
 ;; active views
 views[] = missing_date
 views[] = monthly_sums
-views[] = edit_tables
+views[] = yearly_sums
 views[] = eks
+views[] = edit_tables
 
 ;; column names in this array are shown together in a multi-value column
 multi_column[] = invoice_number
