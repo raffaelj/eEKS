@@ -43,9 +43,10 @@ $this->grid_text_delete           = "Löschen";
 $this->grid_text_no_records_found = "Keine Einträge gefunden";
 
 // pagination text
-$this->pagination_text_use_paging = 'use paging';
+$this->pagination_text_use_paging = 'benutze Paginierung';
 $this->pagination_text_show_all   = 'alle anzeigen';
-$this->pagination_text_records    = 'Einträge'; // singular: "Eintrag", looks better than "Eintrag/Einträge"
+$this->pagination_text_records    = 'Einträge';
+$this->pagination_text_record     = 'Eintrag';
 $this->pagination_text_go         = 'aufrufen'; // not the best translation, but no better idea
 $this->pagination_text_page       = 'Seite';
 $this->pagination_text_of         = 'von';

@@ -78,6 +78,9 @@ class eEKS extends lazy_mofo{
   // allow javascript - if enabled scripts are added at bottom of template
   public $allow_javascript = false;
   
+  // missing singular if only one record is found
+  public $pagination_text_record = "Record";
+  
   
   /////////////// overwrite LM variables
   // some of them are new for i18n
@@ -247,6 +250,8 @@ class eEKS extends lazy_mofo{
     
     $html .= "<div class='lm_error'><p>Dashboard - coming soon</p></div>";
     
+    $html .= "<div class='center'>";
+    
     //// unpayed invoices
     
     // income
@@ -312,8 +317,6 @@ class eEKS extends lazy_mofo{
     $this->config['active_columns'] = $tmp_active_columns;
     
     $html .= "</div>";
-    
-    $html .= "<div class='center'>";
     
     //// sums of last three months
     
@@ -1225,9 +1228,9 @@ class eEKS extends lazy_mofo{
     // quit if there's no data
     if($count <= 0){
       if(!$no_form)
-        $html .= "<div class='lm_error'><p>$this->grid_text_no_records_found</p></div></form>\n";
+        $html .= "<div class='lm_notice'><p>$this->grid_text_no_records_found</p></div></form>\n";
       else
-        $html .= "<div class='lm_error'><p>$this->grid_text_no_records_found</p></div>\n";
+        $html .= "<div class='lm_notice'><p>$this->grid_text_no_records_found</p></div>\n";
       
       return $html;    
     }
@@ -3022,16 +3025,20 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
         $active_page = floor($_offset / $limit) + 1; 
         $total_page = ceil($count / $limit);
         $uri_path = $this->get_uri_path();
+        $pagination_text_records = $this->pagination_text_records;
 
         if($count <= 0)
             return;
+          
+        if($count == 1)
+          $pagination_text_records = $this->pagination_text_record;
 
         $use_paging_link = '';
         if($_pagination_off == 1)
-            $use_paging_link = "<a href='{$uri_path}_pagination_off=0&amp;$get' rel='nofollow'>$this->pagination_text_use_paging</a>";
+            $use_paging_link = " <a href='{$uri_path}_pagination_off=0&amp;$get' rel='nofollow'>$this->pagination_text_use_paging</a>";
 
         if($_pagination_off == 1 || $count <= $limit) 
-            return number_format($count) . " $this->pagination_text_records $use_paging_link";
+            return "<p>" . number_format($count) . " $pagination_text_records$use_paging_link</p>";
 
         // simple text input for page number on giant datasets. use drop-down for smaller datasets.
         if($count > 100000){
@@ -3064,7 +3071,7 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
         else
             $pagination  .= " <a href='{$uri_path}_offset=" . ($_offset + $limit) . "&amp;$get'>$this->pagination_text_next</a> ";
 
-        $pagination .= " &nbsp; " . number_format($count) . " $this->pagination_text_records <a href='{$uri_path}_pagination_off=1&amp;$get' rel='nofollow'>$this->pagination_text_show_all</a></p>";
+        $pagination .= " &nbsp; " . number_format($count) . " $pagination_text_records <a href='{$uri_path}_pagination_off=1&amp;$get' rel='nofollow'>$this->pagination_text_show_all</a></p>";
 
         $id++;
         return $pagination;
