@@ -287,8 +287,6 @@ class eEKS extends lazy_mofo{
     
     // unpayed invoices - costs
     $_GET['_amount'] = "neg";
-    unset($_GET['_missing_date']);
-    $_GET['_missing_date'][] = "voucher_date";
     
     $this->config['active_columns'] = array(
       "ID" => 1
