@@ -11,7 +11,7 @@ header('Content-Type: text/html; charset=utf-8');
 
 
 //////////////////////////////////////////////////////////////////////////////
-function is_income(){
+function validate_is_income(){
   
   // purpose: check for correct sign of amount in form if type_of_costs is set
   // returns true if is income, else false
@@ -46,6 +46,14 @@ function is_income(){
   }
   
 }
+
+//////////////////////////////////////////////////////////////////////////////
+// function validate_date_format(){
+  
+  // global $eeks;
+  
+  
+// }
 
 // enter your database host, name, username, and password in
 // 'eEKS.db.ini.php.dist' and rename the file to 'eEKS.db.ini.php'
@@ -127,7 +135,7 @@ $eeks->grid_output_control['file_03'] = '--image'; // image clickable
 $eeks->grid_output_control['gross_amount'] = '--number'; // 
 
 
-$eeks->on_insert_validate['gross_amount'] = array('is_income', 'Only costs have negative signs.', '-0'.$eeks->dec_point.'00');
+$eeks->on_insert_validate['gross_amount'] = array('validate_is_income', 'Only costs have negative signs.', '-0'.$eeks->dec_point.'00');
 // copy validation rules to update - same rules
 $eeks->on_update_validate = $eeks->on_insert_validate;
 
