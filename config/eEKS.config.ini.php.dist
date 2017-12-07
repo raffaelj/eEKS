@@ -30,7 +30,7 @@ grid_repeat_header_at = 26
 grid_multi_delete = false
 
 ;; 
-query_string_list = "_date_between,_from,_to,_amount,_type_of_costs,_mode_of_employment,_edit_table,_missing_date_on,_missing_date"
+query_string_list = "_date_between,_from,_to,_amount,_type_of_costs,_mode_of_employment,_edit_table,_missing_date_on,_missing_date,_eks"
 
 ;; 
 query_string_list_post = "_edit_table"
@@ -118,6 +118,7 @@ amount_filter = gross_amount
 ;; filters per view
 ;; options: by_pos_neg_amount, between_dates, missing_date, by_category, full_text_search, eks_date_range, choose_eks_profile
 [view_filter]
+eks[] = eks_estimated
 eks[] = eks_date_range
 eks[] = choose_eks_profile
 monthly_sums[] = by_pos_neg_amount
@@ -176,6 +177,7 @@ edit_delete_column = true
 
 ;; joins for sql query
 ;; alias `a` is used for default table accounting
+;; alias `b` and `c` are used in EKS view
 ;; description coming soon
 [sql_joins]
 type_of_costs[table] = type_of_costs

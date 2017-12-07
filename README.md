@@ -47,6 +47,22 @@ coming soon
 * automation of "Anlage EKS" (coming soon)
 * ...
 
+## EKS estimation algorithm
+
+Right now the algorithm is really simple. You have to set up an intended growth rate in percent in your profile ini file and you must have existing data from the last six months.
+
+**Example:**
+
+* `intended_growth = 5%` --> This is the multiplier
+* all income records have a multiplier of `intended_growth * 2`
+* all cost records have a multiplier of `intended_growth`
+* --> `total_income = (income of last 6 months) * 1.10`
+* --> `total_costs = (costs of last 6 months) * 1.05`
+* --> `total = (total of last 6 months) * 1.05`
+
+A better algorithm is coming soon.
+
+
 ## Code features compared to lazy_mofo/datagrid (all work in progress)
 
 * no javascript for basic functionality like delete or back link

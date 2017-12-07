@@ -490,17 +490,28 @@ class eEKS extends lazy_mofo{
   function eks(){
     
     // purpose: show form with prefilled data to user (attachment EKS)
+
+    // parse profile
+    // --> inside `views/eks.inc.php`
     
     $uri_path = $this->get_uri_path();
     $qs = $this->get_qs();
     $eks = $this->eks_config;
+    
+    $estimated = false;
+    if(@$_GET['_eks'] == 'estimated')
+      $estimated = true;
+    
+    $disabled = $checked = '';
+    
+    // $this->debug($eks);
     
     // get current date for signatures
     $today = $this->date_out(date('Y-m-d'));
     
     $html = "";
     
-    $html .= "<div class='lm_error'><p>experimental - form doesn't work - coming soon</p></div>";
+    $html .= "<div class='lm_error'><p>experimental - no input possible - coming soon</p></div>";
     
     $html .= "<form action='$uri_path$qs&amp;action=eks' method='post' class='eks_form'>";
     
@@ -542,9 +553,11 @@ class eEKS extends lazy_mofo{
       
       // 2. estimated or calculated data
       $html .= "<fieldset>";
-      $html .= '<input type="radio" id="estimated" name="estimated" disabled="disabled" />';
+      $checked = (!$estimated) ? "" : " checked='checked'";
+      $html .= "<input type='radio' id='estimated' name='estimated' disabled='disabled'$checked />";
       $html .= '<label for="estimated"></label>';
-      $html .= '<input type="radio" id="calculated" name="calculated" checked="checked" />';
+      $checked = ($estimated) ? "" : " checked='checked'";
+      $html .= "<input type='radio' id='calculated' name='calculated' disabled='disabled'$checked />";
       $html .= '<label for="calculated"></label>';
       $html .= "</fieldset>";
       
@@ -663,9 +676,11 @@ class eEKS extends lazy_mofo{
       
       // estimated or calculated data
       $html .= "<fieldset>";
-      $html .= '<input type="radio" id="page3_estimated" name="page3_estimated" disabled="disabled" />';
+      $checked = (!$estimated) ? "" : " checked='checked'";
+      $html .= "<input type='radio' id='page3_estimated' name='page3_estimated' disabled='disabled'$checked />";
       $html .= '<label for="page3_estimated"></label>';
-      $html .= '<input type="radio" id="page3_calculated" name="page3_calculated" checked="checked" />';
+      $checked = ($estimated) ? "" : " checked='checked'";
+      $html .= "<input type='radio' id='page3_calculated' name='page3_calculated' disabled='disabled'$checked />";
       $html .= '<label for="page3_calculated"></label>';
       $html .= "</fieldset>";
       
@@ -1385,7 +1400,6 @@ class eEKS extends lazy_mofo{
     // purpose: generate sql query ($this->grid_sql) with defined filter options
     
     $search_in_columns = $this->search_in_columns;
-    // $date_filters = $this->config['date_filters'];
     $date_filters = $this->date_filters;
     
     $query = "";
@@ -1768,61 +1782,108 @@ class eEKS extends lazy_mofo{
     
     $date = "value_date";
     
+    $estimated = false;
+    if(@$_GET['_eks'] == 'estimated')
+      $estimated = true;
+    
     $query = "";
     
-    $query .= "SELECT\r\n";
-    $query .= "c.ID, c.type_of_costs\r\n";
-    
     $from = (new DateTime($this->date_in($_GET['_from'])))->modify('first day of this month')->format('Y-m-d');
-    $to = (new DateTime($this->date_in($_GET['_to'])))->modify('last day of this month')->format('Y-m-d');
+    
+    // use last 6 months for estimated EKS
+    if($estimated){
+      $from    = (new DateTime($from))->modify('- 6 months')->format('Y-m-d');
+    }
+    
+    $to = (new DateTime($from))->modify('+ 5 months')->modify('last day of this month')->format('Y-m-d');
+    
     
     // add montly summed columns in sql query in date range
-    $start    = (new DateTime($from))->modify('first day of this month');
+    $start    = (new DateTime($from));
     $end      = (new DateTime($to))->modify('first day of next month');
     $interval = DateInterval::createFromDateString('1 month');
     $period   = new DatePeriod($start, $interval, $end);
     
-    $count_months = 0;
+    $select_months = "";// contains query for summed months
+    $i = "a";// temporary column name for estimated months
+    $cols = array();// contains temporary month names and 
     foreach ($period as $dt) {
       
       $month = $dt->format('m');
       $year = $dt->format('Y');
-      $col = $this->translate($dt->format('M')) . $dt->format(' (y)');
-      $query .= ",SUM( CASE WHEN EXTRACT(MONTH FROM a.$date) = $month AND EXTRACT(YEAR FROM a.$date) = $year THEN a.gross_amount ELSE 0 END ) AS '$col'\r\n";
+      
+      if(!$estimated)
+        $col = $this->translate($dt->format('M')) . $dt->format(' (y)');
+      else{
+        $col = $this->translate($dt->modify('+ 6 months')->format('M')) . $dt->format(' (y)');
+      }
+      
+      if(!$estimated)// concluded EKS, don't change data
+        $select_months .= ",SUM( CASE WHEN EXTRACT(MONTH FROM a.$date) = $month AND EXTRACT(YEAR FROM a.$date) = $year THEN a.gross_amount ELSE 0 END ) AS '$col'\r\n";
+      else{
+        // estimated EKS, use averages and defined multipliers
+        $multiplier = $this->eks_config['eks']['intended_growth'] / 100;
+        $multiplier_income = $multiplier * 2 + 1;
+        $multiplier_cost = $multiplier + 1;
+        
+        $select_months .= ", FORMAT( COALESCE( SUM(\r\n";
+        $select_months .= "    CASE WHEN c.page = 3 THEN a.gross_amount / 6 * $multiplier_income ELSE a.gross_amount / 6 * $multiplier_cost END\r\n";
+        $select_months .= "  ), 0), 2 ) AS '$i'\r\n";
+      }
       
       // grid output control
       $this->grid_output_control[$col] = '--number';
       $this->grid_output_control['sum'] = '--number';
       
-      $count_months++;
+      $cols[$i] = $col;
+      $i++;
     }
     
+    // add sub-query for estimated EKS to avoid rounding issues in calculated sums
+    if($estimated){
+      $query .= "SELECT ID, type_of_costs\r\n";
+      foreach($cols as $key=>$val)
+        $query .= ", $key AS '$val'\r\n";
+      $query .= ", ". implode('+', array_keys($cols) ) ." AS sum\r\n";
+      $query .= ", average AS old_average\r\n";
+      $query .= "FROM (\r\n";
+      
+      $this->grid_output_control['old_average'] = '--number';// grid output control
+    }
+    
+    $query .= "SELECT\r\n";
+    $query .= "c.ID, c.type_of_costs\r\n";
+    
+    $query .= $select_months;
+    
     // sum
-    $query .= ",SUM(COALESCE(NULLIF(a.gross_amount, ''), 0)) as sum\r\n";
+    if(!$estimated)
+      $query .= ", SUM(COALESCE(NULLIF(a.gross_amount, ''), 0)) as sum\r\n";
     
     // average
-    $query .= ", FORMAT( COALESCE(SUM( a.gross_amount / $count_months ), 0), 2 ) AS average\r\n";
+    $query .= ", FORMAT( COALESCE(SUM( a.gross_amount / 6 ), 0), 2 ) AS average\r\n";
     
     $this->grid_output_control['average'] = '--number';
     
-    
-    
-    $query .= "FROM type_of_costs t
-RIGHT JOIN coa_jobcenter_eks_01_2017 c
-  ON t.coa_jobcenter_eks_01_2017 = c.ID
-LEFT JOIN accounting a
-  ON a.type_of_costs = t.ID
-AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
+    $query .= "FROM type_of_costs t\r\n";
+    $query .= "RIGHT JOIN coa_jobcenter_eks_01_2017 c\r\n";
+    $query .= "  ON t.coa_jobcenter_eks_01_2017 = c.ID\r\n";
+    $query .= "LEFT JOIN accounting a\r\n";
+    $query .= "  ON a.type_of_costs = t.ID\r\n";
+    $query .= "AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
     $query .= "AND a.$date BETWEEN '$from' AND '$to'\r\n";
     
     // get specific page
     $query .= "WHERE c.page IN ($pages)\r\n";
     
-// AND a.value_date BETWEEN '2016-06-01' AND '2016-12-31'
     if(!$no_group_by)
       $query .= "GROUP BY c.type_of_costs\r\n";
     
+    if($estimated)// close sub-query
+      $query .= ") b\r\n";
+    
     $query .= "ORDER BY ID\r\n";
+    
     
     $this->grid_sql_param[":_mode_of_employment"] = $this->clean_out(@$_GET["_mode_of_employment"]);
     
@@ -2024,7 +2085,31 @@ AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
     
     // purpose: return selectbox to choose EKS profiles
     
-    return;
+    $html = "";
+    
+    $html .= "<span title='coming soon'> choose profile... </span>";
+    
+    return $html;
+    
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////
+  function search_box_filter_eks_estimated(){
+    
+    // purpose: return links for estimated or calculated EKS
+    
+    $uri = $this->get_uri_path();
+    $qs = $this->get_qs();
+    
+    $html = "";
+    
+    $active = (@$_GET['_eks'] != 'estimated') ? " active" : "";
+    $html .= "<a class='lm_button$active' href='$uri$qs'>".$this->translate('concluded', 'pretty')."</a>";
+    
+    $active = (@$_GET['_eks'] == 'estimated') ? " active" : "";
+    $html .= "<a class='lm_button$active' href='$uri$qs&amp;_eks=estimated'>".$this->translate('estimated', 'pretty')."</a>";
+    
+    return $html;
     
   }
   

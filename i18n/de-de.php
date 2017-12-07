@@ -94,11 +94,13 @@ $this->translate['yearly_sums'] = "jährlich summiert";
 $this->translate['missing_date'] = "ohne Datum";
 $this->translate['edit_tables'] = "Tabellen bearbeiten";
 $this->translate['hide'] = "ausblenden";
-$this->translate['show'] = "anzeigen";
+$this->translate['show'] = "einblenden";
 $this->translate['value_date'] = 'Zahlungsdatum';
 $this->translate['voucher_date'] = 'Belegdatum';
 $this->translate['sum'] = 'Summe';
 $this->translate['accounting'] = 'Buchhaltung';
+$this->translate['concluded'] = 'abschließend';
+$this->translate['estimated'] = 'vorläufig';
 
 // month names (short)
 $this->translate['Jan'] = 'Jan';
@@ -167,6 +169,7 @@ $this->rename['notes'] = 'Notizen';
 
 $this->rename['sum'] = 'Summe';
 $this->rename['average'] = 'Ø';
+$this->rename['old_average'] = 'Ø zuvor';
 // $this->rename['average'] = 'Durchschnitt';
 
 $this->rename['topic'] = 'Oberthema';

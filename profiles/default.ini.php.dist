@@ -23,6 +23,9 @@ small_business = true
 ;; default language
 language = "de"
 
+;; intended growth in percent
+intended_growth = "5"
+
 ;;;;; page 1 / Seite 1
 
 ;; personal data of applicant
