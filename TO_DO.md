@@ -82,6 +82,7 @@ see also [DONE.md](DONE.md)
 
 * [ ] account
 * [ ] filter by custom categories (without tables, via ini file)
+* [ ] reset all filters (or reset for each filter)
 
 ### views/pages
 
@@ -101,6 +102,7 @@ see also [DONE.md](DONE.md)
 * [ ] settings
   * [x] change content of tables (as view with table name via $_GET and some input controls)
   * [ ] change (some) content of ini files
+* [x] yearly sums - average is wrong
 
 ### EKS preview
 

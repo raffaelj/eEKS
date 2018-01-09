@@ -1695,11 +1695,11 @@ class eEKS extends lazy_mofo{
       $query .= ", SUM(COALESCE(NULLIF(a.gross_amount, ''), 0)) as sum\r\n";
     
     // average
-    $query .= ", FORMAT( COALESCE(SUM( a.gross_amount / $count_cols ), 0), 2 ) AS average\r\n";
+    $query .= ", ROUND( COALESCE(SUM( a.gross_amount / $count_cols ), 0), 2 ) AS average\r\n";
     
     return $query;
     
-  }
+  }// end of select_interval()
   
   //////////////////////////////////////////////////////////////////////////////
   function generate_grid_sql_interval($interval = "monthly", $date = "", $group = "", $no_group_by = false){
@@ -1773,7 +1773,7 @@ class eEKS extends lazy_mofo{
     
     return $query;
     
-  }// end of generate_grid_sql_monthly()
+  }// end of generate_grid_sql_interval()
   
   //////////////////////////////////////////////////////////////////////////////
   function generate_grid_sql_eks($pages = "1,2,3,4,5,6", $no_group_by = false){
@@ -1824,7 +1824,7 @@ class eEKS extends lazy_mofo{
         $multiplier_income = $multiplier * 2 + 1;
         $multiplier_cost = $multiplier + 1;
         
-        $select_months .= ", FORMAT( COALESCE( SUM(\r\n";
+        $select_months .= ", ROUND( COALESCE( SUM(\r\n";
         $select_months .= "    CASE WHEN c.page = 3 THEN a.gross_amount / 6 * $multiplier_income ELSE a.gross_amount / 6 * $multiplier_cost END\r\n";
         $select_months .= "  ), 0), 2 ) AS '$i'\r\n";
       }
@@ -1859,7 +1859,7 @@ class eEKS extends lazy_mofo{
       $query .= ", SUM(COALESCE(NULLIF(a.gross_amount, ''), 0)) as sum\r\n";
     
     // average
-    $query .= ", FORMAT( COALESCE(SUM( a.gross_amount / 6 ), 0), 2 ) AS average\r\n";
+    $query .= ", ROUND( COALESCE(SUM( a.gross_amount / 6 ), 0), 2 ) AS average\r\n";
     
     $this->grid_output_control['average'] = '--number';
     
@@ -2978,7 +2978,7 @@ class eEKS extends lazy_mofo{
       return "<a href='https://github.com/raffaelj/eEKS/commit/$arr[1]'>last commit:</a> ". $this->date_out($arr[0], true);
     }
     else
-      return "no version available";
+      return "no version number available";
     
   }
   
