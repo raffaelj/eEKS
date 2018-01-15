@@ -1515,9 +1515,9 @@ class eEKS extends lazy_mofo{
       if(!empty($_GET["_amount"]))
         $amount = $this->clean_out($_GET["_amount"]);
       if($amount == "pos")
-        $query .= "AND ( a.$column >= 0 AND a.is_reimbursement = 0 OR ( a.$column < 0 AND a.is_reimbursement = 1 ) )\r\n";
+        $query .= "AND ( a.$column >= 0 AND COALESCE(a.is_reimbursement, 0) = 0 OR ( a.$column < 0 AND a.is_reimbursement = 1 ) )\r\n";
       if($amount == "neg")
-        $query .= "AND ( a.$column < 0 AND a.is_reimbursement = 0 OR ( a.$column >= 0 AND a.is_reimbursement = 1 ) )\r\n";
+        $query .= "AND ( a.$column < 0 AND COALESCE(a.is_reimbursement, 0) = 0 OR ( a.$column >= 0 AND a.is_reimbursement = 1 ) )\r\n";
     }
     
     
@@ -1752,9 +1752,9 @@ class eEKS extends lazy_mofo{
       if(!empty($_GET["_amount"]))
         $amount = $this->clean_out($_GET["_amount"]);
       if($amount == "pos")
-        $query .= "WHERE ( a.$column >= 0 AND a.is_reimbursement = 0 OR ( a.$column < 0 AND a.is_reimbursement = 1 ) )\r\n";
+        $query .= "WHERE ( a.$column >= 0 AND COALESCE(a.is_reimbursement, 0) = 0 OR ( a.$column < 0 AND a.is_reimbursement = 1 ) )\r\n";
       if($amount == "neg")
-        $query .= "WHERE ( a.$column < 0 AND a.is_reimbursement = 0 OR ( a.$column >= 0 AND a.is_reimbursement = 1 ) )\r\n";
+        $query .= "WHERE ( a.$column < 0 AND COALESCE(a.is_reimbursement, 0) = 0 OR ( a.$column >= 0 AND a.is_reimbursement = 1 ) )\r\n";
     }
     
     // add AND clause for filter by category
