@@ -30,7 +30,7 @@ grid_repeat_header_at = 26
 grid_multi_delete = false
 
 ;; 
-query_string_list = "_date_between,_from,_to,_amount,_type_of_costs,_mode_of_employment,_edit_table,_missing_date_on,_missing_date,_eks"
+query_string_list = "_date_between,_from,_to,_amount,_type_of_costs,_mode_of_employment,_edit_table,_missing_date_on,_missing_date,_eks,_profile,_last_profile"
 
 ;; 
 query_string_list_post = "_edit_table"
@@ -84,6 +84,7 @@ wkhtmltopdf_path = "/home/$USER/bin/wkhtmltopdf"
 views[] = monthly_sums
 views[] = yearly_sums
 views[] = eks
+views[] = cba
 views[] = edit_tables
 
 ;; column names in this array are shown together in a multi-value column
@@ -119,8 +120,8 @@ amount_filter = gross_amount
 ;; options: by_pos_neg_amount, between_dates, missing_date, by_category, full_text_search, eks_date_range, choose_eks_profile
 [view_filter]
 eks[] = eks_estimated
-eks[] = eks_date_range
 eks[] = choose_eks_profile
+eks[] = eks_date_range
 monthly_sums[] = by_pos_neg_amount
 monthly_sums[] = between_dates
 monthly_sums[] = by_category

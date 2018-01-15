@@ -4,10 +4,16 @@
 $_POST['action'] = "eks";
 
 // parse profile
-$this->eks_config = parse_ini_file('profiles/default.ini.php', true, INI_SCANNER_TYPED);
+if( !empty($_GET['_profile']) ){
+  $ini = glob('profiles/*.ini.php')[$_GET['_profile']];
+  $this->eks_config = parse_ini_file($ini, true, INI_SCANNER_TYPED);
+}
+else{
+  $this->eks_config = parse_ini_file('profiles/default.ini.php', true, INI_SCANNER_TYPED);
+}
 
 // set date range
-if( empty($_GET['_from']) ){
+if( empty($_GET['_from']) or $_GET['_profile'] != $_GET['_last_profile'] ){
   $from = new DateTime( $this->date_in($this->eks_config['eks']['eks_start_date']) );
 }
 else{

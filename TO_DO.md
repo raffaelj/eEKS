@@ -35,7 +35,7 @@ see also [DONE.md](DONE.md)
 * [ ] product database
 * [ ] periodic entries
 * [ ] nice looking dashboard
-* [ ] notices and warnings on euser defined events
+* [ ] notices and warnings on user defined events
 * [ ] deamon with mail notifications (daily, monthly overview etc.)
 * [ ] more icons
 * [ ] driver's log
@@ -107,7 +107,7 @@ see also [DONE.md](DONE.md)
 ### EKS preview
 
 * [x] configuration file for not changing/ personal data
-* [ ] choose profiles
+* [x] choose profiles
 * [ ] edit profiles in form
 * [x] concluded
 * [ ] estimated
@@ -141,3 +141,7 @@ see also [DONE.md](DONE.md)
 * [ ] date formats
 * [ ] number formats
 * [ ] no text in numerical or date fields
+
+### nice to have
+
+* [ ] split record into multiple records (multiple products, same invoice, different categories)

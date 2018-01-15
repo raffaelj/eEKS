@@ -195,6 +195,7 @@ class eEKS extends lazy_mofo{
       case "eks":           $this->template($this->eks());         break;
       case "settings":      $this->template($this->settings());    break;
       case "dashboard":     $this->template($this->dashboard());    break;
+      case "cba":           $this->template($this->cba());          break;
       default:              $this->template($this->index());
     }
 
@@ -355,6 +356,41 @@ class eEKS extends lazy_mofo{
     return $html;
     
   }// end of dashboard()
+  
+  //////////////////////////////////////////////////////////////////////////////
+  function cba(){
+    // purpose: cash basis accounting (German: EÜR)
+    
+    
+    $html = "";
+    
+    $html .= "<h2>Einnahmen</h2>";
+    
+    $_GET['_amount'] = "pos";
+    $this->grid_sql = $this->generate_grid_sql_interval("yearly");
+    
+    $html .= $this->grid('', true);
+    
+    
+    $html .= "<h2>Ausgaben</h2>";
+    
+    $_GET['_amount'] = "neg";
+    $this->grid_sql = $this->generate_grid_sql_interval("yearly");
+    
+    $html .= $this->grid('', true);
+    
+    $html .= "<h2>Gesamt</h2>";
+    
+    $_GET['_amount'] = "";
+    
+    $this->grid_sql = $this->generate_grid_sql_interval($interval = "yearly", $date = "", $group = "", $no_group_by = true);
+    
+    $html .= $this->grid('', true);
+    
+    return $html;
+    
+  }// end of cba()
+  
   
   //////////////////////////////////////////////////////////////////////////////
   function settings(){
@@ -1695,7 +1731,8 @@ class eEKS extends lazy_mofo{
       $query .= ", SUM(COALESCE(NULLIF(a.gross_amount, ''), 0)) as sum\r\n";
     
     // average
-    $query .= ", ROUND( COALESCE(SUM( a.gross_amount / $count_cols ), 0), 2 ) AS average\r\n";
+    if($count_cols > 1)
+      $query .= ", ROUND( COALESCE(SUM( a.gross_amount / $count_cols ), 0), 2 ) AS average\r\n";
     
     return $query;
     
@@ -1727,12 +1764,18 @@ class eEKS extends lazy_mofo{
     $query = "";
     
     $query .= "SELECT\r\n";
+    if ($no_group_by)
+      $query .= "  (CASE WHEN t.ID != 'sku2lkajsnclj43' THEN '".$this->translate("all")."' END) AS ID\r\n";
+    else
     $query .= "  t.ID\r\n";
     
     // add column with type income/cost in interval view
     // $query .= ", CASE WHEN t.is_income = true THEN '".$this->translate("income")."' ELSE '".$this->translate("costs")."' END AS income_costs\r\n";
     
-    $query .= ", t.$group\r\n";
+    if ($no_group_by)
+      $query .= ", (CASE WHEN t.$group != 'sku2lkajsnclj43' THEN '".$this->translate("all")."' END) AS $group\r\n";
+    else
+      $query .= ", t.$group\r\n";
     
     $from_to = $this->expect_sloppy_date_filter_inputs($interval);
     $from = $from_to[0];
@@ -2085,7 +2128,28 @@ class eEKS extends lazy_mofo{
     
     $html = "";
     
-    $html .= "<span title='coming soon'> choose profile... </span>";
+    !empty($_GET['_profile']) ? $profile = $_GET['_profile'] : $profile = 0;
+    $profiles = glob('profiles/*.ini.php');
+    
+    // if(count($profiles) == 1){
+      // $name = $this->translate(mb_substr($profiles[0], 9, (mb_strpos($profiles[0], '.ini.php')-9)), "pretty");
+      // $html .= "<span>$name</span>";
+    // }
+    // else{
+      $html .= "<select name='_profile' title='".$this->translate("Choose Profile", "pretty")."'>";
+    
+      foreach( $profiles as $key=>$val ){
+        $name = $this->translate(mb_substr($val, 9, (mb_strpos($val, '.ini.php')-9)), "pretty");
+        $selected = "";
+        if( $profile == $key )
+          $selected = " selected='selected'";
+        $html .= "<option$selected value='".$key."'>" . $name . "</option>";
+      }
+      
+      $html .= "</select>";
+      
+      $html .= "<input type='hidden' name='_last_profile' value='$profile'>";
+    // }
     
     return $html;
     
