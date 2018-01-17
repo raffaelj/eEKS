@@ -76,6 +76,9 @@ see also [DONE.md](DONE.md)
   * [ ] use different margins for EKS and all other pages
   * [ ] doesn't recognize changed input fields, expected: output same as screen, should submit form data to querystring
   * [x] background-image not loading inside @media print, [wkhtmltopdf issue](https://github.com/wkhtmltopdf/wkhtmltopdf/issues/3126)
+  * [x] export of CBA/EÜR doesn't work (unescaped ampersands in qs)
+  * [ ] export of Dashboard doesn't work (missing qs:action in link)
+  * [x] export of EKS doesn't work  (unescaped ampersands in qs)
 * [ ] optional: disable links in column headers (for EKS to prevent unwanted sorting)
 
 ### filters
@@ -108,6 +111,7 @@ see also [DONE.md](DONE.md)
 
 * [x] configuration file for not changing/ personal data
 * [x] choose profiles
+  * [ ] better check $_GET parameters to avoid notices
 * [ ] edit profiles in form
 * [x] concluded
 * [ ] estimated

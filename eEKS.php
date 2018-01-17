@@ -867,6 +867,8 @@ class eEKS extends lazy_mofo{
     // export page to PDF and quit 
     if($_pdf == 1){
       $url = $this->get_uri_path() . $this->get_qs();
+      // replace escaped ampersands from get_qs() with unescaped ampersands
+      $url = str_replace('&amp;', '&', $url);
       $url .= "&_wkhtmltopdf_img_fix=1"; // add parameter to qs of current page for CSS insert
       $this->generate_pdf($url);
       return;
@@ -2974,6 +2976,11 @@ class eEKS extends lazy_mofo{
         $param = " --print-media-type -L 0 -R 0 -B 0 -T 0 -d 300 --disable-smart-shrinking";
       }
       
+      // add post data to params
+      // maybe to print changed formulas in the future... 
+      // foreach( $_POST as $key=>$val ){
+        // $param .= " --post $key $val";
+      // }
       
       // execute wkhtmltopdf
       exec($path.$param.' "'.$url.'" '.$file);
