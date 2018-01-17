@@ -13,7 +13,7 @@ else{
 }
 
 // set date range
-if( empty($_GET['_from']) or $_GET['_profile'] != $_GET['_last_profile'] ){
+if( empty($_GET['_from']) or @$_GET['_profile'] != @$_GET['_last_profile'] ){
   $from = new DateTime( $this->date_in($this->eks_config['eks']['eks_start_date']) );
 }
 else{

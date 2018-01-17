@@ -111,7 +111,7 @@ see also [DONE.md](DONE.md)
 
 * [x] configuration file for not changing/ personal data
 * [x] choose profiles
-  * [ ] better check $_GET parameters to avoid notices
+  * [x] better check $_GET parameters to avoid notices
 * [ ] edit profiles in form
 * [x] concluded
 * [ ] estimated
