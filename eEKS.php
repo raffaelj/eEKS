@@ -2964,7 +2964,7 @@ class eEKS extends lazy_mofo{
       // set params
       $param = "";
       $param .= " --print-media-type";            // use print CSS
-      $param .= " -L 10 -R 10 -B 10 -T 10";           // set margins to 0 for full size background images
+      $param .= " -L 20 -R 20 -B 20 -T 20";           // set margins to 0 for full size background images
       $param .= " -d 300";                        // dpi
       $param .= " --disable-smart-shrinking";     // Disable to make WebKit pixel/dpi ratio constant
       if( empty($_GET['_portrait']) && @$_GET['_portrait'] != 1 ) // wkhtmltopdf default: portrait
@@ -3019,13 +3019,15 @@ class eEKS extends lazy_mofo{
     $title = "";
     
     // add action
-    $title .= $this->translate($this->get_action(), "pretty");
+    $action = $this->get_action();
+    $title .= $this->translate($action, "pretty");
     
     // add view
-    if($this->get_view() != "default"){
+    $view = $this->get_view();
+    if( $view != "default" && $view != "" && $action != $view ){
       if(mb_strlen($title) > 0)
         $title .= " - ";
-      $title .= $this->translate($this->get_view(), "pretty");
+      $title .= $this->translate($view, "pretty");
     }
     
     // add software name
