@@ -251,9 +251,12 @@ table.lm_grid {
     border-spacing:0;//fix loosing borders in firefox
     margin:0;
     page-break-inside:auto;
-    width:100%;
+    // width:100%;
+    // min-width:50%; // wkhtmltopdf seems to ignore min-width
+    max-width:100%;
     font-size:12px;
     border-radius:0;
+    border: 1px solid $clr_grey_light;
   }
 }
 .lm_grid, .lm_form{
@@ -263,6 +266,7 @@ table.lm_grid {
     @media print{
       padding:2px;
       border-left: 1px solid $clr_grey_light;
+      border-bottom:none;
       &:first-child{border-left:none;}
     }
     
@@ -277,6 +281,11 @@ table.lm_grid {
     .minus{color: $clr_alarm_dark;}
     .zero{color:$clr_grey_light;}
     .plus{}
+  }
+  td{
+    @media print{
+      border-top: 1px solid $clr_grey_light;
+    }
   }
   th {
     background-color: $clr_main_2;
@@ -305,14 +314,16 @@ table.lm_grid {
   }
   tr {
     // rounded borders
-    &:first-child th:first-child{border-top-left-radius:3px;}
-    &:first-child th:last-child{border-top-right-radius:3px;}
-    &:last-child td:first-child{border-bottom-left-radius:3px;}
-    &:last-child td:last-child{border-bottom-right-radius:3px;}
-    // different colors for even and odd rows
-    &:nth-child(even) td {background-color: $clr_white_tr;}
-    &:nth-child(odd) td {background-color: $clr_grey_light_tr;}
-    &:nth-child(odd):last-child td {border-bottom-color:transparent;}
+    @media screen{
+      &:first-child th:first-child{border-top-left-radius:3px;}
+      &:first-child th:last-child{border-top-right-radius:3px;}
+      &:last-child td:first-child{border-bottom-left-radius:3px;}
+      &:last-child td:last-child{border-bottom-right-radius:3px;}
+      // different colors for even and odd rows
+      &:nth-child(even) td {background-color: $clr_white_tr;}
+      &:nth-child(odd) td {background-color: $clr_grey_light_tr;}
+      &:nth-child(odd):last-child td {border-bottom-color:transparent;}
+    }
     // highlight hover and current row edited
     &.lm_active td, &:hover td {background: $clr_confirm_tr;}
     &.column_sums td{
@@ -346,8 +357,6 @@ table.lm_grid {
           display:none;
         }
       }
-      &:nth-child(even) td {background-color: transparent;}
-      &:nth-child(odd) td {background-color: transparent;}
     }
   }
 }
@@ -849,6 +858,25 @@ input[name=_missing_date_on]{
     &:checked + label + pre{
       display:block;
       font-size: .7em;
+    }
+  }
+}
+
+////// CBA/EÜR
+.cba .lm_grid{
+  td:nth-child(1){
+    width:2em;
+  }
+  td:nth-child(2){
+    width:18em;
+  }
+  td:nth-child(n+3){
+    width:4em;
+  }
+  @media print{
+    margin:0 auto;
+    td:nth-child(2){
+      width:12em;
     }
   }
 }
