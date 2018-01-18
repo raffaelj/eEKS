@@ -122,10 +122,38 @@ p{
   padding:0;
 }
 
-h2 {
+h2{
+  font-size:0;
+  height:0;
+  text-indent:-9999px;
+  @media print{
+    text-align: center;
+    margin: 0 0 .5em;
+    font-size: 1.2em;
+    height:auto;
+    text-indent:0;
+  }
+}
+
+h3 {
   text-align: center;
   margin: 1em 0 .5em;
   font-size: 1.2em;
+}
+
+.date_now{
+  font-size:0;
+  height:0;
+  text-indent:-9999px;
+  @media print{
+    position: fixed;
+    right: 0;
+    top: 0;
+    margin: 0;
+    font-size: 1em;
+    height:auto;
+    text-indent:0;
+  }
 }
 
 // custom classes for easier styling
@@ -871,12 +899,12 @@ input[name=_missing_date_on]{
     width:18em;
   }
   td:nth-child(n+3){
-    width:4em;
+    width:5em;
   }
   @media print{
     margin:0 auto;
     td:nth-child(2){
-      width:12em;
+      width:14em;
     }
   }
 }

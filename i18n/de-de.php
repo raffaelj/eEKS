@@ -101,6 +101,7 @@ $this->translate['sum'] = 'Summe';
 $this->translate['accounting'] = 'Buchhaltung';
 $this->translate['concluded'] = 'abschließend';
 $this->translate['estimated'] = 'vorläufig';
+$this->translate['eks'] = 'EKS';
 $this->translate['cba'] = 'EÜR';
 $this->translate['Choose Profile'] = 'Profil auswählen';
 

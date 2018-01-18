@@ -220,26 +220,26 @@ class eEKS extends lazy_mofo{
   }
   
   //////////////////////////////////////////////////////////////////////////////
-  function translate($str = "", $upper = ""){
+  function translate($str = "", $format = ""){
     
     // purpose: translate words
     // example:
     // content of i18n file: `$this->translate['all'] = "alle";`  (array)
     //          use in code: `$this->translate('all');`           (function)
     
-    if(array_key_exists($str, $this->translate)){
-      if($upper == "pretty"){
-        return $this->format_title($this->translate($str));
-      }
-      else
-        return $this->translate[$str];
-    }
-    else{
-      if($upper == "pretty"){
-        return $this->format_title($str);
-      }
-      return $str;
-    }
+    if(array_key_exists($str, $this->translate))
+      $str = $this->translate[$str];
+    
+    if($format == "pretty")
+      $str = $this->format_title($str);
+    
+    if($format == "upper")
+      $str = mb_strtoupper($str, $this->charset);
+    
+    if($format == "lower")
+      $str = mb_strtolower($str, $this->charset);
+    
+    return $str;
   }
   
   //////////////////////////////////////////////////////////////////////////////
@@ -278,7 +278,7 @@ class eEKS extends lazy_mofo{
     
     $html .= "<div class='dash_box'>";
     $html .= "<a href='$link'>";
-    $html .= "<h2>Do I have to send an admonition?</h2>";
+    $html .= "<h3>Do I have to send an admonition?</h3>";
     $html .= "</a>";
     
     $html .= $this->grid('', true);
@@ -304,7 +304,7 @@ class eEKS extends lazy_mofo{
     
     $html .= "<div class='dash_box'>";
     $html .= "<a href='$link'>";
-    $html .= "<h2>Hey, don't forget to pay your crazy stuff!</h2>";
+    $html .= "<h3>Hey, don't forget to pay your crazy stuff!</h3>";
     $html .= "</a>";
     
     $html .= $this->grid('', true);
@@ -328,7 +328,7 @@ class eEKS extends lazy_mofo{
     
     $html .= "<div class='dash_box'>";
     $html .= "<a href='$link'>";
-    $html .= "<h2>last three months</h2>";
+    $html .= "<h3>last three months</h3>";
     $html .= "</a>";
     
     $html .= $this->grid('', true);
@@ -340,14 +340,14 @@ class eEKS extends lazy_mofo{
     
     // graphs
     $html .= "<div class='dash_box'>";
-    $html .= "<h2>maybe a graph, because it looks cool</h2>";
+    $html .= "<h3>maybe a graph, because it looks cool</h3>";
     
     
     $html .= "</div>";
     
     // a wide one
     $html .= "<div class='dash_box wide'>";
-    $html .= "<h2>another table with a lot of columns</h2>";
+    $html .= "<h3>another table with a lot of columns</h3>";
     
     $html .= "</div>";
     
@@ -364,7 +364,7 @@ class eEKS extends lazy_mofo{
     
     $html = "";
     
-    $html .= "<h2>Einnahmen</h2>";
+    $html .= "<h3>Einnahmen</h3>";
     
     $_GET['_amount'] = "pos";
     $this->grid_sql = $this->generate_grid_sql_interval("yearly");
@@ -372,14 +372,14 @@ class eEKS extends lazy_mofo{
     $html .= $this->grid('', true);
     
     
-    $html .= "<h2>Ausgaben</h2>";
+    $html .= "<h3>Ausgaben</h3>";
     
     $_GET['_amount'] = "neg";
     $this->grid_sql = $this->generate_grid_sql_interval("yearly");
     
     $html .= $this->grid('', true);
     
-    $html .= "<h2>Gesamt</h2>";
+    $html .= "<h3>Gesamt</h3>";
     
     $_GET['_amount'] = "";
     
@@ -410,7 +410,7 @@ class eEKS extends lazy_mofo{
 
     foreach($this->config as $group=>$arr){
       $html .= "<div style='display:inline-block;vertical-align:top;border:1px solid #ccc;height:300px;margin:5px;padding:5px;overflow:auto;'>";
-      $html .= "<h2>$group</h2>";
+      $html .= "<h3>$group</h3>";
       foreach($arr as $key=>$val){
         
         if( is_array($val) ){
@@ -898,6 +898,9 @@ class eEKS extends lazy_mofo{
     $software_name = htmlspecialchars($this->software_name);
     $slogan = htmlspecialchars($this->slogan);
     $version = $this->version();
+    
+    $page_name = $this->get_page_name("", false);
+    $date_now = date($this->datetime_out);
     
     $user_css = "";
     if(mb_strlen($css) > 0)
@@ -3012,7 +3015,7 @@ class eEKS extends lazy_mofo{
   }
   
   //////////////////////////////////////////////////////////////////////////////
-  function get_page_name(){
+  function get_page_name($format = "pretty", $add_software_name = true){
     
     // purpose: get a page name from action and view
     
@@ -3020,20 +3023,26 @@ class eEKS extends lazy_mofo{
     
     // add action
     $action = $this->get_action();
-    $title .= $this->translate($action, "pretty");
+    $title .= $this->translate($action, $format);
     
     // add view
     $view = $this->get_view();
+    
+    if($view == "default")
+      $view = $this->translate($this->table, "pretty");
+    
     if( $view != "default" && $view != "" && $action != $view ){
       if(mb_strlen($title) > 0)
         $title .= " - ";
-      $title .= $this->translate($view, "pretty");
+      $title .= $this->translate($view, $format);
     }
     
     // add software name
-    if(mb_strlen($title) > 0)
-      $title .= " - ";
-    $title .= "$this->software_name";
+    if($add_software_name or mb_strlen($title) == 0){
+      if(mb_strlen($title) > 0)
+        $title .= " - ";
+      $title .= "$this->software_name";
+    }
       
     return htmlspecialchars($title);
     
