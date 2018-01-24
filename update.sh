@@ -24,6 +24,7 @@ then
   then
     cp config/eEKS.config.ini.php.dist config/eEKS.config.ini.php
     cp profiles/default.ini.php.dist profiles/default.ini.php
+    cp profiles/demo_gewerbe.ini.php.dist profiles/demo_gewerbe.ini.php
     echo config files updated
   fi
 

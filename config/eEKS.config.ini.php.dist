@@ -30,10 +30,10 @@ grid_repeat_header_at = 26
 grid_multi_delete = false
 
 ;; 
-query_string_list = "_date_between,_from,_to,_amount,_type_of_costs,_mode_of_employment,_edit_table,_missing_date_on,_missing_date,_eks,_profile,_last_profile"
+query_string_list = "_date_between,_from,_to,_amount,_type_of_costs,_mode_of_employment,_edit_table,_missing_date_on,_missing_date,_eks,_profile,_last_profile,_eks_est_from,_eks_est_range,_intended_growth"
 
 ;; 
-query_string_list_post = "_edit_table"
+query_string_list_post = "_edit_table,_eks"
 
 ;; allow javascript
 allow_javascript = true
@@ -122,6 +122,7 @@ amount_filter = gross_amount
 eks[] = eks_estimated
 eks[] = choose_eks_profile
 eks[] = eks_date_range
+eks[] = eks_estimate_from_date_range
 monthly_sums[] = by_pos_neg_amount
 monthly_sums[] = between_dates
 monthly_sums[] = by_category

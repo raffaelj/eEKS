@@ -59,6 +59,7 @@ Right now the algorithm is really simple. You have to set up an intended growth 
 * --> `total_income = (income of last 6 months) * 1.10`
 * --> `total_costs = (costs of last 6 months) * 1.05`
 * --> `total = (total of last 6 months) * 1.05`
+* --> if some types of cost are excluded, the result varies
 
 A better algorithm is coming soon.
 

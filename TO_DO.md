@@ -115,11 +115,17 @@ see also [DONE.md](DONE.md)
 * [ ] edit profiles in form
 * [x] concluded
 * [ ] estimated
+  * [x] solve rounding issues in sums
+  * better algorithm
+    * [x] exclude some types of cost from growing
+    * [ ] intended growth = 0 not possible
   * [ ] automated sums on every page
   * [ ] save estimated data for comparing in the future
 * [x] rotate landscape pages for printing and PDF export
 * [x] show only one/some pages
   * [x] table pages require variables from page before (sum, carryover)
+* [ ] EKS page 1, 4.1 image - missing text "handelt."
+* [ ] EKS page 4, remove "e)" to "i)" from image to avoid overlapping of text
 
 ### GUI and styling
 

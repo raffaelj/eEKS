@@ -727,7 +727,8 @@ class eEKS extends lazy_mofo{
       
       // inject rows with sums/carryover
       $sql = $this->generate_grid_sql_eks(3, true);
-      $this->inject_rows['last'] = $this->query($sql, $this->grid_sql_param);
+      $sum_page_3 = $this->query($sql, $this->grid_sql_param);
+      $this->inject_rows['last'] = $sum_page_3;
       $this->inject_rows['last'][0]['ID'] = "";
       $this->inject_rows['last'][0]['type_of_costs'] = "Summe A1-A7";
       
@@ -747,10 +748,10 @@ class eEKS extends lazy_mofo{
       // inject rows with sums/carryover
       $sql = $this->generate_grid_sql_eks(4, true); // sum of page 4
       $sum_page_4 = $this->query($sql, $this->grid_sql_param);
+      
       $this->inject_rows["last"] = $sum_page_4;
       $this->inject_rows['last'][0]['ID'] = "";
       $this->inject_rows['last'][0]['type_of_costs'] = "Zwischensumme B1-B7";
-      
       
       // grid
       $this->grid_sql = $this->generate_grid_sql_eks(4);
@@ -770,13 +771,21 @@ class eEKS extends lazy_mofo{
       $this->inject_rows[1][0]['ID'] = "";
       $this->inject_rows[1][0]['type_of_costs'] = "Übertrag B1-B7";
       
-      $sql = $this->generate_grid_sql_eks("4,5", true); // sum of all costs
-      $this->inject_rows[22] = $this->query($sql, $this->grid_sql_param);
+      $sql = $this->generate_grid_sql_eks(5, true); // sum of page 5
+      $sum_page_5 = $this->query($sql, $this->grid_sql_param);
+      
+      foreach($sum_page_4[0] as $key=>$val){
+        $sum_costs[0][$key] = $val + $sum_page_5[0][$key];
+      }
+      foreach($sum_page_3[0] as $key=>$val){
+        $sum_all[0][$key] = $val + $sum_costs[0][$key];
+      }
+      
+      $this->inject_rows[22] = $sum_costs;
       $this->inject_rows[22][0]['ID'] = "";
       $this->inject_rows[22][0]['type_of_costs'] = "Summe B1-B18";
       
-      $sql = $this->generate_grid_sql_eks("3,4,5", true); // total income - costs
-      $this->inject_rows[23] = $this->query($sql, $this->grid_sql_param);
+      $this->inject_rows[23] = $sum_all;
       $this->inject_rows[23][0]['ID'] = "";
       $this->inject_rows[23][0]['type_of_costs'] = "Gewinn";
       
@@ -813,7 +822,7 @@ class eEKS extends lazy_mofo{
     
     return $html;
     
-  }
+  }// end of eks()
   
   //////////////////////////////////////////////////////////////////////////////
   function back_button($identity_id = 0){
@@ -1835,13 +1844,28 @@ class eEKS extends lazy_mofo{
     $query = "";
     
     $from = (new DateTime($this->date_in($_GET['_from'])))->modify('first day of this month')->format('Y-m-d');
-    
-    // use last 6 months for estimated EKS
-    if($estimated){
-      $from    = (new DateTime($from))->modify('- 6 months')->format('Y-m-d');
-    }
-    
     $to = (new DateTime($from))->modify('+ 5 months')->modify('last day of this month')->format('Y-m-d');
+    
+    // use data in different date range to estimate future income
+    $range = 6;
+    if($estimated){
+      // set range
+      if( empty($_GET['_eks_est_range']) )
+        $range = 6;
+      else
+        $range = $this->clean_out($_GET['_eks_est_range']);
+      
+      // set dates
+      if( empty($_GET['_eks_est_from']) ){
+        // if nothing specified, use six months before estimation date
+        $eks_est_from = (new DateTime($from))->modify('- '.$range.' months')->format('Y-m-d');
+        $eks_est_to = (new DateTime($from))->modify('+ ' . ($range - 1) . ' months')->modify('last day of this month')->format('Y-m-d');
+      }
+      else{
+        $eks_est_from = (new DateTime($this->date_in($_GET['_eks_est_from'])))->modify('first day of this month')->format('Y-m-d');
+        $eks_est_to = (new DateTime($eks_est_from))->modify('+ ' . ($range - 1) . ' months')->modify('last day of this month')->format('Y-m-d');
+      }
+    }
     
     
     // add montly summed columns in sql query in date range
@@ -1858,23 +1882,48 @@ class eEKS extends lazy_mofo{
       $month = $dt->format('m');
       $year = $dt->format('Y');
       
-      if(!$estimated)
-        $col = $this->translate($dt->format('M')) . $dt->format(' (y)');
-      else{
-        $col = $this->translate($dt->modify('+ 6 months')->format('M')) . $dt->format(' (y)');
-      }
+      $col = $this->translate($dt->format('M')) . $dt->format(' (y)');
       
       if(!$estimated)// concluded EKS, don't change data
         $select_months .= ",SUM( CASE WHEN EXTRACT(MONTH FROM a.$date) = $month AND EXTRACT(YEAR FROM a.$date) = $year THEN a.gross_amount ELSE 0 END ) AS '$col'\r\n";
       else{
         // estimated EKS, use averages and defined multipliers
-        $multiplier = $this->eks_config['eks']['intended_growth'] / 100;
+        if(!empty($_GET['_intended_growth']))
+          $multiplier = $this->clean_out($_GET['_intended_growth']) / 100;
+        else
+          $multiplier = $this->eks_config['eks']['intended_growth'] / 100;
+        
+        // $multiplier = $this->eks_config['eks']['intended_growth'] / 100;
         $multiplier_income = $multiplier * 2 + 1;
         $multiplier_cost = $multiplier + 1;
         
+        $exclude_growing = false;
+        if(isset($this->eks_config['eks']['exclude_growth'])){
+          $exclude_growing = true;
+          $exclude_growth = implode(",",$this->eks_config['eks']['exclude_growth']);
+        }
+        
         $select_months .= ", ROUND( COALESCE( SUM(\r\n";
-        $select_months .= "    CASE WHEN c.page = 3 THEN a.gross_amount / 6 * $multiplier_income ELSE a.gross_amount / 6 * $multiplier_cost END\r\n";
-        $select_months .= "  ), 0), 2 ) AS '$i'\r\n";
+        
+        if($exclude_growing){ // add extra CASE for exclude_growth
+          $select_months .= "    CASE
+      WHEN a.type_of_costs in ($exclude_growth)
+      THEN a.gross_amount / $range
+      ELSE\r\n";
+        }
+        
+        // multiplier
+        $select_months .= "        CASE
+          WHEN c.page = 3
+          THEN a.gross_amount / $range * $multiplier_income
+          ELSE a.gross_amount / $range * $multiplier_cost
+        END\r\n";
+      
+        if($exclude_growing){ // close extra CASE for exclude_growth
+          $select_months .= "    END\r\n";
+        }
+        
+      $select_months .= "  ), 0), 2 ) AS '$i'\r\n";
       }
       
       // grid output control
@@ -1907,7 +1956,7 @@ class eEKS extends lazy_mofo{
       $query .= ", SUM(COALESCE(NULLIF(a.gross_amount, ''), 0)) as sum\r\n";
     
     // average
-    $query .= ", ROUND( COALESCE(SUM( a.gross_amount / 6 ), 0), 2 ) AS average\r\n";
+    $query .= ", ROUND( COALESCE(SUM( a.gross_amount / $range ), 0), 2 ) AS average\r\n";
     
     $this->grid_output_control['average'] = '--number';
     
@@ -1917,7 +1966,10 @@ class eEKS extends lazy_mofo{
     $query .= "LEFT JOIN accounting a\r\n";
     $query .= "  ON a.type_of_costs = t.ID\r\n";
     $query .= "AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
-    $query .= "AND a.$date BETWEEN '$from' AND '$to'\r\n";
+    if(!$estimated)
+      $query .= "AND a.$date BETWEEN '$from' AND '$to'\r\n";
+    else
+      $query .= "AND a.$date BETWEEN '$eks_est_from' AND '$eks_est_to'\r\n";
     
     // get specific page
     $query .= "WHERE c.page IN ($pages)\r\n";
@@ -2127,6 +2179,41 @@ class eEKS extends lazy_mofo{
   }
   
   //////////////////////////////////////////////////////////////////////////////
+  function search_box_filter_eks_estimate_from_date_range(){
+    
+    // purpose: return inputs for estimated EKS to find average of specific
+    // date range
+    
+    $html = "";
+    
+    if(!empty($_GET['_eks']) && $_GET['_eks'] == "estimated"){
+      $from = $range = "";
+      if(!empty($_GET['_eks_est_from']))
+        $from = $this->clean_out($_GET['_eks_est_from']);
+      if(!empty($_GET['_eks_est_range']))
+        $range = $this->clean_out($_GET['_eks_est_range']);
+      
+      if(!empty($_GET['_intended_growth']))
+        $growth = $this->clean_out($_GET['_intended_growth']);
+      else
+        $growth = $this->eks_config['eks']['intended_growth'];
+      
+      $html .= "<fieldset>\r\n";
+      
+      $html .= "<input type='text' name='_eks_est_from' value='".$from."' placeholder='estimate from' title='estimate from (month)' size='10' class='date'>";
+      
+      $html .= "<input type='number' name='_eks_est_range' value='".$range."' placeholder='range' title='range in months' size='2' class=''>";
+      
+      $html .= "<input type='number' name='_intended_growth' value='".$growth."'  title='intended growth in percent' size='2' class=''>";
+      
+      $html .= "</fieldset>\r\n";
+    }
+    
+    return $html;
+    
+  }// end of search_box_filter_eks_date_range()
+  
+  //////////////////////////////////////////////////////////////////////////////
   function search_box_filter_choose_eks_profile(){
     
     // purpose: return selectbox to choose EKS profiles
@@ -2167,6 +2254,9 @@ class eEKS extends lazy_mofo{
     
     $uri = $this->get_uri_path();
     $qs = $this->get_qs();
+    // remove get parameter "_eks" from $qs
+    if( !empty($_GET['_eks']) && $_GET['_eks'] == "estimated" )
+      $qs = str_replace("&amp;_eks=estimated", "", $qs);
     
     $html = "";
     

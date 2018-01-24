@@ -8,7 +8,7 @@
 
 [eks]
 ;; 1=freiberuflich, 3=gewerblich
-default_mode_of_employment = 1
+default_mode_of_employment = 3
 
 ;; for possible future change
 eks_version = "Jobcenter-EKS.01.2017"
@@ -24,7 +24,7 @@ small_business = true
 language = "de"
 
 ;; intended growth in percent
-intended_growth = "5"
+intended_growth = "10"
 
 ;; exclude some types of cost from growing
 ;; 9 = Telefon+Internet
@@ -72,8 +72,8 @@ birthday =
 ;; 4.  Daten zur selbständigen Tätigkeit
 ;; 4.1  Allgemeine Daten zur selbständigen Tätigkeit
 [company_data]
-activity = "Kunst, Gestaltung, Phantasietraining"
-start_date = "25.04.2001"
+activity = "Auftrags-Troll und Schabernack"
+start_date = "01.03.2002"
 end_date = 
 company_location = "Unter dem Regenbogen 42, 04567 Leipzig"
 legal_form = "Einzelunternehmerin"
@@ -117,9 +117,9 @@ financed_amount_of_costs =
 ;; home office
 ;; 7.  Angaben zu den Betriebsräumen
 [home_office]
-has_home_office = true
-quantity = 1
-square_meter = "12,32"
+has_home_office = false
+quantity = 
+square_meter = 
 
 ;; don't change anything below this line
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;*/
