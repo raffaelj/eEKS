@@ -45,6 +45,10 @@ body.eks{
     text-align:center;// centering inline-block pages
     position:relative;// for absolute positioned hide-page-checkboxes
   }
+  @media print{
+    h2{display:none;}
+    .date_now{display:none;}
+  }
 }
 
 @media print{
