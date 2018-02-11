@@ -898,9 +898,10 @@ class eEKS extends lazy_mofo{
     $qs_without_lang = $this->get_qs('_order_by,_desc,_offset,_search,_pagination_off,_view,action');// + action
 
     // optional background image
-    $background_image = "";
-    if (mb_strlen($this->background_image) > 0)
-      $background_image = " style='background-image:url($this->background_image)' ";
+    if (mb_strlen($this->background_image) > 0){
+      $css .= "main{background-image:url($this->background_image);}";
+      $css .= "@media print{main{background-image:none;}}";
+    }
     
     $html_lang = substr($this->i18n,0,2);
     $title = $this->get_page_name();
@@ -911,6 +912,7 @@ class eEKS extends lazy_mofo{
     $page_name = $this->get_page_name("", false);
     $date_now = date($this->datetime_out);
     
+    // user CSS
     $user_css = "";
     if(mb_strlen($css) > 0)
       $user_css .= "<style>$css</style>";
@@ -1348,7 +1350,7 @@ class eEKS extends lazy_mofo{
       // highlight last updated or inserted row
       $shaded = '';
       if(@$_GET[$this->identity_name] == @$row[$this->identity_name] && mb_strlen(@$_GET[$this->identity_name]) > 0)
-        $class[] = "lm_active'";
+        $class[] = "lm_active";
       
       
       // add class to column sums
@@ -1389,7 +1391,7 @@ class eEKS extends lazy_mofo{
         // experimental multi-value column
         elseif(in_array($column_name, $this->multi_column) && $this->multi_column_on){
           $multi_column_content .= "<div>";
-          if(mb_strlen($value) > 0) $multi_column_content .= "$title: ";
+          if(mb_strlen($value) > 0) $multi_column_content .= "<strong>$title:</strong> ";
           $multi_column_content .= $this->get_output_control($column_name . '-' . $row[$this->identity_name], $value, '--text', 'grid') . "</div>";
           
         }

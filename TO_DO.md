@@ -80,6 +80,7 @@ see also [DONE.md](DONE.md)
   * [ ] export of Dashboard doesn't work (missing qs:action in link)
   * [x] export of EKS doesn't work  (unescaped ampersands in qs)
 * [ ] optional: disable links in column headers (for EKS to prevent unwanted sorting)
+* [x] print CSS - deactivate optional background image
 
 ### filters
 

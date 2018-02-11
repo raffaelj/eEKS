@@ -27,7 +27,7 @@ return
     $searchbox
     $list_of_editable_tables
   </header>
-  <main$background_image>
+  <main>
     <h2>$page_name</h2>
     <p class='date_now'>$date_now</p>
     $error

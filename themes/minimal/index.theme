@@ -20,7 +20,7 @@ return
     $export_button_csv
     $searchbox
   </header>
-  <main$background_image>
+  <main>
     $error
     $content
   </main>
