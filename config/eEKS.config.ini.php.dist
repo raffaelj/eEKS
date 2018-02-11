@@ -92,7 +92,10 @@ multi_column[] = invoice_number
 multi_column[] = account
 multi_column[] = cat_02
 multi_column[] = cat_03
+multi_column[] = notes_01
 multi_column[] = notes_02
+multi_column[] = type_of_costs
+multi_column[] = mode_of_employment
 ; multi_column[] = is_reimbursement
 
 ;;;; search filters
