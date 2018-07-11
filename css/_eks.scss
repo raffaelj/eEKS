@@ -921,9 +921,9 @@ $size: 1.5em;
     &:nth-child(n+13):nth-child(-n+17) td:nth-child(2){ // display custom types of costs
       opacity:1;
       // hacky solution to hide first part of text (until changing database to better names)
-      text-indent:$zoom * -9.8px;//-24.5
+      text-indent:$zoom * -6.8px;//-17
       position: relative;
-      left:$zoom * 13.4px;//33.5
+      left:$zoom * 10.4px;//26
       background-color:transparent;
     }
   }
@@ -962,8 +962,8 @@ $size: 1.5em;
       &:nth-child(n+13):nth-child(-n+17) td:nth-child(2){ // display custom types of costs
         opacity:1;
         // hacky solution to hide first part of text (until changing database to better names)
-        text-indent:-9.8mm;//-24.5
-        left:13.4mm;//33.5
+        text-indent:-5.8mm;//
+        left:10.4mm;//33.5
       }
     }
   }

@@ -126,7 +126,7 @@ see also [DONE.md](DONE.md)
 * [x] show only one/some pages
   * [x] table pages require variables from page before (sum, carryover)
 * [ ] EKS page 1, 4.1 image - missing text "handelt."
-* [ ] EKS page 4, remove "e)" to "i)" from image to avoid overlapping of text
+* [x] EKS page 4, remove "e)" to "i)" from image to avoid overlapping of text
 
 ### GUI and styling
 

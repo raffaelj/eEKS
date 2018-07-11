@@ -396,6 +396,7 @@ td{
     max-width:30em;
     @media print{
       white-space:normal;
+      min-width:16em;
     }
   }
   &[data-col=sum]{
