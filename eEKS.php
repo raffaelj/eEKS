@@ -725,15 +725,16 @@ class eEKS extends lazy_mofo{
       $html .= '<label for="small_business"></label>';
       $html .= "</fieldset>";
       
+      $this->grid_sql = $this->generate_grid_sql_eks(3);
+      
       // inject rows with sums/carryover
-      $sql = $this->generate_grid_sql_eks(3, true);
-      $sum_page_3 = $this->query($sql, $this->grid_sql_param);
+      $sum_page_3 = $this->sum_result($this->query($this->grid_sql, $this->grid_sql_param)); // sum of page 3
+      
       $this->inject_rows['last'] = $sum_page_3;
       $this->inject_rows['last'][0]['ID'] = "";
       $this->inject_rows['last'][0]['type_of_costs'] = "Summe A1-A7";
       
       // grid
-      $this->grid_sql = $this->generate_grid_sql_eks(3);
       $html .= $this->grid('', true);
       
       // reset row injection
@@ -745,16 +746,16 @@ class eEKS extends lazy_mofo{
     ///////////////// EKS page 4
       $html .= "<page id='eks_page4' class='eks_page landscape'>";
       
+      $this->grid_sql = $this->generate_grid_sql_eks(4);
+      
       // inject rows with sums/carryover
-      $sql = $this->generate_grid_sql_eks(4, true); // sum of page 4
-      $sum_page_4 = $this->query($sql, $this->grid_sql_param);
+      $sum_page_4 = $this->sum_result($this->query($this->grid_sql, $this->grid_sql_param)); // sum of page 4
       
       $this->inject_rows["last"] = $sum_page_4;
       $this->inject_rows['last'][0]['ID'] = "";
       $this->inject_rows['last'][0]['type_of_costs'] = "Zwischensumme B1-B7";
       
       // grid
-      $this->grid_sql = $this->generate_grid_sql_eks(4);
       $html .= $this->grid('', true);
       
       // reset row injection
@@ -771,8 +772,9 @@ class eEKS extends lazy_mofo{
       $this->inject_rows[1][0]['ID'] = "";
       $this->inject_rows[1][0]['type_of_costs'] = "Übertrag B1-B7";
       
-      $sql = $this->generate_grid_sql_eks(5, true); // sum of page 5
-      $sum_page_5 = $this->query($sql, $this->grid_sql_param);
+      $this->grid_sql = $this->generate_grid_sql_eks(5);
+      
+      $sum_page_5 = $this->sum_result($this->query($this->grid_sql, $this->grid_sql_param)); // sum of page 5
       
       foreach($sum_page_4[0] as $key=>$val){
         $sum_costs[0][$key] = $val + $sum_page_5[0][$key];
@@ -790,7 +792,6 @@ class eEKS extends lazy_mofo{
       $this->inject_rows[23][0]['type_of_costs'] = "Gewinn";
       
       // grid
-      $this->grid_sql = $this->generate_grid_sql_eks(5);
       $html .= $this->grid('', true);
       
       // reset row injection
@@ -802,6 +803,9 @@ class eEKS extends lazy_mofo{
     
     ///////////////// EKS page 6
       $html .= "<page id='eks_page6' class='eks_page landscape'>";
+      
+      // this section doesn't exist in the database or in any other place.
+      // It's coming in the future...
       
       // grid
       // $this->grid_sql = $this->generate_grid_sql_eks(6);
@@ -1083,12 +1087,12 @@ class eEKS extends lazy_mofo{
     
     // purpose: set class names for different numbers
     
-    $str = $this->number_out($str, $type);
-    
     $class = "number";
     if ($str == 0) $class .= " zero";
     if ($str < 0)  $class .= " minus";
     if ($str > 0)  $class .= " plus";
+    
+    $str = $this->number_out($str, $type);
     
     return "<span class='$class'>$str</span>";
     
@@ -1748,7 +1752,7 @@ class eEKS extends lazy_mofo{
     
     // average
     if($count_cols > 1)
-      $query .= ", ROUND( COALESCE(SUM( a.gross_amount / $count_cols ), 0), 2 ) AS average\r\n";
+      $query .= ", ROUND( COALESCE(SUM( a.gross_amount / $count_cols ), 0), ".($this->decimals)." ) AS average\r\n";
     
     return $query;
     
@@ -1925,7 +1929,7 @@ class eEKS extends lazy_mofo{
           $select_months .= "    END\r\n";
         }
         
-      $select_months .= "  ), 0), 2 ) AS '$i'\r\n";
+      $select_months .= "  ), 0), ".($this->decimals)." ) AS '$i'\r\n";
       }
       
       // grid output control
@@ -1958,7 +1962,7 @@ class eEKS extends lazy_mofo{
       $query .= ", SUM(COALESCE(NULLIF(a.gross_amount, ''), 0)) as sum\r\n";
     
     // average
-    $query .= ", ROUND( COALESCE(SUM( a.gross_amount / $range ), 0), 2 ) AS average\r\n";
+    $query .= ", ROUND( COALESCE(SUM( a.gross_amount / $range ), 0), ".($this->decimals)." ) AS average\r\n";
     
     $this->grid_output_control['average'] = '--number';
     
@@ -3357,6 +3361,25 @@ class eEKS extends lazy_mofo{
       // $class .= "test";
       
     return $class;
+    
+  }
+  
+  //////////////////////////////////////////////////////////////////////////////
+  function sum_result($arr){
+    
+    // purpose: return array with sum of result for estimated eks
+    // the old solution with calling of grid-sql without group_by leads to rounding issues
+    
+    foreach($arr as $v){
+      foreach($v as $key => $val){
+        if( !isset($sum[0][$key]) )
+          $sum[0][$key] = $val;
+        else
+          $sum[0][$key] += $val;
+      }
+    }
+    
+    return $sum;
     
   }
   
