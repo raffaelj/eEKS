@@ -125,7 +125,7 @@ see also [DONE.md](DONE.md)
 * [x] rotate landscape pages for printing and PDF export
 * [x] show only one/some pages
   * [x] table pages require variables from page before (sum, carryover)
-* [ ] EKS page 1, 4.1 image - missing text "handelt."
+* [x] EKS page 1, 4.1 image - missing text "handelt."
 * [x] EKS page 4, remove "e)" to "i)" from image to avoid overlapping of text
 
 ### GUI and styling
