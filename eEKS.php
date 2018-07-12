@@ -81,6 +81,9 @@ class eEKS extends lazy_mofo{
   // missing singular if only one record is found
   public $pagination_text_record = "Record";
   
+  // disable link to reorder table with click on table header
+  public $reorder_link_on_header = true;
+  
   
   /////////////// overwrite LM variables
   // some of them are new for i18n
@@ -1257,15 +1260,20 @@ class eEKS extends lazy_mofo{
     foreach($columns as $column_name){
 
       $title = $this->format_title($column_name, @$this->rename[$column_name]);
+      
+      if( $this->reorder_link_on_header )
+        $order_link = "<a href='{$uri_path}_order_by=" . ($i + 1) . "&amp;_desc=$_desc_invert&amp;" . $this->get_qs('_search,_view,_lang') . "' class='lm_$column_name'>$title</a>";
+      else
+        $order_link = $title;
 
       if($column_name == $this->identity_name && $i == ($column_count - 1))
         $edit_delete = "    <th class='col_edit'></th>\n"; // if identity is last column then this is the column with the edit and delete links
       elseif( $this->multi_column_on ){ // experimental multi-value column active
         if( !in_array($column_name, $this->multi_column) )
-          $head .= "    <th><a href='{$uri_path}_order_by=" . ($i + 1) . "&amp;_desc=$_desc_invert&amp;" . $this->get_qs('_search,_view,_lang') . "' class='lm_$column_name'>$title</a></th>\n";
+          $head .= "    <th>$order_link</th>\n";
       }
       else
-        $head .= "    <th><a href='{$uri_path}_order_by=" . ($i + 1) . "&amp;_desc=$_desc_invert&amp;" . $this->get_qs('_search,_view,_lang') . "' class='lm_$column_name'>$title</a></th>\n";
+          $head .= "    <th>$order_link</th>\n";
   
       $i++;
 

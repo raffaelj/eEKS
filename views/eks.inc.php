@@ -35,3 +35,4 @@ $this->grid_sql = $this->generate_grid_sql_eks();
 $this->multi_column_on = false;
 $this->grid_repeat_header_at = false;
 $this->grid_show_column_sums = false; // disable column sums
+$this->reorder_link_on_header = false;
