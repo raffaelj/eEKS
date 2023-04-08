@@ -495,9 +495,9 @@ td{
     }
   }
 }
-.lang_button{
-  float:right;
-}
+// .lang_button{
+//   float:right;
+// }
 
 .icon, .lm_icon{
   display: inline-block;
@@ -525,7 +525,7 @@ td{
 .delete_confirm{
   display:none;
 }
-  
+
 .button_delete{
   display:none;
   + label{
@@ -599,10 +599,13 @@ td{
   margin: 0 auto;
   border-radius: 4px;
   border: 1px solid $clr_grey_light;
-  width: 600px;
+  // width: 600px;
+  width: 50em;
   max-width: 100%;
   td:first-child {
     text-align: right;
+    // width: 10em;
+    min-width: 10em;
   }
   textarea{
     width:100%;
@@ -632,8 +635,15 @@ td{
 
 
 .lm_form_button_bar{
-  text-align: center;
-  padding-top: 1em;
+  // text-align: center;
+  padding: 1em 2em 0;
+  overflow: hidden; // fix light gray background caused by floating elements
+}
+.lm_form_button_main {
+  float: left;
+}
+.lm_form_button_secondary {
+  float: right;
 }
 
 

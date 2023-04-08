@@ -1,44 +1,41 @@
 <?php
 
-require_once('lazy_mofo.php');
+class eEKS extends lazy_mofo {
 
-class eEKS extends lazy_mofo{
-  
   /////////////// custom non-LM variables
-  
+
   public $software_name = "eEKS";
   public $slogan = "";
   public $background_image = "";
-  
+
   // column names in this array are shown together in a multi-value column
   public $multi_column_on = false;
   public $multi_value_column_title = "Multiple Values";
   public $multi_column = array();
-  
+
   // number format
   public $decimals = 2;
   public $dec_point = '.';
   public $thousands_sep = ',';
-  
+
   // language for html lang attribute
   public $html_lang = "en";
-  
+
   // contains error message --> must be in template
   public $error = "";
-  
+
   // placeholders for date filters
   public $date_filter_from = "from";
   public $date_filter_to = "to";
-  
+
   // other words that need translation and may appear somewhere
-  // example in i18n file: $this->translate['all'] = "alle";
-  public $translate = array();
-  
+  // example in i18n file: $this->translations['all'] = "alle";
+  public $translations = array();
+
   // active views
   // options: missing_date, monthly, edit, eks
   public $views = array();
-  
-  
+
   // filter settings for search bar and configurable grid sql
   // Set column names to use for filtering
   // Arrays can contain multiple columns, variables can contain one column name
@@ -46,79 +43,78 @@ class eEKS extends lazy_mofo{
   public $category_filters = array();   // category filters
   public $search_in_columns = array();  // full text search
   public $amount_filter = "";           // positive/negative/all amounts
-  
+
   // display sums of columns in the last row of the grid
   public $grid_show_column_sums = false;
   public $sum_these_columns = array();
-  
+
   // inject rows into grid for column sums, carryovers, additional infos etc.
   public $inject_rows = array();
-  
+
   // rename column headers to nice names instead of original database headers
   public $rename_csv_headers = false;
-  
+
   // folder for pdf creation
-  public $pdf_path = "exports";
-  
+  // public $pdf_path = "exports";
+
   // for PDF export wkhtmltopdf must be installed
   // you have to define the full path of the wkhtmltopdf executable
   // Example on Uberspace: '/home/$USER/bin/wkhtmltopdf';
   // more info in `docs/install.md` (coming soon)
-  public $wkhtmltopdf_path = 'wkhtmltopdf';
-  
-  // optional configuration via ini file
+  // public $wkhtmltopdf_path = 'wkhtmltopdf';
+
+  // optional configuration via config file
   public $config = array();
-  
-  // EKS profile via ini file
+
+  // EKS profile via config file
   private $eks_config = array();
-  
+
   // public variable to overwrite i18n
   public $i18n = "";
-  
+
   // allow javascript - if enabled scripts are added at bottom of template
   public $allow_javascript = false;
-  
+
   // missing singular if only one record is found
   public $pagination_text_record = "Record";
-  
+
   // disable link to reorder table with click on table header
   public $reorder_link_on_header = true;
-  
-  
+
   /////////////// overwrite LM variables
   // some of them are new for i18n
-  
+
   public $table = 'accounting';    // table name for updates, inserts and deletes
   public $identity_name = 'ID';    // identity / primary key for table
-  
+
   // links on grid
   public $grid_add_link_text    = "Add a Record";
   public $grid_add_link    = "<a href='[script_name]action=edit&amp;[qs]' class='lm_button confirm lm_grid_add_link'>[grid_add_link_text]</a>";
-  
+
   public $grid_edit_link_text   = "edit";
   public $grid_edit_link   = "<a href='[script_name]action=edit&amp;[identity_name]=[identity_id]&amp;[qs]' class='lm_button lm_icon lm_grid_edit_link' title='[grid_edit_link_text]'>[[grid_edit_link_text]]</a>";
-  
+
   // lm used a hidden form and javascript
   // this solution uses CSS, a checkbox and a confirm button
   public $grid_delete_link = "<input type='checkbox' name='[identity_name]' id='delete_[identity_id]' value='[identity_id]' class='button_delete'><label for='delete_[identity_id]' class='lm_button lm_icon alarm'>X</label><div class='delete_confirm'><p>[delete_confirm]</p><input type='submit' name='confirm_delete' value='[grid_text_delete]' class='button_delete_confirm lm_button alarm'></div>";
-  
+
   public $grid_export_link_text = "Export CSV";
   public $grid_export_link = "<a href='[script_name]_export=1&amp;[qs]' title='[grid_export_link_text]' class='lm_button grid_export_link'>CSV</a>";
-  
+
   // form buttons
   public $form_add_button_text    = "Add";
   public $form_add_button    = "<input type='submit' value='[form_add_button_text]' class='lm_button confirm'>";
-  
+
   public $form_update_button_text = "Update"; 
   public $form_update_button = "<input type='submit' value='[form_update_button_text]' class='lm_button confirm'>"; 
-  
+
   public $form_delete_button = "<input type='checkbox' name='delete_check' id='delete_check' value='not-important' class='button_delete alarm'><label for='delete_check' class='lm_button alarm'>[grid_text_delete]</label><div class='delete_confirm'><p>[delete_confirm]</p><input type='submit' name='confirm_delete' value='[grid_text_delete]' class='lm_button alarm'></div>";
-  
+
   public $form_duplicate_button_text = "Copy to new entry";
   public $form_duplicate_button = "<input type='submit' name='duplicate' value='[form_duplicate_button_text]' class='lm_button attention'>";
-  
+
   public $form_back_button_text   = "Back";
-  
+
   // search box
   public $grid_search_box_clear = "Clear Search";
   public $grid_search_box_search = "Search";
@@ -130,7 +126,7 @@ class eEKS extends lazy_mofo{
       <input type='hidden' name='' value=''>[query_string_list]
     </fieldset>
   </form>";
-  
+
   /**
    * query string list for search filters
    * 
@@ -139,56 +135,62 @@ class eEKS extends lazy_mofo{
    * main category filters: _mode_of_employment,_type_of_costs
    * custom category filters: _cat_01... - coming soon
    */
-  
+
   public $query_string_list = "";
   public $query_string_list_post = "";
-  
-  
-  //////////////////////////////////////////////////////////////////////////////
-  function __construct($dbh, $i18n = 'en-us', $ini = ''){
 
-    if(!$dbh)
-      die('Pass in a PDO object connected to the mysql database.');
+    public $debug = false;
 
-    if(!(get_magic_quotes_gpc() == 0) && (get_magic_quotes_runtime() == 0))
-      echo('Warning: lazy mofo requires magic_quotes be disabled.');
+    function __construct($dbh, $i18n = 'en-us', $config = []) {
 
-    $this->dbh = $dbh; 
+        if(!$dbh)
+            die('Pass in a PDO object connected to the mysql database.');
 
-    $timezone = @date_default_timezone_get();
-    if($timezone == '' || $timezone == 'UTC')
-      date_default_timezone_set($this->timezone);
+        if (isset($config['debug'])) $this->debug = (bool) $config['debug'];
 
-    // avoid notices for this noonce token
-    if(!isset($_SESSION['_csrf']))
-      $_SESSION['_csrf'] = '';
-    
-    // load configuration from ini file
-    if(strlen($ini) > 0){
-      if(file_exists("config/{$ini}"))
-        $this->config = parse_ini_file("config/{$ini}", true, INI_SCANNER_TYPED);
-      elseif(file_exists("config/{$ini}.dist"))
-        $this->config = parse_ini_file("config/{$ini}.dist", true, INI_SCANNER_TYPED);
-      else
-        die("Error: Requested ini file ({$ini}) does not exist.");
-      
-      // overwrite public variables defined in config file
-      $this->config_from_ini();
+        $this->version = json_decode(file_get_contents(__DIR__ . '/package.json'), true)['version'];
+
+        $this->dbh = $dbh;
+
+        $timezone = @date_default_timezone_get();
+        if ($timezone == '' || $timezone == 'UTC')
+            date_default_timezone_set($this->timezone);
+
+        // avoid notices for this noonce token
+        if (!isset($_SESSION['_csrf']))
+            $_SESSION['_csrf'] = '';
+
+        $this->config = $config;
+
+        if (isset($config['lm'])) {
+            foreach ($config['lm'] as $key => $val){
+                if (property_exists('eEKS', $key)) {
+                    $this->$key = $val;
+                }
+            }
+        }
+
+        if (isset($config['eeks'])) {
+            foreach ($config['eeks'] as $key => $val){
+                if (property_exists('eEKS', $key)) {
+                    $this->$key = $val;
+                }
+            }
+        }
+
+        // load internationalization file if it exists, en-us (default) is defined in this class
+        $this->set_language();
+
     }
-    
-    // load internationalization file if it exists, en-us (default) is defined in this class
-    $this->set_language();
-    
-  }
-  
+
   //////////////////////////////////////////////////////////////////////////////
   function run(){
 
     // purpose: built-in controller
-    
+
     // set commands and grid_sql
     $this->set_grid_view_parameters();
-    
+
     switch($this->get_action()){
       case "edit":          $this->template($this->edit());        break;
       case "insert":        $this->insert();      break;
@@ -203,17 +205,18 @@ class eEKS extends lazy_mofo{
     }
 
   }
-  
+
   //////////////////////////////////////////////////////////////////////////////
   function set_language(){
-    
+
     // purpose: load internationalization file, default: en-us
-    
-    if(strlen(@$_GET['_lang']) == 5 && !strpos(@$_GET['_lang'], '/'))
-      $this->i18n = $_GET['_lang'];
-    
+
+    if ($lang = $_GET['_lang'] ?? false) {
+      if (strlen($lang) === 5 && !strpos($lang, '/')) $this->i18n = $lang;
+    }
+
     $i18n = $this->i18n;
-    
+
     if(strlen($i18n) > 0 && $i18n != 'en-us'){
       if(!file_exists("i18n/{$i18n}.php"))
         $this->error = "Error: Requested i18n file ({$i18n}.php) does not exist.";
@@ -221,30 +224,32 @@ class eEKS extends lazy_mofo{
         include("i18n/{$i18n}.php");
     }
   }
-  
-  //////////////////////////////////////////////////////////////////////////////
-  function translate($str = "", $format = ""){
-    
-    // purpose: translate words
-    // example:
-    // content of i18n file: `$this->translate['all'] = "alle";`  (array)
-    //          use in code: `$this->translate('all');`           (function)
-    
-    if(array_key_exists($str, $this->translate))
-      $str = $this->translate[$str];
-    
-    if($format == "pretty")
-      $str = $this->format_title($str);
-    
-    if($format == "upper")
-      $str = mb_strtoupper($str, $this->charset);
-    
-    if($format == "lower")
-      $str = mb_strtolower($str, $this->charset);
-    
-    return $str;
-  }
-  
+
+
+    function translate($str = "", $format = ""){
+
+        // purpose: translate words
+        // example:
+        // content of i18n file: `$this->translations['all'] = "alle";`  (array)
+        //          use in code: `$this->translate('all');`           (function)
+
+        if ($str === null) $str = '';
+
+        if(array_key_exists($str, $this->translations))
+            $str = $this->translations[$str];
+
+        if($format == "pretty")
+            $str = $this->format_title($str, null);
+
+        if($format == "upper")
+            $str = mb_strtoupper($str, $this->charset);
+
+        if($format == "lower")
+            $str = mb_strtolower($str, $this->charset);
+
+        return $str;
+    }
+
   //////////////////////////////////////////////////////////////////////////////
   function dashboard(){
     
@@ -313,6 +318,7 @@ class eEKS extends lazy_mofo{
     $html .= $this->grid('', true);
     
     // reset variables
+    $this->grid_sql_param = [];
     unset($_GET['_missing_date_on']);
     unset($_GET['_missing_date']);
     unset($_GET['_amount']);
@@ -336,6 +342,8 @@ class eEKS extends lazy_mofo{
     
     $html .= $this->grid('', true);
     
+    // reset variables
+    $this->grid_sql_param = [];
     unset($_GET['_from']);
     unset($_GET['_view']);
     
@@ -506,24 +514,21 @@ class eEKS extends lazy_mofo{
     
     return $html;
   }
-  
-  //////////////////////////////////////////////////////////////////////////////
+
   function set_grid_view_parameters($view = ""){
-    
+
     // purpose: show different views with different grids, forms and searchboxes
-    // views must be defined in $this->views or via ini file
+    // views must be defined in $this->views or via config file
     // for a better overview views are in external files in folder `views`
-    
-    
+
     if($view == "")
       $view = $this->get_view();
-    
+
     if( file_exists("views/{$view}.inc.php") )
       include("views/{$view}.inc.php");
-    
+
   }
-  
-  //////////////////////////////////////////////////////////////////////////////
+
   function eks(){
     
     // purpose: show form with prefilled data to user (attachment EKS)
@@ -856,7 +861,7 @@ class eEKS extends lazy_mofo{
     $grid_add_link = str_replace('[grid_add_link_text]', $this->grid_add_link_text, $grid_add_link);
     return $grid_add_link;
   }
-  
+
   //////////////////////////////////////////////////////////////////////////////
   function export_button(){
     $qs = $this->get_qs();
@@ -867,36 +872,35 @@ class eEKS extends lazy_mofo{
     $grid_export_link = str_replace('[grid_export_link_text]', $this->grid_export_link_text, $grid_export_link);
     return $grid_export_link;
   }
-  
+
   //////////////////////////////////////////////////////////////////////////////
   function template($content){
-    
+
     // purpose: use template file for HTML output
-    
+
     // wkhtmltopdf has a bug and doesnt't load background images inside @media rules
     // issue: https://github.com/wkhtmltopdf/wkhtmltopdf/issues/3126
     // Therefore we have to insert some CSS to overwrite the screen images with
     // high-resulution images for printing
-    $_wkhtmltopdf_img_fix = intval(@$_REQUEST['_wkhtmltopdf_img_fix']);
-    $_pdf = intval(@$_REQUEST['_pdf']);
+    // $_wkhtmltopdf_img_fix = intval(@$_REQUEST['_wkhtmltopdf_img_fix']);
+    // $_pdf = intval(@$_REQUEST['_pdf']);
 
     // export page to PDF and quit 
-    if($_pdf == 1){
-      $url = $this->get_uri_path() . $this->get_qs();
-      // replace escaped ampersands from get_qs() with unescaped ampersands
-      $url = str_replace('&amp;', '&', $url);
-      $url .= "&_wkhtmltopdf_img_fix=1"; // add parameter to qs of current page for CSS insert
-      $this->generate_pdf($url);
-      return;
-    }
+    // if($_pdf == 1){
+    //   $url = $this->get_uri_path() . $this->get_qs();
+    //   // replace escaped ampersands from get_qs() with unescaped ampersands
+    //   $url = str_replace('&amp;', '&', $url);
+    //   $url .= "&_wkhtmltopdf_img_fix=1"; // add parameter to qs of current page for CSS insert
+    //   $this->generate_pdf($url);
+    //   return;
+    // }
 
     $css = "";
-    if($_wkhtmltopdf_img_fix == 1) // insert CSS to overwrite background images
-      $css .= "body.eks form.eks_form #eks_page1.eks_page{background-image:url('img/eks_1-6_print.png');}body.eks form.eks_form #eks_page2.eks_page{background-image:url('img/eks_2-6_print.png');}body.eks form.eks_form #eks_page3.eks_page{background-image:url('img/eks_3-6_print.png');}body.eks form.eks_form #eks_page4.eks_page{background-image:url('img/eks_4-6_print.png');}body.eks form.eks_form #eks_page5.eks_page{background-image:url('img/eks_5-6_print.png');}body.eks form.eks_form #eks_page6.eks_page{background-image:url('img/eks_6-6_print.png');}";
-    
-    
+    // if($_wkhtmltopdf_img_fix == 1) // insert CSS to overwrite background images
+    //   $css .= "body.eks form.eks_form #eks_page1.eks_page{background-image:url('img/eks_1-6_print.png');}body.eks form.eks_form #eks_page2.eks_page{background-image:url('img/eks_2-6_print.png');}body.eks form.eks_form #eks_page3.eks_page{background-image:url('img/eks_3-6_print.png');}body.eks form.eks_form #eks_page4.eks_page{background-image:url('img/eks_4-6_print.png');}body.eks form.eks_form #eks_page5.eks_page{background-image:url('img/eks_5-6_print.png');}body.eks form.eks_form #eks_page6.eks_page{background-image:url('img/eks_6-6_print.png');}";
+
     //// variables for templating
-    
+
     // class name generated by page name/type for easier styling
     $body_class = $this->get_action();
 
@@ -909,76 +913,57 @@ class eEKS extends lazy_mofo{
       $css .= "main{background-image:url($this->background_image);}";
       $css .= "@media print{main{background-image:none;}}";
     }
-    
+
     $html_lang = substr($this->i18n,0,2);
     $title = $this->get_page_name();
     $software_name = htmlspecialchars($this->software_name);
     $slogan = htmlspecialchars($this->slogan);
-    $version = $this->version();
-    
+    // $version = $this->version();
+    $version = $this->version;
+    $debug = $this->debug;
+
     $page_name = $this->get_page_name("", false);
     $date_now = date($this->datetime_out);
-    
+
     // user CSS
     $user_css = "";
     if(mb_strlen($css) > 0)
       $user_css .= "<style>$css</style>";
-    
+
     // buttons
     $settings_button = "<a href='{$uri}action=settings' class='lm_button'>".$this->translate("settings", "pretty")."</a>";
     $dashboard_button = "<a href='{$uri}action=dashboard' class='lm_button'>Dashboard</a>";
     $add_button = $this->add_button();
     $export_button_csv = $this->export_button();
-    $export_button_pdf = "<a target='_blank' href='{$uri}_pdf=1&amp;{$qs}' class='lm_button' title='PDF Export'>PDF</a>";
+    // $export_button_pdf = "<a target='_blank' href='{$uri}_pdf=1&amp;{$qs}' class='lm_button' title='PDF Export'>PDF</a>";
     // language buttons
     $langs = array("de-de", "en-us");
     $language_button = "";
     foreach($langs as $lang)
       if($lang != $this->i18n)
         $language_button .= "<a href='{$uri}_lang=$lang&amp;$qs_without_lang' class='lang_button'>".substr($lang,0,2)."</a>";
-    
+
     $list_of_views = $this->list_of_views();
     $searchbox = $this->search_box();
     $list_of_editable_tables = $this->list_of_editable_tables(); // empty if _view != "edit_tables"
-    
+
     // javascript
     $js = "";
     if($this->allow_javascript){
-      $js = "<script src='js/pikaday.js'></script>";
+      $js = "<script src='assets/js/pikaday.js'></script>";
       $js .= "<script>var lang = '$this->i18n', date_out = '$this->date_out'</script>";
-      $js .= "<script src='js/eEKS.js'></script>";
+      $js .= "<script src='assets/js/eEKS.js?v=".($debug ? time() : $version)."'></script>";
     }
-    
+
     $error = $this->error;
-    
+
     // include template file
-    if(file_exists('themes/'.$this->config['eeks']['theme'].'/index.theme'))
-      echo include('themes/'.$this->config['eeks']['theme'].'/index.theme');
+    if(file_exists('themes/'.$this->config['eeks']['theme'].'/index.php'))
+      include('themes/'.$this->config['eeks']['theme'].'/index.php');
     else
-      echo include('themes/default/index.theme');
+      include('themes/default/index.php');
   }
-  
-  //////////////////////////////////////////////////////////////////////////////
-  function config_from_ini(){
-    
-    // purpose: use ini file instead of overwriting variables in PHP
-    
-    if(!empty($this->config)){
-      
-      foreach($this->config['lm'] as $key => $val){
-        if(property_exists('eEKS', $key))
-          $this->$key = $val;
-      }
-      
-      foreach($this->config['eeks'] as $key => $val){
-        if(property_exists('eEKS', $key))
-          $this->$key = $val;
-      }
-      
-    }
-    
-  }
-  
+
   //////////////////////////////////////////////////////////////////////////////
   function edit($error = ''){
     
@@ -1031,60 +1016,62 @@ class eEKS extends lazy_mofo{
     if(mb_strlen($file_name) == 0)
         return;
 
+    $ext = strtolower(pathinfo($this->upload_path . '/' . $file_name, PATHINFO_EXTENSION));
+
+    if ($ext == 'pdf') {
+        return "<a href='$this->upload_path/$file_name' target='_blank' title='" . $this->clean_out($file_name) . "'>" . $ext . "</a>";
+    }
+
     if($this->grid_show_images == false)
       return "<a href='$this->upload_path/$file_name' target='_blank'>" . $this->clean_out($file_name, $this->grid_ellipse_at) . "</a>";
-    elseif(mb_strlen($this->thumb_path))
+    elseif(mb_strlen($this->thumb_path) && file_exists($this->thumb_path.'/'.$file_name))
       return "<a href='$this->upload_path/$file_name' target='_blank'><img src='$this->thumb_path/$file_name' alt='image' /></a>";
     else
       return "<a href='$this->upload_path/$file_name' target='_blank'><img src='$this->upload_path/$file_name' alt='image' /></a>";
 
   }
-  
-  //////////////////////////////////////////////////////////////////////////////
-  function number_in($str){
-    
-    // purpose: convert local format to database format
-    
-    if(mb_strlen($str) == 0)
-      return null;
-    
-    $str = $this->clean_out($str);
-    
-    if($this->dec_point != '.'){
-      $str = str_replace($this->thousands_sep, '', $str);
-      $str = str_replace($this->dec_point, '.', $str);
-      $str = floatval($str);
+
+  function html_document_output($file_name){
+
+    // purpose: if exists, display document link
+    // returns: html
+
+    if (!file_exists($this->upload_path . '/' . $file_name)) return '';
+
+    $ext = strtolower(pathinfo($this->upload_path . '/' . $file_name, PATHINFO_EXTENSION));
+
+    if ($this->grid_show_images && in_array($ext, ['jpg','jpeg','gif','png'])) {
+        return $this->html_image_output($file_name);
     }
-    
-    $str = number_format((float)$str, 2, '.', '');
-    
-    return $str;
-    
+
+    return "<a href='$this->upload_path/$file_name' target='_blank' title='" . $this->clean_out($file_name) . "'>" . $ext . "</a>";
+
   }
-  
-  //////////////////////////////////////////////////////////////////////////////
+
   function number_out($str = "", $type = "float"){
-    
+
     // purpose: convert database format to local format
-    
+
+    if ($str === null) return '';
+
     if(mb_strlen($str) == 0)
       return;
-    
+
     $str = $this->clean_out($str);
-    
+
     // delete thousands separator if it exists
     $str = str_replace(',', '', $str);
-    
+
     // format number with local separators
     if( $type == "float" )
       $str = number_format((float)$str, $this->decimals, $this->dec_point, $this->thousands_sep);
     else
       $str = number_format((float)$str, 0, $this->dec_point, $this->thousands_sep);
-    
+
     return $str;
-    
+
   }
-  
+
   //////////////////////////////////////////////////////////////////////////////
   function html_number_output($str = "", $type = "float"){
     
@@ -1119,7 +1106,7 @@ class eEKS extends lazy_mofo{
   
   //////////////////////////////////////////////////////////////////////////////
   function grid($error = '', $no_form = false){
-    
+
     // purpose: function to list a table of records. aka data grid
     // returns: html
     // populate_from_post tells inputs to populate from $_POST instead of the database. useful to preserve data when displaying validation errors.
@@ -1361,7 +1348,7 @@ class eEKS extends lazy_mofo{
       
       // highlight last updated or inserted row
       $shaded = '';
-      if(@$_GET[$this->identity_name] == @$row[$this->identity_name] && mb_strlen(@$_GET[$this->identity_name]) > 0)
+      if(@$_GET[$this->identity_name] == @$row[$this->identity_name] && mb_strlen($_GET[$this->identity_name] ?? '') > 0)
         $class[] = "lm_active";
       
       
@@ -1392,7 +1379,8 @@ class eEKS extends lazy_mofo{
         $title = $this->format_title($column_name, @$this->rename[$column_name]);
 
         $value = $row[$column_name];
-        
+        if ($value === null) $value = '';
+
         // edit & delete links
         if($column_name == $this->identity_name && $i == ($column_count - 1))
           if($this->grid_show_column_sums && $j == $count_result - 1)
@@ -1460,6 +1448,8 @@ class eEKS extends lazy_mofo{
   function generate_grid_sql(){
     
     // purpose: generate sql query ($this->grid_sql) with defined filter options
+      
+      // $this->grid_sql_param = [];
     
     $search_in_columns = $this->search_in_columns;
     $date_filters = $this->date_filters;
@@ -1480,7 +1470,7 @@ class eEKS extends lazy_mofo{
       $active_columns[] = $this->identity_name;
     }
     
-    // list active columns (defined in ini file)
+    // list active columns (defined in config file)
     $i = 0;
     foreach($active_columns as $val){
       
@@ -1511,7 +1501,7 @@ class eEKS extends lazy_mofo{
         $where[] = $val;
       
       // set variable for date filters
-      if(in_array($val, $date_filters) && $val == @$_REQUEST['_date_between'] && ( mb_strlen(trim(@$_REQUEST['_from'])) > 0 || mb_strlen(trim(@$_REQUEST['_to'])) > 0 ))
+      if(in_array($val, $date_filters) && $val == @$_REQUEST['_date_between'] && ( mb_strlen(trim($_REQUEST['_from'] ?? '')) > 0 || mb_strlen(trim($_REQUEST['_to'] ?? '')) > 0 ))
         $date_filter[] = $val;
       
       $i++;
@@ -1546,7 +1536,7 @@ class eEKS extends lazy_mofo{
     
     // add WHERE clause for full text search
     if(!empty($where)){
-      
+
       $query .= "WHERE (\r\n";
       
       $i = 0;
@@ -1556,17 +1546,18 @@ class eEKS extends lazy_mofo{
         $query .= "  COALESCE(a.$val, '') LIKE :_search\r\n";
         $i++;
       }
+    
+        // add grid_sql_param
+        $this->grid_sql_param[':_search'] = '%' . trim($_REQUEST['_search'] ?? '') . '%';
       
     }
-    
-    // add grid_sql_param
-    $this->grid_sql_param[':_search'] = '%' . trim(@$_REQUEST['_search']) . '%';
     
     $query .= ")\r\n";
       
     // add AND clause for filter by category
     foreach($this->category_filters as $val){
       if(!empty($_REQUEST["_$val"])){
+// echo $val . PHP_EOL;
         $query .= "AND a.$val LIKE :_$val\r\n";
         $this->grid_sql_param[":_$val"] = $this->clean_out(@$_REQUEST["_$val"]);
       }
@@ -1703,10 +1694,10 @@ class eEKS extends lazy_mofo{
     
     return array($from, $to);
   }
-  
+
   //////////////////////////////////////////////////////////////////////////////
-  function select_interval($interval = "monthly", $from, $to, $date){
-    
+  function select_interval($from, $to, $date, $interval = "monthly"){
+
     if($interval == "monthly"){
       // add montly summed columns in sql query in date range
       $start    = (new DateTime($from))->modify('first day of this month');
@@ -1738,7 +1729,7 @@ class eEKS extends lazy_mofo{
       }
       
       // set grid output control
-      $this->grid_output_control[$col] = '--number';
+      $this->grid_output_control[$col] = ['type' => 'number'];
       
       // set column sums
       $this->sum_these_columns[] = $col;
@@ -1747,8 +1738,8 @@ class eEKS extends lazy_mofo{
     }
     
     // set grid output control
-    $this->grid_output_control['sum'] = '--number';
-    $this->grid_output_control['average'] = '--number';
+    $this->grid_output_control['sum'] = ['type' => 'number'];
+    $this->grid_output_control['average'] = ['type' => 'number'];
     
     // set column sums
     $this->sum_these_columns[] = "sum";
@@ -1790,32 +1781,32 @@ class eEKS extends lazy_mofo{
     
     // start query
     $query = "";
-    
+
     $query .= "SELECT\r\n";
     if ($no_group_by)
       $query .= "  (CASE WHEN t.ID != 'sku2lkajsnclj43' THEN '".$this->translate("all")."' END) AS ID\r\n";
     else
     $query .= "  t.ID\r\n";
-    
+
     // add column with type income/cost in interval view
     // $query .= ", CASE WHEN t.is_income = true THEN '".$this->translate("income")."' ELSE '".$this->translate("costs")."' END AS income_costs\r\n";
-    
+
     if ($no_group_by)
       $query .= ", (CASE WHEN t.$group != 'sku2lkajsnclj43' THEN '".$this->translate("all")."' END) AS $group\r\n";
     else
       $query .= ", t.$group\r\n";
-    
+
     $from_to = $this->expect_sloppy_date_filter_inputs($interval);
     $from = $from_to[0];
     $to = $from_to[1];
-    
+
     // add select summed columns in month/year interval
-    $query .= $this->select_interval($interval, $from, $to, $date);
-    
+    $query .= $this->select_interval($from, $to, $date, $interval);
+
     $query .= "FROM $this->table a\r\n";
     $query .= "RIGHT OUTER JOIN $group t\r\n";
     $query .= "ON a.$group = t.ID\r\n";
-    
+
     // add WHERE clause(s) for negative/positive amounts
     if(mb_strlen($this->amount_filter) > 0){
       $column = $this->amount_filter;
@@ -1827,7 +1818,7 @@ class eEKS extends lazy_mofo{
       if($amount == "neg")
         $query .= "WHERE ( a.$column < 0 AND COALESCE(a.is_reimbursement, 0) = 0 OR ( a.$column >= 0 AND a.is_reimbursement = 1 ) )\r\n";
     }
-    
+
     // add AND clause for filter by category
     foreach($this->category_filters as $val){
       if(!empty($_GET["_$val"])){
@@ -1941,8 +1932,8 @@ class eEKS extends lazy_mofo{
       }
       
       // grid output control
-      $this->grid_output_control[$col] = '--number';
-      $this->grid_output_control['sum'] = '--number';
+      $this->grid_output_control[$col] = ['type' => 'number'];
+      $this->grid_output_control['sum'] = ['type' => 'number'];
       
       $cols[$i] = $col;
       $i++;
@@ -1957,7 +1948,7 @@ class eEKS extends lazy_mofo{
       $query .= ", average AS old_average\r\n";
       $query .= "FROM (\r\n";
       
-      $this->grid_output_control['old_average'] = '--number';// grid output control
+      $this->grid_output_control['old_average'] = ['type' => 'number'];// grid output control
     }
     
     $query .= "SELECT\r\n";
@@ -1972,7 +1963,7 @@ class eEKS extends lazy_mofo{
     // average
     $query .= ", ROUND( COALESCE(SUM( a.gross_amount / $range ), 0), ".($this->decimals)." ) AS average\r\n";
     
-    $this->grid_output_control['average'] = '--number';
+    $this->grid_output_control['average'] = ['type' => 'number'];
     
     $query .= "FROM type_of_costs t\r\n";
     $query .= "RIGHT JOIN coa_jobcenter_eks_01_2017 c\r\n";
@@ -2602,173 +2593,137 @@ class eEKS extends lazy_mofo{
     $this->redirect($url, $id);
 
   }// end of duplicate()
-  
-  //////////////////////////////////////////////////////////////////////////////
-  function cast_value($val, $column_name = '', $posted_from = 'form'){
-      
-    // purpose: cast data going into the database. set blanks null and format dates
-    // returns: string
-    // $column_name is not used right now but might be needed as a hack to cast by column name for databases like sqlite
-    // missing types seem to always be numbers
-    
-    // changes in eEKS, compared to lm: added number_in)()
 
-    if(is_array($val))
-      $val = implode($this->delim, $val);
+    function get_input_control($column_name, $value, $control, $called_from, &$validate = array()){
 
-    $val = trim($val);
+        // purpose: render html input based "command", if command is then try to call a user function
+        // returns: html 
 
-    if($posted_from == 'grid')
-      $command = @$this->grid_input_control[$column_name];
-    else
-      $command = @$this->form_input_control[$column_name];
+        $type = 'text'; // default
+        $sql = '';
+        $sql_param = '';
+        if(isset($control['type'])){
+            $type = $control['type'];
+            $sql = @$control['sql']; // optional
+            $sql_param = @$control['sql_param']; // optional
+        }
 
-    // get command only, no sql, no '--'
-    $cmd = trim(mb_substr($command, mb_strrpos($command, '--') + 2));
+        // subtle backward compatible madness
+        $legacy_control = $control;
+        if(isset($control['legacy_control']))
+            $legacy_control = $control['legacy_control'];
 
-    if(isset($this->cast_user_function[$column_name]))
-      $val = call_user_func($this->cast_user_function[$column_name], $val);
-    elseif($cmd == 'date')
-      $val = $this->date_in($val);
-    elseif($cmd == 'datetime')
-      $val = $this->date_in($val, true);
-    elseif($cmd == 'number' && mb_strlen($this->restricted_numeric_input) > 0){
-      $val = $this->number_in($val);
-      $val = preg_replace($this->restricted_numeric_input, '', $val);
+        // set input size    
+        if($called_from == 'grid')
+            $size = $this->grid_text_input_size;
+        else
+            $size = $this->form_text_input_size;
+
+        $class = $this->get_class_name($column_name); 
+
+        $validate_error_msg = ''; // error next to input
+        $validate_tip = '';       // placeholder next to input for some inputs
+
+        // text, password, textarea only - placeholder depending on settings, inside or outside the input
+        $validate_placeholder = '';
+        $validate_placeholder_alternative = '';
+
+        // display tip or error next to input, not both
+        if(@$validate[$column_name]['result'] === false)
+            $validate_error_msg = "<span class='lm_validate_error'>" . $this->clean_out($validate[$column_name]['error_msg']) . "</span>";
+        elseif(isset($validate[$column_name]['placeholder']) && strlen($validate[$column_name]['placeholder']) > 0)
+            $validate_tip = "<span class='lm_validate_tip'>" . $this->clean_out($validate[$column_name]['placeholder']) . "</span>";
+
+        // always try to get a placeholder for the text inputs
+        if($this->validate_tip_in_placeholder)
+            $validate_placeholder = $this->clean_out(@$validate[$column_name]['placeholder']); // placeholders for text 
+        elseif(strlen($validate_error_msg) == 0)
+            $validate_placeholder_alternative = "<span class='lm_validate_tip'>" . $this->clean_out($validate[$column_name]['placeholder']) . "</span>";
+
+        $max_length = '';
+        if(intval(@$this->text_input_max_length[$column_name]) > 0)
+            $max_length = "maxlength='" . $this->text_input_max_length[$column_name] . "'";
+        elseif($this->text_input_max_length_default > 0)
+            $max_length = "maxlength='" . $this->text_input_max_length_default . "'";
+
+        if($type == 'text')
+            return "<input type='text' name='$column_name' class='$class' value='" . $this->clean_out($value) . "' size='$size' $max_length placeholder='$validate_placeholder'>$validate_error_msg $validate_placeholder_alternative";
+        elseif($type == 'password')
+            return "<input type='password' name='$column_name' class='$class' value='" . $this->clean_out($value) . "' size='$size' $max_length placeholder='$validate_placeholder'>$validate_error_msg $validate_placeholder_alternative";
+        elseif($type == 'integer')
+            return "<input type='number' name='$column_name' class='$class $type' value='" . $this->number_out($value, "int") . "' $max_length placeholder='$validate_placeholder'>$validate_error_msg $validate_placeholder_alternative";
+        elseif($type == 'number')
+            return "<input type='text' name='$column_name' class='$class $type' value='" . $this->number_out($value) . "' $max_length placeholder='$validate_placeholder'>$validate_error_msg $validate_placeholder_alternative";
+        elseif($type == 'date')
+            return "<input type='text' name='$column_name' class='$class date' value='" . $this->date_out($value) . "' size='18' $max_length placeholder='$validate_placeholder'>$validate_error_msg $validate_placeholder_alternative";
+        elseif($type == 'datetime')
+            return "<input type='text' name='$column_name' class='$class' value='" . $this->date_out($value, true) . "' size='18' $max_length placeholder='$validate_placeholder'>$validate_error_msg $validate_placeholder_alternative";
+        elseif($type == 'textarea')
+            return "<textarea name='$column_name' class='$class' cols='60' rows='6' placeholder='$validate_placeholder'>" . $this->clean_out($value) . "</textarea>$validate_error_msg $validate_placeholder_alternative";
+        elseif($type == 'readonly_datetime')
+            return $this->date_out($value, true);
+        elseif($type == 'readonly_date')
+            return $this->date_out($value);
+        elseif($type == 'readonly')
+            return $this->clean_out($value);
+        elseif($type == 'image')
+            return $this->html_image_input($column_name, $value) . $validate_tip . $validate_error_msg;
+        elseif($type == 'document')
+            return $this->html_document_input($column_name, $value) . $validate_tip . $validate_error_msg;
+        elseif($type == 'select')
+            return $this->html_select($column_name, $value, $sql, $sql_param, '', $this->select_first_option_blank, 0) . $validate_tip . $validate_error_msg;
+        elseif($type == 'selectmultiple')
+            return $this->html_select($column_name, $value, $sql, $sql_param, '', $this->select_first_option_blank, 6) . $validate_tip . $validate_error_msg;
+        elseif($type == 'radio')
+            return $this->html_radio($column_name, $value, $sql, $sql_param) . $validate_tip . $validate_error_msg;
+        elseif($type == 'checkbox')
+            return $this->html_checkbox($column_name, $value, $sql, $sql_param) . $validate_tip . $validate_error_msg;
+        elseif(is_callable($type))
+            return call_user_func($type, $column_name, $value, $legacy_control, $called_from, $validate_placeholder) . $validate_tip . $validate_error_msg;
+        else
+            $this->display_error("Input command or user function not found: $type", 'get_input_control()');
+
     }
-    
-    if(mb_strlen($val) == 0)
-      $val = null;
 
-    return $val;
+    function get_output_control($column_name, $value, $control, $called_from){
 
-  }
-  
-  //////////////////////////////////////////////////////////////////////////////
-  function get_input_control($column_name, $value, $command, $called_from, &$validate = array()){
+        // purpose: render html output based "command", if command is then try to call a user function
+        // returns: html
 
-    // purpose: render html input based "command", if command is then try to call a user function
-    // returns: html 
-    
-    // changes in eEKS, compared to lm: added number_out(), no inline styles
-    
-    // parse $command into $sql and $cmd, remove delimiter
-    $pos = mb_strrpos($command, '--');
-    $cmd = trim(mb_substr($command, $pos + 2));
-    $sql = mb_substr($command, 0, $pos);
+        $type = 'text'; // default
+        if(isset($control['type']))
+            $type = $control['type'];
 
-    // default
-    if(mb_strlen($cmd) == 0)
-      $cmd = 'text';
+        // subtle backward compatible madness
+        $legacy_control = $control;
+        if(isset($control['legacy_control']))
+            $legacy_control = $control['legacy_control'];
 
-    $class = $this->get_class_name($column_name); 
+        if($type == 'text')
+            return $this->clean_out($value, $this->grid_ellipse_at); 
+        elseif($type == 'date')
+            return $this->date_out($value); 
+        elseif($type == 'datetime')
+            return $this->date_out($value, true); 
+        elseif($type == 'email')
+            return "<a href='mailto:$value'>$value</a>";
+        elseif($type == 'document')
+            return $this->html_document_output($value);
+        elseif($type == 'image')
+            return $this->html_image_output($value);
+        elseif($type == 'html')
+            return $this->html_html_output($value);
+        elseif($type == 'integer')
+            return $this->html_number_output($value, "int");
+        elseif($type == 'number')
+            return $this->html_number_output($value);
+        elseif(is_callable($type))
+            return call_user_func($type, $column_name, $value, $legacy_control, $called_from);
+        else
+            $this->display_error("Output command or user function not found: $type. Be sure to prefix control type with 2 dashes --", 'get_output_control()');
 
-    $validate_error = ''; // error next to input
-    $validate_tip = '';   // tip next to input
-    $validate_placeholder = ''; // text in placeholder - text inputs only
-    $validate_placeholder_alternative = ''; // placeholder setting disabled - move text next to input 
+    }
 
-    // display tip or error next to input, not both
-    if(@$validate[$column_name][4] === false)
-      $validate_error = "<span class='lm_validate_error'>" . $this->clean_out($validate[$column_name][1]) . "</span>";
-    elseif(@$validate[$column_name][2] != '')
-      $validate_tip = "<span class='lm_validate_tip'>" . $this->clean_out($validate[$column_name][2]) . "</span>";
-
-    // always try to get a placeholder for the text inputs
-    if($this->validate_tip_in_placeholder)
-      $validate_placeholder = $this->clean_out(@$validate[$column_name][2]); // placeholders for text 
-    elseif($validate_error == '')
-    $validate_placeholder_alternative = "<span class='lm_validate_tip'>" . $this->clean_out($validate[$column_name][2]) . "</span>";
-  
-    $max_length = '';
-    if(intval(@$this->text_input_max_length[$column_name]) > 0)
-      $max_length = "maxlength='" . $this->text_input_max_length[$column_name] . "'";
-    elseif($this->text_input_max_length_default > 0)
-      $max_length = "maxlength='" . $this->text_input_max_length_default . "'";
-
-    if($cmd == 'text')
-      return "<input type='text' name='$column_name' class='$class' value='" . $this->clean_out($value) . "' $max_length placeholder='$validate_placeholder'>$validate_error $validate_placeholder_alternative";
-    elseif($cmd == 'password')
-      return "<input type='password' name='$column_name' class='$class' value='" . $this->clean_out($value) . "' $max_length placeholder='$validate_placeholder'>$validate_error $validate_placeholder_alternative";
-    elseif($cmd == 'integer')
-      return "<input type='number' name='$column_name' class='$class $cmd' value='" . $this->number_out($value, "int") . "' $max_length placeholder='$validate_placeholder'>$validate_error $validate_placeholder_alternative";
-    elseif($cmd == 'number')
-      return "<input type='text' name='$column_name' class='$class $cmd' value='" . $this->number_out($value) . "' $max_length placeholder='$validate_placeholder'>$validate_error $validate_placeholder_alternative";
-    elseif($cmd == 'date')
-      return "<input type='text' name='$column_name' class='$class $cmd' value='" . $this->date_out($value) . "' $max_length placeholder='$validate_placeholder'>$validate_error $validate_placeholder_alternative";
-    elseif($cmd == 'datetime')
-      return "<input type='text' name='$column_name' class='$class $cmd' value='" . $this->date_out($value, true) . "' $max_length placeholder='$validate_placeholder'>$validate_error $validate_placeholder_alternative";
-    elseif($cmd == 'textarea')
-      return "<textarea name='$column_name' class='$class' placeholder='$validate_placeholder'>" . $this->clean_out($value) . "</textarea>$validate_error $validate_placeholder_alternative";
-    elseif($cmd == 'readonly_datetime')
-      return $this->date_out($value, true);
-    elseif($cmd == 'readonly_date')
-      return $this->date_out($value);
-    elseif($cmd == 'readonly')
-      return $this->clean_out($value);
-    elseif($cmd == 'image')
-      return $this->html_image_input($column_name, $value) . $validate_tip . $validate_error;
-    elseif($cmd == 'document')
-      return $this->html_document_input($column_name, $value) . $validate_tip . $validate_error;
-    elseif($cmd == 'select')
-      return $this->html_select($column_name, $value, $sql, array(), '', $this->select_first_option_blank, 0) . $validate_tip . $validate_error;
-    elseif($cmd == 'selectmultiple')
-      return $this->html_select($column_name, $value, $sql, array(), '', $this->select_first_option_blank, 6) . $validate_tip . $validate_error;
-    elseif($cmd == 'radio')
-      return $this->html_radio($column_name, $value, $sql, array()) . $validate_tip . $validate_error;
-    elseif($cmd == 'checkbox')
-      return $this->html_checkbox($column_name, $value, $sql, array()) . $validate_tip . $validate_error;
-    elseif(is_callable($cmd))
-      return call_user_func($cmd, $column_name, $value, $command, $called_from, $validate_placeholder) . $validate_tip . $validate_error;
-    else
-      $this->display_error("Input command or user function not found: $cmd. Be sure to prefix control type with 2 dashes --", 'get_input_control()');
-
-  }
-  
-  //////////////////////////////////////////////////////////////////////////////
-  function get_output_control($column_name, $value, $command, $called_from){
-
-    // purpose: render html output based "command", if command is then try to call a user function
-    // returns: html
-    
-    // changes in eEKS, compared to lm: added html_number_output()
-
-    // get command only, no '--'
-    $cmd = trim(mb_substr($command, mb_strrpos($command, '--') + 2));
-
-    // default
-    if(mb_strlen($cmd) == 0)
-        $cmd = 'text';
-
-    if($cmd == 'text')
-      return $this->clean_out($value, $this->grid_ellipse_at); 
-    // elseif($cmd == 'date')
-      // return $this->date_out($value); 
-    // elseif($cmd == 'datetime')
-      // return $this->date_out($value, true); 
-    elseif($cmd == 'date')
-      return $this->html_date_output($value); 
-    elseif($cmd == 'datetime')
-      return $this->html_date_output($value, true); 
-    elseif($cmd == 'email')
-      return "<a href='mailto:$value'>$value</a>";
-    elseif($cmd == 'document')
-      return $this->html_document_output($value);
-    elseif($cmd == 'image')
-      return $this->html_image_output($value);
-    elseif($cmd == 'html')
-      return $this->html_html_output($value);
-    elseif($cmd == 'integer')
-      return $this->html_number_output($value, "int");
-    elseif($cmd == 'number')
-      return $this->html_number_output($value);
-    elseif(is_callable($cmd))
-      return call_user_func($cmd, $column_name, $value, $command, $called_from);
-    else
-      $this->display_error("Output command or user function not found: $cmd. Be sure to prefix control type with 2 dashes --", 'get_output_control()');
-
-  }
-  
   //////////////////////////////////////////////////////////////////////////////
   function form($error = ''){
 
@@ -2788,7 +2743,7 @@ class eEKS extends lazy_mofo{
 
     $sql = $this->form_sql;
     $sql_param = $this->form_sql_param;
-    
+
     // make sql statement from table name if no sql was provided
     if(mb_strlen($sql) == 0){
       $sql_param = array(':identity_id' => $identity_id);
@@ -2920,9 +2875,11 @@ class eEKS extends lazy_mofo{
     // add buttons
     // add extra hidden update button first to prevent wrong submit on `Enter`
     if($action == 'edit')
-      $html .= "<div class='lm_form_button_bar'><span class='hidden'>$this->form_update_button</span>" . $this->back_button($identity_id) . "  $this->form_delete_button $this->form_duplicate_button $this->form_update_button</div>";
+      // $html .= "<div class='lm_form_button_bar'><span class='hidden'>$this->form_update_button</span>" . $this->back_button($identity_id) . "  $this->form_delete_button $this->form_duplicate_button $this->form_update_button</div>";
+      $html .= "<div class='lm_form_button_bar'><div class='lm_form_button_main'>" . $this->form_update_button . $this->back_button($identity_id) . "</div><div class='lm_form_button_secondary'>" .  $this->form_delete_button . $this->form_duplicate_button ."</div></div>";
     else
-      $html .= "<div class='lm_form_button_bar'>" . $this->back_button($identity_id) . " $this->form_add_button</div>";
+      $html .= "<div class='lm_form_button_bar'><div class='lm_form_button_main'>" . $this->form_update_button . $this->back_button($identity_id) . "</div></div>";
+      // $html .= "<div class='lm_form_button_bar'>" . $this->back_button($identity_id) . " $this->form_add_button</div>";
 
     $html .= $this->form_additional_html;
     $html .= "</form>\n";
@@ -3013,97 +2970,116 @@ class eEKS extends lazy_mofo{
     die();
 
   }
-  
+
+
+    function export_escape($str, $column_index){
+
+        // purpose: escape for export()
+        // returns: separated and escaped string
+
+        // difference to lm: cast null entries as string
+
+        if ($str === null) $str = '';
+
+        $str = str_replace($this->export_delim, $this->export_delim_escape . $this->export_delim, $str);
+
+        if($column_index == 0)
+            return $this->export_delim . $str . $this->export_delim; 
+        else
+            return $this->export_separator . $this->export_delim . $str . $this->export_delim; 
+
+    }
+
   //////////////////////////////////////////////////////////////////////////////
-  function generate_pdf($url = ""){
-    
-    // purpose: generate PDF
-    // requires wkhtmltopdf: https://wkhtmltopdf.org/downloads.html
-    // see installation instructions in `docs/install.md`
-    
-    $path = "wkhtmltopdf";
-    
-    // try if wkhtmltopdf is installed and path is known
-    if( !mb_substr(exec($path.' --version'), 0, 11) == "wkhtmltopdf" ){
-      
-      // set path to user defined path
-      $path = $this->wkhtmltopdf_path;
-    }
-    // try with explicit path to wkhtmltopdf
-    if( !mb_substr(exec($path.' --version'), 0, 11) == "wkhtmltopf" ){
-      $error = 'wkhtmltopdf is not installed or the path '.$this->wkhtmltopdf_path.' is incorrect';
-      $this->display_error($error, 'generate_pdf()');
-      return;
-    }
-    else{
-      
-      // create folder if not exist
-      if(!file_exists($this->pdf_path) && mb_strlen($this->pdf_path) > 0){
-        mkdir($this->pdf_path, 0755);
-        usleep(500);
-      }
-      
-      
-      // set page name as file name
-      $filename = trim(strtolower($this->get_page_name()));
-      
-      // escape unwanted characters
-      $filename = preg_replace('/[^A-Za-z0-9_\-]/', '_', $filename);
-      
-      // rename if file exists
-      $filename = $this->upload_rename_if_exists($this->pdf_path, $filename);
-      
-      $ext = ".pdf";
-      
-      $file = $this->pdf_path ."/". $filename . $ext;
-      
-      // get complete url
-      $port = '';
-      $host = preg_replace('/:[0-9]+$/', '', $_SERVER['HTTP_HOST']); // host without port number
-      $protocol = 'http://';
-      if(@$_SERVER['HTTPS'] != '' && @$_SERVER['HTTPS'] != 'off')
-        $protocol = 'https://';
-      if(!($_SERVER['SERVER_PORT'] == '80' || $_SERVER['SERVER_PORT'] == '443'))
-        $port = ':' . $_SERVER['SERVER_PORT'];
-      
-      $url = $protocol.$host.$port.$url;
-      
-      // set params
-      $param = "";
-      $param .= " --print-media-type";            // use print CSS
-      $param .= " -L 20 -R 20 -B 20 -T 20";           // set margins to 0 for full size background images
-      $param .= " -d 300";                        // dpi
-      $param .= " --disable-smart-shrinking";     // Disable to make WebKit pixel/dpi ratio constant
-      if( empty($_GET['_portrait']) && @$_GET['_portrait'] != 1 ) // wkhtmltopdf default: portrait
-        $param .= " -O Landscape";                // orientation landscape as default for printing tables
-        
-      
-      // use different params for EKS view
-      if( !empty($_GET['_view']) && $_GET['_view'] == "eks" ){
-        $param = " --print-media-type -L 0 -R 0 -B 0 -T 0 -d 300 --disable-smart-shrinking";
-      }
-      
-      // add post data to params
-      // maybe to print changed formulas in the future... 
-      // foreach( $_POST as $key=>$val ){
-        // $param .= " --post $key $val";
-      // }
-      
-      // execute wkhtmltopdf
-      exec($path.$param.' "'.$url.'" '.$file);
-      
-      // pass pdf as download to user
-      $fileinfo = pathinfo($file);
-      $sendname = $fileinfo['filename'] . '.' . strtoupper($fileinfo['extension']);
-      
-      header('Content-Type: application/pdf');
-      header("Content-Disposition: attachment; filename=\"$sendname\"");
-      header('Content-Length: ' . filesize($file));
-      readfile($file);
-      die();
-    }
-    
-  }
+//   function generate_pdf($url = ""){
+//     
+//     // purpose: generate PDF
+//     // requires wkhtmltopdf: https://wkhtmltopdf.org/downloads.html
+//     // see installation instructions in `docs/install.md`
+//     
+//     $path = "wkhtmltopdf";
+//     
+//     // try if wkhtmltopdf is installed and path is known
+//     if( !mb_substr(exec($path.' --version'), 0, 11) == "wkhtmltopdf" ){
+//       
+//       // set path to user defined path
+//       $path = $this->wkhtmltopdf_path;
+//     }
+//     // try with explicit path to wkhtmltopdf
+//     if( !mb_substr(exec($path.' --version'), 0, 11) == "wkhtmltopf" ){
+//       $error = 'wkhtmltopdf is not installed or the path '.$this->wkhtmltopdf_path.' is incorrect';
+//       $this->display_error($error, 'generate_pdf()');
+//       return;
+//     }
+//     else{
+//       
+//       // create folder if not exist
+//       if(!file_exists($this->pdf_path) && mb_strlen($this->pdf_path) > 0){
+//         mkdir($this->pdf_path, 0755);
+//         usleep(500);
+//       }
+//       
+//       
+//       // set page name as file name
+//       $filename = trim(strtolower($this->get_page_name()));
+//       
+//       // escape unwanted characters
+//       $filename = preg_replace('/[^A-Za-z0-9_\-]/', '_', $filename);
+//       
+//       // rename if file exists
+//       $filename = $this->upload_rename_if_exists($this->pdf_path, $filename);
+//       
+//       $ext = ".pdf";
+//       
+//       $file = $this->pdf_path ."/". $filename . $ext;
+//       
+//       // get complete url
+//       $port = '';
+//       $host = preg_replace('/:[0-9]+$/', '', $_SERVER['HTTP_HOST']); // host without port number
+//       $protocol = 'http://';
+//       if(@$_SERVER['HTTPS'] != '' && @$_SERVER['HTTPS'] != 'off')
+//         $protocol = 'https://';
+//       if(!($_SERVER['SERVER_PORT'] == '80' || $_SERVER['SERVER_PORT'] == '443'))
+//         $port = ':' . $_SERVER['SERVER_PORT'];
+//       
+//       $url = $protocol.$host.$port.$url;
+//       
+//       // set params
+//       $param = "";
+//       $param .= " --print-media-type";            // use print CSS
+//       $param .= " -L 20 -R 20 -B 20 -T 20";           // set margins to 0 for full size background images
+//       $param .= " -d 300";                        // dpi
+//       $param .= " --disable-smart-shrinking";     // Disable to make WebKit pixel/dpi ratio constant
+//       if( empty($_GET['_portrait']) && @$_GET['_portrait'] != 1 ) // wkhtmltopdf default: portrait
+//         $param .= " -O Landscape";                // orientation landscape as default for printing tables
+//         
+//       
+//       // use different params for EKS view
+//       if( !empty($_GET['_view']) && $_GET['_view'] == "eks" ){
+//         $param = " --print-media-type -L 0 -R 0 -B 0 -T 0 -d 300 --disable-smart-shrinking";
+//       }
+//       
+//       // add post data to params
+//       // maybe to print changed formulas in the future... 
+//       // foreach( $_POST as $key=>$val ){
+//         // $param .= " --post $key $val";
+//       // }
+//       
+//       // execute wkhtmltopdf
+//       exec($path.$param.' "'.$url.'" '.$file);
+//       
+//       // pass pdf as download to user
+//       $fileinfo = pathinfo($file);
+//       $sendname = $fileinfo['filename'] . '.' . strtoupper($fileinfo['extension']);
+//       
+//       header('Content-Type: application/pdf');
+//       header("Content-Disposition: attachment; filename=\"$sendname\"");
+//       header('Content-Length: ' . filesize($file));
+//       readfile($file);
+//       die();
+//     }
+//     
+//   }
   
   //////////////////////////////////////////////////////////////////////////////
   function get_view(){
@@ -3151,24 +3127,7 @@ class eEKS extends lazy_mofo{
     return htmlspecialchars($title);
     
   }
-  
-  //////////////////////////////////////////////////////////////////////////////
-  function version(){
-    
-    // purpose: until I don't have versioning show date of last commit
-    // `last_commit.txt` will be created while `update.sh` runs
-    // or as git hook
-    
-    if( file_exists('last_commit.txt') ){
-      $arr = explode(",", file_get_contents('last_commit.txt'));
-      return "<a href='https://github.com/raffaelj/eEKS/commit/$arr[1]'>last commit:</a> ". $this->date_out($arr[0], true);
-    }
-    else
-      return "no version number available";
-    
-  }
-  
-  //////////////////////////////////////////////////////////////////////////////
+
   function get_qs($query_string_list = '_order_by,_desc,_offset,_search,_pagination_off,_view,_lang'){
 
     // purpose: render querysting. user selections for order, search, and page are carry from page to page. 
@@ -3252,36 +3211,7 @@ class eEKS extends lazy_mofo{
     return $result;
     
   }
-  
-  //////////////////////////////////////////////////////////////////////////////
-  private $debug_count = 0;
-  function debug($var, $str = "", $out = "print"){
-    
-    // purpose: output of readable content for arrays and variables
 
-    $str = $this->debug_count.": $str";
-        
-    $html = "";
-    $html .= "<div class='debug'>";
-    $html .= "<input type='checkbox' id='debug$this->debug_count' /><label for='debug$this->debug_count' class='lm_button'>$str</label>";
-    $html .= "<pre>";
-    if($out == "export")
-      $html .= var_export($var, true);
-    elseif($out == "dump"){
-      ob_start();
-      var_dump($var);
-      $html .= ob_get_clean();
-    }
-    else
-      $html .= print_r($var, true);
-    $html .= "</pre>";
-    $html .= "</div>";
-    
-    $this->debug_count++;
-    
-    echo $html;
-  }
-  
   //////////////////////////////////////////////////////////////////////////////
   function get_pagination($count, $limit, $_offset, $_pagination_off){
 
@@ -3371,29 +3301,205 @@ class eEKS extends lazy_mofo{
     return $class;
     
   }
-  
+
   //////////////////////////////////////////////////////////////////////////////
   function sum_result($arr){
-    
+
     // purpose: return array with sum of result for estimated eks
     // the old solution with calling of grid-sql without group_by leads to rounding issues
-    
+
     foreach($arr as $v){
       foreach($v as $key => $val){
         if( !isset($sum[0][$key]) )
-          $sum[0][$key] = $val;
+          $sum[0][$key] = (float) $val;
         else
-          $sum[0][$key] += $val;
+          $sum[0][$key] += (float) $val;
       }
     }
-    
+
     return $sum;
-    
+
   }
-  
-  
-  
-  
-  
-  
+
+    /**
+     * same as lm, but with fix to prevent null value in mb_strlen
+     */
+    function html_document_input($field_name, $file_name){
+
+        // purpose: if document exists, display link and delete checkbox. also display file input
+        // returns: html
+
+        if ($file_name === null) $file_name = '';
+
+        $html = '';
+        $class = $this->get_class_name($field_name);
+
+        if(mb_strlen($file_name) > 0)
+            $html .= "<a href='$this->upload_path/$file_name' target='_blank'>$file_name</a> <label><input type='checkbox' name='{$field_name}-delete' value='1'>$this->text_delete_document</label><br >";
+
+        $html .= "<input type='file' name='$field_name' class='$class' size='$this->form_text_input_size'>";
+
+        return $html;
+
+    }
+
+    function get_upload($columns, $table_name, $identity_name, $identity_id, $context = 'form', $field_index = ''){
+
+        // purpose: used in insert and update to handle files
+        // returns: true on success, false on error
+
+        // difference to lm: use ID as prefix for uploaded files
+
+        $upload_width = $this->upload_width;
+        $upload_height = $this->upload_height;
+        $upload_crop = $this->upload_crop;
+        $thumb_width = $this->thumb_width;
+        $thumb_height = $this->thumb_height;
+        $thumb_crop = $this->thumb_crop;
+        $notice = '';
+
+        if($context == 'grid')
+            $input_control = $this->grid_input_control;
+        else
+            $input_control = $this->form_input_control;
+
+        foreach($columns as $column_name){
+
+            $type = @$input_control[$column_name]['type'];
+
+            // uploads only
+            if(!$this->is_upload($input_control, $column_name))
+                continue;
+
+            // inputs are named differently on grids
+            $input_name = $column_name;
+            if($context != 'form')
+                if(mb_strlen($field_index) > 0)
+                    $input_name = "$column_name-0"; // inserting
+                else
+                    $input_name = "$column_name-$identity_id"; // updating 
+
+            if(!file_exists($this->get_upload_path()) && mb_strlen($this->get_upload_path()) > 0){
+                mkdir($this->get_upload_path(), 0755);
+                usleep(500);
+            }
+
+            if(!file_exists($this->get_thumb_path()) && mb_strlen($this->get_thumb_path()) > 0){
+                mkdir($this->get_thumb_path(), 0755);
+                usleep(500);
+            }
+
+            // process file deletion requested by checkbox with field_name + "-delete"
+            if(@$_POST[$input_name . '-delete'] == 1)
+                $this->upload_delete($table_name, $identity_name, $identity_id, $column_name, $input_control);
+
+            // see if a new file was uploaded
+            // $file_name = $this->upload_file($input_name, $notice, $field_index);
+            $fileNamePrefix = $identity_id . '_';
+            $file_name = $this->upload_file($input_name, $notice, $field_index, $fileNamePrefix);
+
+            // reloop - no new file uploaded
+            if(!isset($file_name) || mb_strlen($file_name) == 0)
+                continue;
+
+            // delete previous existing file
+            $this->upload_delete($table_name, $identity_name, $identity_id, $column_name, $input_control);
+
+            // copy upload to thumbnail path
+            if(mb_strlen($this->get_thumb_path()) > 0 && $type == 'image')
+                if(!copy($this->get_upload_path() . "/$file_name", $this->get_thumb_path() . "/$file_name")){
+                    $this->display_error("Unable to copy uploaded to thumb_path. Make sure path: " . $this->get_thumb_path() . " exists and is writeable. Try chmod 0755 (or 0777 if you must) on the destination path.", 'get_upload()');
+                    return false;
+                }
+
+            // resize or crop main image
+            if($type == 'image')
+                if($upload_crop)
+                    $this->image_crop($this->get_upload_path() . "/$file_name", $upload_width, $upload_height);
+                else
+                    $this->image_resize($this->get_upload_path() . "/$file_name", $upload_width, $upload_height);
+
+            // thumbs - resize or crop 
+            if($type == 'image' && mb_strlen($this->get_thumb_path()) > 0)
+                if($thumb_crop)
+                    $this->image_crop($this->get_thumb_path() . "/$file_name", $thumb_width, $thumb_height);
+                else
+                    $this->image_resize($this->get_thumb_path() . "/$file_name", $thumb_width, $thumb_height);
+
+            // update file name in table 
+            $sql_param = array();
+            $sql = "update `$table_name` set `$column_name` = :file_name where `$identity_name` = :identity_id";
+            $sql_param[':file_name'] = $file_name;
+            $sql_param[':identity_id'] = $identity_id;
+            if($this->query($sql, $sql_param, 'get_upload()') === false)
+                return false;
+
+        }
+
+        if(mb_strlen($notice) > 0){
+            $this->display_error($notice, 'get_upload()');
+            return false;
+        }
+
+        return true;
+
+    }
+
+    function upload_file($input_name, &$notice, $field_index = '', $prefix = null){
+
+        // purpose: upload file and return file name as a string
+        // returns: file name on success, errors sent back by reference to $notice
+
+         // make regex pattern for extension validation from allow list. it should end up looking like this: /(.\.mp3)|(.\.pdf)$/i
+
+        // difference to lm: use ID as prefix for uploaded files
+
+        $pattern = '';
+        $arr = preg_split('/\s+/', $this->upload_allow_list);
+        foreach($arr as $val)
+            $pattern .= '(.' . preg_quote($val) . ')|';
+
+        $pattern = '/' . rtrim($pattern, '|') . '$/i'; 
+
+        // get file info
+        if(mb_strlen($field_index) > 0){
+            $size = intval($_FILES[$input_name]['size'][$field_index]);
+            $tmp_name = $_FILES[$input_name]['tmp_name'][$field_index];
+            $file_name = $this->clean_file_name($_FILES[$input_name]['name'][$field_index]);
+        }
+        else{
+            $size = intval($_FILES[$input_name]['size']);
+            $tmp_name = $_FILES[$input_name]['tmp_name'];
+            $file_name = $this->clean_file_name($_FILES[$input_name]['name']);
+        }
+
+        if ($prefix && mb_strpos($file_name, $prefix) !== 0) {
+            $file_name = $prefix . $file_name;
+        }
+
+        // nothing to do
+        if($size <= 0 || mb_strlen($file_name) == 0)
+            return;
+
+        if(mb_strlen($file_name) > 250){
+            $notice .= "File name is too long.\n";
+            return;
+        }
+
+        if(!preg_match($pattern, $file_name)){
+            $notice .= "Invalid file type. Only the following documents and media types are allowed: $this->upload_allow_list\n";
+            return;
+        }
+
+        $file_name = $this->upload_rename_if_exists($this->get_upload_path(), $file_name);
+
+        if(!move_uploaded_file($tmp_name, $this->get_upload_path() . "/$file_name")){
+            $notice .= "Unable to move uploaded file. Make sure path: " . $this->get_upload_path() . " exists and is writeable. Try chmod 0755 (or 0777 is you must) on the destination path.\n";
+            return;
+        }
+
+        return $file_name;
+
+    }
+
 }// end of class eEKS

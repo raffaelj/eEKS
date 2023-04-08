@@ -5,6 +5,9 @@ tests
 exports
 layout
 last_commit.txt
+node_modules
+package-lock.json
+config/config.php
 
 # Windows image file caches
 Thumbs.db

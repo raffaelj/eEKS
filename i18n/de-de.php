@@ -21,7 +21,7 @@ $this->update_grid_confirm = 'Sind Sie sicher, dass Sie diese [count] Einträge 
 // form buttons
 $this->form_add_button_text    = "Hinzufügen";
 $this->form_update_button_text = "Aktualisieren";
-$this->form_duplicate_button_text = "Kopieren";
+$this->form_duplicate_button_text = "Duplizieren";
 
 // titles in the <th> of top of the edit form 
 $this->form_text_title_add    = 'Eintrag hinzufügen';   
@@ -83,45 +83,46 @@ $this->date_filter_from = "von";
 $this->date_filter_to = "bis";
 
 // other words that need translation and may appear somewhere
-$this->translate['all'] = "alle";
-$this->translate['edit'] = "bearbeiten";
-$this->translate['income'] = "Einnahmen";
-$this->translate['costs'] = "Ausgaben";
-$this->translate['settings'] = "Einstellungen";
-$this->translate['monthly'] = "monatlich";
-$this->translate['monthly_sums'] = "monatlich summiert";
-$this->translate['yearly_sums'] = "jährlich summiert";
-$this->translate['missing_date'] = "ohne Datum";
-$this->translate['edit_tables'] = "Tabellen bearbeiten";
-$this->translate['hide'] = "ausblenden";
-$this->translate['show'] = "einblenden";
-$this->translate['value_date'] = 'Zahlungsdatum';
-$this->translate['voucher_date'] = 'Belegdatum';
-$this->translate['sum'] = 'Summe';
-$this->translate['accounting'] = 'Buchhaltung';
-$this->translate['concluded'] = 'abschließend';
-$this->translate['estimated'] = 'vorläufig';
-$this->translate['eks'] = 'EKS';
-$this->translate['cba'] = 'EÜR';
-$this->translate['Choose Profile'] = 'Profil auswählen';
+$this->translations['all'] = "alle";
+$this->translations['edit'] = "bearbeiten";
+$this->translations['income'] = "Einnahmen";
+$this->translations['costs'] = "Ausgaben";
+$this->translations['settings'] = "Einstellungen";
+$this->translations['monthly'] = "monatlich";
+$this->translations['monthly_sums'] = "monatlich summiert";
+$this->translations['yearly_sums'] = "jährlich summiert";
+$this->translations['missing_date'] = "ohne Datum";
+$this->translations['edit_tables'] = "Tabellen bearbeiten";
+$this->translations['hide'] = "ausblenden";
+$this->translations['show'] = "einblenden";
+$this->translations['value_date'] = 'Zahlungsdatum';
+$this->translations['voucher_date'] = 'Belegdatum';
+$this->translations['sum'] = 'Summe';
+$this->translations['accounting'] = 'Buchhaltung';
+$this->translations['concluded'] = 'abschließend';
+$this->translations['estimated'] = 'vorläufig';
+$this->translations['eks'] = 'EKS';
+$this->translations['cba'] = 'EÜR';
+$this->translations['Choose Profile'] = 'Profil auswählen';
 
 // month names (short)
-$this->translate['Jan'] = 'Jan';
-$this->translate['Feb'] = 'Feb';
-$this->translate['Mar'] = 'Mär';
-$this->translate['Apr'] = 'Apr';
-$this->translate['May'] = 'Mai';
-$this->translate['Jun'] = 'Jun';
-$this->translate['Jul'] = 'Jul';
-$this->translate['Aug'] = 'Aug';
-$this->translate['Sep'] = 'Sep';
-$this->translate['Oct'] = 'Okt';
-$this->translate['Nov'] = 'Nov';
-$this->translate['Dec'] = 'Dez';
+$this->translations['Jan'] = 'Jan';
+$this->translations['Feb'] = 'Feb';
+$this->translations['Mar'] = 'Mär';
+$this->translations['Apr'] = 'Apr';
+$this->translations['May'] = 'Mai';
+$this->translations['Jun'] = 'Jun';
+$this->translations['Jul'] = 'Jul';
+$this->translations['Aug'] = 'Aug';
+$this->translations['Sep'] = 'Sep';
+$this->translations['Oct'] = 'Okt';
+$this->translations['Nov'] = 'Nov';
+$this->translations['Dec'] = 'Dez';
 
 // number format
 $this->decimals = 2;
 $this->dec_point = ',';
+$this->decimal_separator = ',';
 $this->thousands_sep = '.';
 
 // rename multi-value column

@@ -1,0 +1,19 @@
+{
+  "name": "eeks",
+  "version": "0.1.0",
+  "description": "Simple accounting software with automation for 'Anlage EKS' (a document needed in Germany for freelancers with unemployment benefits)",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+    "build": "node-sass -r --source-map true --output-style compressed assets/css/style.scss assets/css/style.min.css",
+    "watch": "npm run build && npm run build -- -w"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "node-sass": "^8.0.0"
+  }
+}

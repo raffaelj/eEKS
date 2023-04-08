@@ -1,9 +1,9 @@
 <?php
 
-// php crud datagrid for mysql and php5
-// MIT License - http://lazymofo.wdschools.com/
+// CRUD datagrid for MySQL and PHP
+// MIT License - https://github.com/lazymofo/datagrid
 // send feedback or questions iansoko at gmail
-// version 2017-10-09
+// version 2023-01-25
 
 class lazy_mofo{
 
@@ -13,7 +13,9 @@ class lazy_mofo{
 
     public $rename = array();               // associative array of column names and friendly names. example: array('prod_id' => 'Product ID') 
 
-    public $uri_path = '';                  // experimental - to specify URI used for WordPress admin plugins
+    public $uri_path = '';                  // experimental - to specify URI used for WordPress admin plugins, example: http://localhost:80/demo.php
+
+    public $absolute_redirect = false;      // 2018-06 switched to relative redirects since it should be supported now, also port forwards don't work with absolute redirects 
 
     public $query_string_list = '';         // comma delimited list of variable names to carry around in the URL
 
@@ -21,20 +23,20 @@ class lazy_mofo{
 
     public $form_sql = '';                  // render form from fields retuned in sql statement. if blank then 'select * from table where identity_name = identity_id' is used. when no record is found then a blank form to ADD a record is displayed
     public $form_sql_param = array();       // associative array to bind named parameters to form_sql. use to pass in identity_id when specifiying form_sql.
-    public $form_input_control = array();   // for form(), define inputs like select boxes, document uploads, etc... *info on usage below*
+    public $form_input_control = array();   // for form(), define inputs like select boxes, checkboxes, etc. example: $lm->form_input_control['field_name'] = array('type' => 'select', 'sql' => "select id as val, title as opt from table");
     public $form_default_value = array();   // for form(), define default values for columns when adding a record. if auto_populate_control = true then this array will be populated from the defaults in the database. 
     public $form_display_identity = true;   // display identity value when editing a record
     public $form_additional_html = '';      // add any addition html inside the <form> after the form buttons.
     public $form_text_input_size = 35;      // size of text inputs on form()
 
-    public $grid_sql = '';                  // render grid with desired sql. defaults to 'select *, identity_name from table'. *important* to display [edit] and [delete] links, the identity must be the last column in the sql statement. this arangement allows grid to display data without showing the identity.
-    public $grid_sql_param = array();       // associative array to bind variables to grid_sql. see php docs on PDOStatement->execute for more info.
+    public $grid_sql = '';                  // optional, render grid with query result. *important* to display [edit] and [delete] links, the identity must be the last column in the sql statement. include an 'order by' to prevent query parsing errors on complex queries.
+    public $grid_sql_param = array();       // associative array to bind variables to grid_sql. example: $lm->grid_sql_param(':market_id' => $market_id);
     public $grid_default_order_by = '';     // free-form 'order by' clause. Not used if grid_sql is specified. Example: column1 desc, column2 asc
-    public $grid_input_control = array();   // for grid(), define inputs like select boxes, checkboxes, etc... *info on usage below*
-    public $grid_output_control = array();  // for grid(). define outputs like --email to make a clickable mailto or --document to make a link. *info on usage below*
+    public $grid_input_control = array();   // for grid(), define inputs like select boxes, checkboxes, etc. example: $lm->grid_input_control['field_name'] = array('type' => 'select', 'sql' => "select id as val, title as opt from table");
+    public $grid_output_control = array();  // for grid(). define outputs like email or document to make a link. example: example: $lm->grid_output_control['field_name'] = array('type' => 'email');
     public $grid_multi_delete = false;      // display checkboxes on grid to allow for multiple record delete
     public $grid_show_search_box = false;   // display search field at the top - grid_sql must be altered to accomodate search
-    public $grid_limit = 200;               // pagination limit number of records per page
+    public $grid_limit = 200;               // pagination limit number of records per page, verion >= 2018-07-10 set to 0 to disable pagination
     public $grid_repeat_header_at = 0;      // interval of records to repeat header column titles at
     public $grid_show_images = false;       // option to show images inside the grid, otherwise a link is displayed for --image type
     public $grid_ellipse_at = 30;           // limit number of characters displayed, set to 0 to disable truncation
@@ -43,19 +45,18 @@ class lazy_mofo{
     public $text_input_max_length_default = 0;  // global max_length attribute for input. 0 is disabled
     public $text_input_max_length = array();    // array of column names to max length integers, optional
 
-    public $auto_populate_controls = true;      // have get_columns() populate input and output controls according to meta data for types --date, --datetime, --number and --textarea. also, populate default values.
+    public $auto_populate_controls = true;      // have get_columns() populate input and output controls according to meta data for types --date, --datetime, --number and --textarea. also, populate default values if user has read access to information_schema.columns
 
-    public $on_insert_validate = array();       // example : $lm->on_insert_validate['field_name'] = array(string $regexp_or_user_function, string $error_message[, string $tip_placeholder , boolean optional_input]); 
-    public $on_update_validate = array();
+    public $on_insert_validate = array();       // example : array('regexp' => '/.+/', 'error_msg' => 'Missing Market Name', 'placeholder' => 'this is required', 'optional' => false); 
+    public $on_update_validate = array();       // regexp may be 'email' or a user defined function, all other parameters optional
     public $validate_tip_in_placeholder = true; // allow input placeholder to display validation tip
-    public $validate_text_general = "Missing or Invalid Input"; // generic message displayed at the top when validation error occurs, optional
 
     public $on_insert_user_function = '';       // user function called before data is inserted, updated, or deleteed. return a string error message for server-side validation. Can be used to formating _POST data.
     public $on_update_user_function = '';
     public $on_delete_user_function = '';
     public $on_update_grid_user_function = '';
 
-    public $after_insert_user_function = '';    // user function names to be called after data is inserted, updated, or deleteed.
+    public $after_insert_user_function = '';    // user function names to be called after data is inserted, updated, or deleted.
     public $after_update_user_function = '';
     public $after_delete_user_function = '';
     public $after_update_grid_user_function = '';
@@ -83,7 +84,8 @@ class lazy_mofo{
     public $image_quality = 80;                       // image quality when resizing and cropping, 1-100
     public $image_style = "style='height: 100px;'";   // apply style to all images displayed. limiting size is nice to keep things orderly.
 
-    public $restricted_numeric_input = '/[^0-9\.\-]/';// optional, regular expression of what numbers are allowed to be sent to the database. helpful to remove dollar signs and spaces. many non-US countries use comma instead of decimal points and spaces instead of commas.
+    public $decimal_separator = '.';                   // expected separator for incoming number, use format() in grid_sql or form_sql for output values, example: "select format(12.34, 2, 'es_ES') as num;"    
+    public $restricted_numeric_input = '/[^0-9\.\-]/'; // do not change - input filter into database, minus could be removed if all numbers are unsigned
 
     public $upload_allow_list = '.mp3 .jpg .jpeg .png .gif .doc .docx .xls .xlsx .txt .pdf'; // space delimted file name extentions. include period
 
@@ -92,15 +94,18 @@ class lazy_mofo{
     public $export_delim = '"';                      // delimiter for csv export 
     public $export_delim_escape = '"';               // if delim is used in content add this string before for escaping
 
-    public $delim = '|';                             // when using mutiple checkboxes or multipleselect, delimiter for values
+    public $delim = '|';                             // when using mutiple checkboxes or multipleselect, delimiter for values. to store data non delimited use on_insert_user_function and on_update_user_function to save data.
 
-    public $select_first_option_blank = true;        // make first option blank on dropdown --select and --selectmultiple inputs
+    public $select_first_option_blank = true;        // make first option blank on dropdown select and selectmultiple inputs
 
     // start i18n defaults // 
 
     // javascript dialogs
     public $delete_confirm      = 'Are you sure you want to delete this record?';
     public $update_grid_confirm = 'Are you sure you want to delete [count] record(s)?';
+
+    // validation general error - this is displayed at the top when a validation error occurs
+    public $validate_text_general = "Missing or Invalid Input";
 
     // form buttons
     public $form_add_button    = "<input type='submit' value='Add' class='lm_button'>";
@@ -145,10 +150,15 @@ class lazy_mofo{
     public $text_delete_image = 'delete image';
     public $text_delete_document = 'delete document';
 
-    // relative paths for --image or --document uploads
-    // paths are created at runtime as needed
-    public $upload_path = 'uploads';            // required when using  input types
+    // relative paths for image or documents uploads
+    // all paths are created at runtime as needed
+    public $upload_path = 'uploads';            // required when using input types
     public $thumb_path = 'thumbs';              // optional, leave blank if you don't need thumbnails
+
+    // newly added absolute paths, 2019-09
+    // if absolute paths are defined then files are uploaded here, relative paths always used on the client side
+    public $upload_path_absolute = '';          // optional, defaults to $upload_path if not defined
+    public $thumb_path_absolute = '';           // optional, defaults to $thumb_path if not defined
 
     // output date formats
     public $date_out = 'm/d/Y';                 // output date, change to d/m/Y for non-us
@@ -165,9 +175,6 @@ class lazy_mofo{
         if(!$dbh)
             die('Pass in a PDO object connected to the mysql database.');
 
-        if(!(get_magic_quotes_gpc() == 0) && (get_magic_quotes_runtime() == 0))
-            echo('Warning: lazy mofo requires magic_quotes be disabled.');
-
         $this->dbh = $dbh; 
 
         $timezone = @date_default_timezone_get();
@@ -180,16 +187,33 @@ class lazy_mofo{
 
         // load requested internationalization file, en-us is defined above, in this class
         if(strlen($i18n) > 0 && $i18n != 'en-us'){
-            if(!file_exists("i18n/{$i18n}.php"))
-                die("Error: Requested i18n file ({$i18n}.php) does not exist.");
-            include("i18n/{$i18n}.php");    
+            $arr = pathinfo(__FILE__);
+            $path = $arr['dirname'] . "/i18n/{$i18n}.php";
+            if(!file_exists($path))
+                die("Error: Requested file $path does not exists.");
+            include($path);    
         }
+
     }
 
     
     function run(){
 
-        // purpose: built-in controller 
+        // purpose: controller 
+
+        // change controls into newer format
+        foreach($this->form_input_control as $column_name => $control)
+            $this->form_input_control[$column_name] = $this->modernize_control($control, $column_name);
+        foreach($this->grid_input_control as $column_name => $control)
+            $this->grid_input_control[$column_name] = $this->modernize_control($control, $column_name);
+        foreach($this->grid_output_control as $column_name => $control)
+            $this->grid_output_control[$column_name] = $this->modernize_control($control, $column_name);
+
+        // change validation into newer format with keys
+        foreach($this->on_insert_validate as $column_name => $arr)
+            $this->on_insert_validate[$column_name] = $this->modernize_validate($arr, $column_name);
+        foreach($this->on_update_validate as $column_name => $arr)
+            $this->on_update_validate[$column_name] = $this->modernize_validate($arr, $column_name);
 
         switch($this->get_action()){
             case "edit":          $this->edit();        break;
@@ -402,10 +426,19 @@ class lazy_mofo{
         $sql_fields = '';
         foreach($_POST as $key => $val){
 
+            // don't allow updates on certain fields
+            if(array_key_exists($key, $this->exclude_field))
+                continue;
+
             // checkboxes require a special hidden field to identify unchecked values
             if(mb_substr($key, -9) == '-checkbox')
                 if(mb_substr($key, 0, -9) != $prev_key)
                     $key = mb_substr($key, 0, -9);
+
+            // same as above but for -selectmultiple
+            if(mb_substr($key, -15) == '-selectmultiple')
+                if(mb_substr($key, 0, -15) != $prev_key)
+                    $key = mb_substr($key, 0, -15);
 
             $prev_key = $key;
 
@@ -428,6 +461,11 @@ class lazy_mofo{
             if(mb_substr($key, -9) == '-checkbox')
                 if(mb_substr($key, 0, -9) != $prev_key)
                     $key = mb_substr($key, 0, -9);
+
+            // same as above but for -selectmultiple
+            if(mb_substr($key, -15) == '-selectmultiple')
+                if(mb_substr($key, 0, -15) != $prev_key)
+                    $key = mb_substr($key, 0, -15);
 
             if(!(array_search($key, $columns) === false)){
                 $safe_np = $this->safe_np($key);
@@ -462,7 +500,7 @@ class lazy_mofo{
         $identity_id = $this->cast_id($_POST[$this->identity_name]);
 
         if(mb_strlen($this->table) == 0 || $identity_id == 0 || count($columns) == 0){
-            $this->display_error("missing tablename, or missing identity_value, or get_columns() failed", 'update()');
+            $this->display_error("missing tablename, or missing identity_value, or get_columns() failed", 'sql_update()');
             return false;
         }
 
@@ -480,8 +518,13 @@ class lazy_mofo{
 
             // checkboxes require a special hidden field so unchecked values are detectable
             if(mb_substr($key, -9) == '-checkbox')
-                if(!array_key_exists(mb_substr($key, 0, -9), $_POST))
+                if(!array_key_exists(mb_substr($key, 0, -9), $_POST)) // add key if none exists already
                     $key = mb_substr($key, 0, -9);
+
+            // same as above, but for selectmultiple 
+            if(mb_substr($key, -15) == '-selectmultiple')
+                if(!array_key_exists(mb_substr($key, 0, -15), $_POST))
+                    $key = mb_substr($key, 0, -15);
             
             if(!(array_search($key, $columns) === false)){
                 $safe_np = $this->safe_np($key);
@@ -526,10 +569,11 @@ class lazy_mofo{
             return false;
         }
 
-        // optimization flag
+        // optimization
         $run_upload = false;
-        if(array_search('--image', $input_control) || array_search('--document', $input_control))
-            $run_upload = true;
+        foreach($input_control as $column_name => $ctrl)
+            if($this->is_upload($input_control, $column_name))
+                $run_upload = true;
 
         // gather all identity ids from suffix of input_name-identity_id
         $arr_identity_id = array();
@@ -596,7 +640,7 @@ class lazy_mofo{
         // upload files
         if($run_upload)
             foreach($arr_identity_id as $identity_id)
-                $this->get_upload($columns, $table, $identity_name, $identity_id, $context);
+                $this->get_upload($columns, $table, $identity_name, $identity_id, 'grid');
 
         // get records to delete
         $arr_delete = @$_POST['_delete'];
@@ -630,10 +674,11 @@ class lazy_mofo{
         // $error = error message to display before form, often from server-side validation
         // returns: html
 
-        if(mb_strlen($this->identity_name) == 0 || (mb_strlen($this->grid_sql) && mb_strlen($this->table) == 0)){
-            $this->display_error("missing grid_sql and table (one is required), or missing identity_name", 'form()');
-            return;
-        }
+        if(mb_strlen($this->identity_name) == 0)
+            return $this->display_error("property: identity_name must be set", 'form()');
+
+        if(mb_strlen($this->form_sql) == 0 && mb_strlen($this->table) == 0)
+            return $this->display_error("property: form_sql or table must be set", 'form()');
 
         $identity_id = $this->cast_id(@$_GET[$this->identity_name]);
         if($identity_id == 0)
@@ -698,9 +743,9 @@ class lazy_mofo{
         
         $uri_path = $this->get_uri_path();
 
-        $html  = "<div id='lm'>\n";
+        $html  = "<div id='lm' class='lm_form_wrapper'>\n";
         $html .= "<form action='$uri_path$qs' method='post' enctype='multipart/form-data'>\n";
-        $html .= "<input type='hidden' name='_csrf' value='$_SESSION[_csrf]'>\n";
+        $html .= "<input type='hidden' name='_csrf' value='{$_SESSION['_csrf']}'>\n";
         $html .= "<input type='hidden' name='_posted' value='1'>\n";
 
         if(mb_strlen($error) > 0)
@@ -721,7 +766,7 @@ class lazy_mofo{
                 continue;
 
             // get data from database or repost
-            if($_posted == 1 && !mb_stristr(@$this->form_input_control[$column_name], 'readonly'))
+            if($_posted == 1 && @$this->form_input_control[$column_name]['type'] != 'readonly')
                 $value = @$_POST[$column_name];
             elseif($count == 0)
                 $value = @$this->form_default_value[$column_name];
@@ -739,7 +784,7 @@ class lazy_mofo{
             elseif(array_key_exists($column_name, $this->form_input_control))
                 $control = $this->get_input_control($column_name, $value, $this->form_input_control[$column_name], 'form', $validate);
             else
-                $control = $this->get_input_control($column_name, $value, '--text', 'form', $validate);
+                $control = $this->get_input_control($column_name, $value, null, 'form', $validate);
         
             $html .= "<tr>\n";
             $html .= "    <td>$title:</td>\n";
@@ -863,7 +908,7 @@ class lazy_mofo{
         $sql = preg_replace('/\s+limit\s+[0-9,\s]+$/i', '', $sql); 
 
         // add limit and offset for pagination
-        if($_pagination_off == 0 && $_export == 0)
+        if($_pagination_off == 0 && $_export == 0 && $grid_limit > 0)
             $sql .= " limit $_offset, $grid_limit"; 
 
         // run query
@@ -902,15 +947,15 @@ class lazy_mofo{
         $links = $grid_edit_link . ' ' . $grid_delete_link;
 
         // pagination and save changes link bar
-		$pagination = $this->get_pagination($count, $grid_limit, $_offset, $_pagination_off);
+        $pagination = $this->get_pagination($count, $grid_limit, $_offset, $_pagination_off);
         $button = '';
-		if(count($this->grid_input_control) > 0 || $this->grid_multi_delete == true)
+        if(count($this->grid_input_control) > 0 || $this->grid_multi_delete == true)
             $button = "<input type='submit' name='__update_grid' value='$this->grid_text_save_changes' class='lm_button lm_save_changes_button'>";
-		$pagination_button_bar = "<table cellpadding='2' cellspacing='1' border='0' width='100%' class='lm_pagination'><tr><td style='text-align: left'>$pagination</td><td style='text-align: right'>$button</td></tr></table>\n";
+        $pagination_button_bar = "<table cellpadding='2' cellspacing='1' border='0' width='100%' class='lm_pagination'><tr><td style='text-align: left'>$pagination</td><td style='text-align: right'>$button</td></tr></table>\n";
 
         // search bar
         $search_box = '';
-		if($this->grid_show_search_box){
+        if($this->grid_show_search_box){
     
             // carry values defined in query_string_list
             $query_string_list_inputs = '';
@@ -921,13 +966,13 @@ class lazy_mofo{
             }
             
             $search_box = $this->grid_search_box;
-			$search_box = str_replace('[script_name]', $uri_path . $this->get_qs('') , $search_box); // for 'x' cancel do add get_qs('') to carry query_string_list
-			$search_box = str_replace('[_search]', $_search, $search_box);
-			$search_box = str_replace('[_csrf]', $_SESSION['_csrf'], $search_box);
-			$search_box = str_replace('[query_string_list]', $query_string_list_inputs, $search_box);
+            $search_box = str_replace('[script_name]', $uri_path . $this->get_qs('') , $search_box); // for 'x' cancel do add get_qs('') to carry query_string_list
+            $search_box = str_replace('[_search]', $_search, $search_box);
+            $search_box = str_replace('[_csrf]', $_SESSION['_csrf'], $search_box);
+            $search_box = str_replace('[query_string_list]', $query_string_list_inputs, $search_box);
         }
 
-		$add_record_search_bar = "<table cellpadding='2' cellspacing='1' border='0' width='100%' class='lm_add_search'><tr><td style='text-align: left'>$grid_add_link &nbsp; $grid_export_link</td><td style='text-align: right'>$search_box</td></tr></table>\n";
+        $add_record_search_bar = "<table cellpadding='2' cellspacing='1' border='0' width='100%' class='lm_add_search'><tr><td style='text-align: left'>$grid_add_link &nbsp; $grid_export_link</td><td style='text-align: right'>$search_box</td></tr></table>\n";
 
         // generate table header
         $head = "<tr>\n";
@@ -942,7 +987,7 @@ class lazy_mofo{
             if($column_name == $this->identity_name && $i == ($column_count - 1))
                 $head .= "    <th></th>\n"; // if identity is last column then this is the column with the edit and delete links
             else
-                $head .= "    <th><a href='{$uri_path}_order_by=" . ($i + 1) . "&amp;_desc=$_desc_invert&amp;" . $this->get_qs('_search') . "'>$title</a></th>\n";
+                $head .= "    <th><a href='{$uri_path}_order_by=" . ($i + 1) . "&_desc=$_desc_invert&" . $this->get_qs('_search') . "'>$title</a></th>\n";
         
             $i++;
 
@@ -961,7 +1006,7 @@ class lazy_mofo{
 
         $html .= "<form action='$uri_path$qs' method='post' onsubmit='return _update_grid()' enctype='multipart/form-data'>\n";
         $html .= "<input type='hidden' name='_posted' value='1'>\n";
-        $html .= "<input type='hidden' name='_csrf' value='$_SESSION[_csrf]'>\n";
+        $html .= "<input type='hidden' name='_csrf' value='{$_SESSION['_csrf']}'>\n";
 
         // quit if there's no data
         if($count <= 0){
@@ -1016,7 +1061,7 @@ class lazy_mofo{
 
                 // anything else
                 else
-                    $html .= '    <td>' . $this->get_output_control($column_name . '-' . $row[$this->identity_name], $value, '--text', 'grid') . "</td>\n";
+                    $html .= '    <td>' . $this->get_output_control($column_name . '-' . $row[$this->identity_name], $value, null, 'grid') . "</td>\n";
 
                 $i++; // column index
             }
@@ -1038,7 +1083,7 @@ class lazy_mofo{
         $html .= $pagination_button_bar;
         $html .= "</form>\n";
         $html .= "</div><!-- close #lm -->\n";
-		$html .= $this->delete_js(0, 'grid');
+        $html .= $this->delete_js(0, 'grid');
 
         return $html;
 
@@ -1066,13 +1111,13 @@ class lazy_mofo{
         <form action='$uri_path$qs' method='post' name='delete_js'>
         <input type='hidden' name='action' value='delete' >
         <input type='hidden' name='$this->identity_name' value='$identity_id' >
-        <input type='hidden' name='_csrf' value='$_SESSION[_csrf]' >
+        <input type='hidden' name='_csrf' value='{$_SESSION['_csrf']}' >
         <input type='hidden' name='_called_from' value='$_called_from' >
         </form>
 
         <script type='text/javascript'>
-		
-		function _delete(id){
+        
+        function _delete(id){
 
             if(!confirm('$delete_confirm'))
                 return false;
@@ -1128,6 +1173,7 @@ class lazy_mofo{
             return true;
 
         }
+
         </script>
         ";
     }
@@ -1141,7 +1187,7 @@ class lazy_mofo{
         $html = '';
         $class = $this->get_class_name($field_name);
 
-        if(mb_strlen($file_name) > 0){
+        if(isset($file_name) && mb_strlen($file_name) > 0){
         
             if(mb_strlen($this->thumb_path))
                 $html .= "<a href='$this->upload_path/$file_name' target='_blank'><img src='$this->thumb_path/$file_name' alt='' $this->image_style ></a>";
@@ -1181,7 +1227,7 @@ class lazy_mofo{
         // purpose: if image exists, display image depending on settings and if thumbnail exists
         // returns: html
 
-        if(mb_strlen($file_name) == 0)
+        if(!isset($file_name) || mb_strlen($file_name) == 0)
             return;
 
         if($this->grid_show_images == false)
@@ -1230,27 +1276,24 @@ class lazy_mofo{
 
     }
 
-	
-	function html_radio($field_name, $value, $sql){    
+    
+    function html_radio($field_name, $value, $sql, $sql_param = array()){    
 
         // purpose: render html radio input, note sql query should return 2 columns
         // returns: html
 
-        static $prev_sql = '';
-        static $result;
         $class = $this->get_class_name($field_name);
+
+        if(!is_array($sql_param))
+            $sql_param = array();
 
         // if no sql is provided render 1 = yes/ 0 = no
         if($sql == '')
             $sql = "select 1 as val, 'Yes' as opt union select 0, 'No'";
 
-        // simple optimization
-        if($prev_sql != $sql)
-            $result = $this->query($sql, array(), 'html_radio()');
+        $result = $this->query_cache($sql, $sql_param, 'html_radio()');
 
-        $prev_sql = $sql;
-
-        $control = '';    
+        $html = '';    
         foreach($result as $row){
 
             $val = current($row);
@@ -1260,39 +1303,36 @@ class lazy_mofo{
             if($val == $value)
                 $checked = "checked='checked'";
             
-            $control .= "<label><input type='radio' name='$field_name' class='$class' value='" . $this->clean_out($val) . "' $checked >" . $this->clean_out($opt) . "</label> ";
+            $html .= "<label><input type='radio' name='$field_name' class='$class' value='" . $this->clean_out($val) . "' $checked >" . $this->clean_out($opt) . "</label> ";
         }
         
-        return $control;
+        return $html;
 
     }
 
 
-    function html_select($field_name, $value, $sql, $sql_param = array(), $js_or_css = '', $first_option_blank = true, $multiple = 0){
+    function html_select($field_name, $value, $sql, $sql_param = array(), $js_or_style = '', $first_option_blank = true, $multiple = 0){
 
         // purpose: render html select dropdown from sql query
         // returns: html
         // sample query: select 0 as val, 'no' as opt union select 1, 'yes'
 
-        static $prev_sql = '';
-        static $result;
-        $out = '';
+        $html = '';
         $class = $this->get_class_name($field_name);
+
+        if(!is_array($sql_param))
+            $sql_param = array();
 
         // if no sql is provided render 1 = yes, 0 = no
         if($sql == '')
             $sql = "select 1 as val, 'Yes' as opt union select 0, 'No'";
-	
-        // simple optimization
-        if($prev_sql != $sql)
-            $result = $this->query($sql, $sql_param, 'html_select()');
 
-        $prev_sql = $sql;
+        $result = $this->query_cache($sql, $sql_param, 'html_select()');
 
         if($multiple == 0){
 
             if($first_option_blank)
-                $out .= "<option value=''>&nbsp;</option>";
+                $html .= "<option value=''>&nbsp;</option>";
 
             foreach($result as $row){
 
@@ -1303,16 +1343,16 @@ class lazy_mofo{
                 if($val == $value)
                     $selected = "selected='selected'";
 
-                $out .= "<option value='" . $this->clean_out($val) . "' $selected>" . $this->clean_out($opt) . "</option>";
+                $html .= "<option value='" . $this->clean_out($val) . "' $selected>" . $this->clean_out($opt) . "</option>";
             }
-            $out = "<select name='$field_name' class='$class' $js_or_css>$out</select>";
-            return $out;
+            $html = "<select name='$field_name' class='$class' $js_or_style>$html</select>";
+            return $html;
         }
             
         // render multiple select
-        $out  = "";
+        $html = "";
         if($first_option_blank)
-            $out .= "<option value=''>&nbsp;</option>";
+            $html .= "<option value=''>&nbsp;</option>";
 
         $value  = "$this->delim$value$this->delim";
         foreach($result as $row){
@@ -1324,11 +1364,12 @@ class lazy_mofo{
             if(mb_strstr($value, "$this->delim$val$this->delim"))
                 $selected = "selected='selected'";
         
-            $out .= "<option value='" . $this->clean_out($val) . "' $selected>" . $this->clean_out($opt) . "</option>";
+            $html .= "<option value='" . $this->clean_out($val) . "' $selected>" . $this->clean_out($opt) . "</option>";
         }    
 
-        $out = "<select name='{$field_name}[]' class='$class' multiple='multiple' size='$multiple' $js_or_css>$out</select>";
-        return $out;
+        // hidden field at the end assists in detecting no selections
+        $html = "<select name='{$field_name}[]' class='$class' multiple='multiple' size='$multiple' $js_or_style>$html</select><input type='hidden' name='{$field_name}-selectmultiple' value=''>";
+        return $html;
 
     }
 
@@ -1340,13 +1381,15 @@ class lazy_mofo{
 
         $class = $this->get_class_name($field_name);
 
+        if(!is_array($sql_param))
+            $sql_param = array();
+
         // make hidden field name. an additional hidden field is require to detect presence of checkbox. 
         $i = mb_strrpos($field_name, '-');
         if($i > 0)
             $field_name_hidden = mb_substr($field_name, 0, $i) . '-checkbox' . mb_substr($field_name, $i); // grid format field_name-checkbox-identity_id
         else
             $field_name_hidden = $field_name . '-checkbox';
-
 
         // if no sql is provided just return a single checkbox for 1 = yes
         $checked = '';
@@ -1358,16 +1401,14 @@ class lazy_mofo{
             return "<label><input type='checkbox' name='$field_name' class='$class' value='1' $checked ></label><input type='hidden' name='$field_name_hidden' value=''>";
         }
 
-        static $prev_sql = '';
-        static $result;
+        $result = $this->query_cache($sql, $sql_param, 'html_checkbox()');
 
-        // simple optimization
-        if($prev_sql != $sql)
-            $result = $this->query($sql, $sql_param, 'html_radio()');
+        // make delimited string of previous post
+        if(is_array($value))
+            $value = $this->delim . implode($this->delim, $value) . $this->delim;
+        else
+            $value = $this->delim . $value . $this->delim;
 
-        $prev_sql = $sql;
-
-        $value  = "$this->delim$value$this->delim";
         $html = '';
         foreach($result as $row){
 
@@ -1375,7 +1416,7 @@ class lazy_mofo{
             $opt = next($row);
 
             $checked = '';    
-            if(mb_strstr($value, "$this->delim$val$this->delim"))
+            if(mb_strstr($value, $this->delim . $val . $this->delim))
                 $checked = "checked='checked'";
 
             $html .= "<label><input type='checkbox' name='{$field_name}[]' class='$class' value='" . $this->clean_out($val) . "' $checked >" . $this->clean_out($opt) . "</label>&nbsp;";
@@ -1400,23 +1441,20 @@ class lazy_mofo{
         $val = trim($val);
 
         if($posted_from == 'grid')
-            $command = @$this->grid_input_control[$column_name];
+            $type = @$this->grid_input_control[$column_name]['type'];
         else
-            $command = @$this->form_input_control[$column_name];
-
-        // get command only, no sql, no '--'
-        $cmd = trim(mb_substr($command, mb_strrpos($command, '--') + 2));
+            $type = @$this->form_input_control[$column_name]['type'];
 
         if(isset($this->cast_user_function[$column_name]))
             $val = call_user_func($this->cast_user_function[$column_name], $val);
-        elseif($cmd == 'date')
+        elseif($type == 'date')
             $val = $this->date_in($val);
-        elseif($cmd == 'datetime')
+        elseif($type == 'datetime')
             $val = $this->date_in($val, true);
-        elseif($cmd == 'number' && mb_strlen($this->restricted_numeric_input) > 0)
-            $val = preg_replace($this->restricted_numeric_input, '', $val);
+        elseif($type == 'number')
+            $val = $this->number_in($val);
         
-        if(mb_strlen($val) == 0)
+        if(!isset($val) || mb_strlen($val) == 0)
             $val = null;
 
         return $val;
@@ -1424,16 +1462,16 @@ class lazy_mofo{
     }
 
 
-	function cast_id($str){
+    function cast_id($str){
 
-		// purpose: similar to intval() but supports mysql bigint and does not overflow
+        // purpose: similar to intval() but supports mysql bigint and does not overflow
 
-		if(preg_match('/-?[0-9]{1,30}/', $str))
-			return $str;
-		else
-			return 0;
+        if(isset($str) && preg_match('/^-?[0-9]{1,30}$/', $str))
+            return $str;
 
-	}
+        return 0;
+
+    }
 
     
     function clean_file_name($file_name){
@@ -1454,16 +1492,35 @@ class lazy_mofo{
 
         // purpose: escape html output w/ optional ellipsing
 
+        if(!isset($str))
+            return '';
+
         if(is_array($str))
             $str = implode($this->delim, $str);
-        elseif($ellipse_at > 0)
-            if(mb_strlen($str) > $ellipse_at)
-                $str = mb_substr($str, 0, $ellipse_at, $this->charset) . "...";
+        elseif($ellipse_at > 0 && mb_strlen($str) > $ellipse_at)
+            $str = mb_substr($str, 0, $ellipse_at, $this->charset) . "...";
 
         // remove illegal characters
         $str = mb_convert_encoding($str, $this->charset, mb_detect_encoding($str));
 
         return htmlspecialchars($str, ENT_QUOTES, $this->charset);
+    }
+
+
+    function number_in($str){
+
+        // purpose: swap out decimal separator and remove any extra chars going into database
+        
+        if($this->decimal_separator != '.'){
+            $str = str_replace('.', '', $str);
+            $str = str_replace($this->decimal_separator, '.', $str); 
+        }
+
+        if(mb_strlen($this->restricted_numeric_input) == 0)
+            return $str;
+
+        return preg_replace($this->restricted_numeric_input, '', $str);
+
     }
 
 
@@ -1497,7 +1554,7 @@ class lazy_mofo{
 
         // purpose: convert database format to local format
 
-        if(mb_strlen($str) < 8)
+        if(!isset($str) || mb_strlen($str) < 8)
             return; 
         
         if($use_time)
@@ -1513,14 +1570,15 @@ class lazy_mofo{
         // purpose: change field name to friendly. example: first_name becomes "First Name" or EntryFee1 becomes "Entry Fee 1"
         // returns: html escaped string
 
-        if(mb_strlen($friendly_name) > 0)
+        if(isset($friendly_name))
             return $this->clean_out($friendly_name);
 
         $friendly_name = $field_name;
+        
         $friendly_name = preg_replace('/([a-z]{1})([A-Z]{1})/', '\1 \2', $friendly_name);
         $friendly_name = preg_replace('/([a-z]{1})([0-9]+)/i', '\1 \2 ', $friendly_name);
         $friendly_name = str_replace('_', ' ', $friendly_name);
-		$friendly_name = mb_convert_case($friendly_name, MB_CASE_TITLE, $this->charset);
+        $friendly_name = mb_convert_case($friendly_name, MB_CASE_TITLE, $this->charset);
 
         return $this->clean_out($friendly_name);
 
@@ -1538,9 +1596,16 @@ class lazy_mofo{
         if(isset($action))
             return $action;
 
-        $post_get = array_merge($_POST, $_GET);
+        $post_get = array();
 
-        if(mb_strlen(@$post_get['action']) > 0)
+        // merge post and get
+        if(isset($_POST))
+            $post_get = $_POST; 
+
+        if(isset($_GET))
+            $post_get = array_merge($post_get, $_GET);
+
+        if(isset($post_get['action']))
             return $post_get['action'];
 
         foreach($post_get as $key => $val)
@@ -1550,19 +1615,24 @@ class lazy_mofo{
     }
 
 
-    function get_input_control($column_name, $value, $command, $called_from, &$validate = array()){
+    function get_input_control($column_name, $value, $control, $called_from, &$validate = array()){
 
         // purpose: render html input based "command", if command is then try to call a user function
         // returns: html 
-        
-        // parse $command into $sql and $cmd, remove delimiter
-		$pos = mb_strrpos($command, '--');
-		$cmd = trim(mb_substr($command, $pos + 2));
-		$sql = mb_substr($command, 0, $pos);
 
-        // default
-        if(mb_strlen($cmd) == 0)
-            $cmd = 'text';
+        $type = 'text'; // default
+        $sql = '';
+        $sql_param = '';
+        if(isset($control['type'])){
+            $type = $control['type'];
+            $sql = @$control['sql']; // optional
+            $sql_param = @$control['sql_param']; // optional
+        }
+
+        // subtle backward compatible madness
+        $legacy_control = $control;
+        if(isset($control['legacy_control']))
+            $legacy_control = $control['legacy_control'];
 
         // set input size    
         if($called_from == 'grid')
@@ -1572,97 +1642,101 @@ class lazy_mofo{
 
         $class = $this->get_class_name($column_name); 
 
-        $validate_error = ''; // error next to input
-        $validate_tip = '';   // tip next to input
-        $validate_placeholder = ''; // text in placeholder - text inputs only
-        $validate_placeholder_alternative = ''; // placeholder setting disabled - move text next to input 
+        $validate_error_msg = ''; // error next to input
+        $validate_tip = '';       // placeholder next to input for some inputs
+
+        // text, password, textarea only - placeholder depending on settings, inside or outside the input
+        $validate_placeholder = '';
+        $validate_placeholder_alternative = '';
 
         // display tip or error next to input, not both
-        if(@$validate[$column_name][4] === false)
-            $validate_error = "<span class='lm_validate_error'>" . $this->clean_out($validate[$column_name][1]) . "</span>";
-        elseif(@$validate[$column_name][2] != '')
-            $validate_tip = "<span class='lm_validate_tip'>" . $this->clean_out($validate[$column_name][2]) . "</span>";
+        if(@$validate[$column_name]['result'] === false)
+            $validate_error_msg = "<span class='lm_validate_error'>" . $this->clean_out($validate[$column_name]['error_msg']) . "</span>";
+        elseif(isset($validate[$column_name]['placeholder']) && strlen($validate[$column_name]['placeholder']) > 0)
+            $validate_tip = "<span class='lm_validate_tip'>" . $this->clean_out($validate[$column_name]['placeholder']) . "</span>";
 
         // always try to get a placeholder for the text inputs
         if($this->validate_tip_in_placeholder)
-            $validate_placeholder = $this->clean_out(@$validate[$column_name][2]); // placeholders for text 
-        elseif($validate_error == '')
-			$validate_placeholder_alternative = "<span class='lm_validate_tip'>" . $this->clean_out($validate[$column_name][2]) . "</span>";
+            $validate_placeholder = $this->clean_out(@$validate[$column_name]['placeholder']); // placeholders for text 
+        elseif(strlen($validate_error_msg) == 0)
+            $validate_placeholder_alternative = "<span class='lm_validate_tip'>" . $this->clean_out($validate[$column_name]['placeholder']) . "</span>";
     
-		$max_length = '';
-		if(intval(@$this->text_input_max_length[$column_name]) > 0)
-			$max_length = "maxlength='" . $this->text_input_max_length[$column_name] . "'";
-		elseif($this->text_input_max_length_default > 0)
-			$max_length = "maxlength='" . $this->text_input_max_length_default . "'";
+        $max_length = '';
+        if(intval(@$this->text_input_max_length[$column_name]) > 0)
+            $max_length = "maxlength='" . $this->text_input_max_length[$column_name] . "'";
+        elseif($this->text_input_max_length_default > 0)
+            $max_length = "maxlength='" . $this->text_input_max_length_default . "'";
 
-        if($cmd == 'text')
-            return "<input type='text' name='$column_name' class='$class' value='" . $this->clean_out($value) . "' size='$size' $max_length placeholder='$validate_placeholder'>$validate_error $validate_placeholder_alternative";
-        elseif($cmd == 'password')
-            return "<input type='password' name='$column_name' class='$class' value='" . $this->clean_out($value) . "' size='$size' $max_length placeholder='$validate_placeholder'>$validate_error $validate_placeholder_alternative";
-        elseif($cmd == 'number')
-            return "<input type='text' name='$column_name' class='$class' value='" . $this->clean_out($value) . "' size='18' $max_length placeholder='$validate_placeholder'>$validate_error $validate_placeholder_alternative";
-        elseif($cmd == 'date')
-            return "<input type='text' name='$column_name' class='$class' value='" . $this->date_out($value) . "' size='18' $max_length placeholder='$validate_placeholder'>$validate_error $validate_placeholder_alternative";
-        elseif($cmd == 'datetime')
-            return "<input type='text' name='$column_name' class='$class' value='" . $this->date_out($value, true) . "' size='18' $max_length placeholder='$validate_placeholder'>$validate_error $validate_placeholder_alternative";
-        elseif($cmd == 'textarea')
-            return "<textarea name='$column_name' class='$class' cols='60' rows='6' placeholder='$validate_placeholder'>" . $this->clean_out($value) . "</textarea>$validate_error $validate_placeholder_alternative";
-        elseif($cmd == 'readonly_datetime')
+        if($type == 'text')
+            return "<input type='text' name='$column_name' class='$class' value='" . $this->clean_out($value) . "' size='$size' $max_length placeholder='$validate_placeholder'>$validate_error_msg $validate_placeholder_alternative";
+        elseif($type == 'password')
+            return "<input type='password' name='$column_name' class='$class' value='" . $this->clean_out($value) . "' size='$size' $max_length placeholder='$validate_placeholder'>$validate_error_msg $validate_placeholder_alternative";
+        elseif($type == 'number')
+            return "<input type='text' name='$column_name' class='$class' value='" . $this->clean_out($value) . "' size='18' $max_length placeholder='$validate_placeholder'>$validate_error_msg $validate_placeholder_alternative";
+        elseif($type == 'date')
+            return "<input type='text' name='$column_name' class='$class' value='" . $this->date_out($value) . "' size='18' $max_length placeholder='$validate_placeholder'>$validate_error_msg $validate_placeholder_alternative";
+        elseif($type == 'datetime')
+            return "<input type='text' name='$column_name' class='$class' value='" . $this->date_out($value, true) . "' size='18' $max_length placeholder='$validate_placeholder'>$validate_error_msg $validate_placeholder_alternative";
+        elseif($type == 'textarea')
+            return "<textarea name='$column_name' class='$class' cols='60' rows='6' placeholder='$validate_placeholder'>" . $this->clean_out($value) . "</textarea>$validate_error_msg $validate_placeholder_alternative";
+        elseif($type == 'readonly_datetime')
             return $this->date_out($value, true);
-        elseif($cmd == 'readonly_date')
+        elseif($type == 'readonly_date')
             return $this->date_out($value);
-        elseif($cmd == 'readonly')
+        elseif($type == 'readonly')
             return $this->clean_out($value);
-        elseif($cmd == 'image')
-            return $this->html_image_input($column_name, $value) . $validate_tip . $validate_error;
-        elseif($cmd == 'document')
-            return $this->html_document_input($column_name, $value) . $validate_tip . $validate_error;
-        elseif($cmd == 'select')
-            return $this->html_select($column_name, $value, $sql, array(), '', $this->select_first_option_blank, 0) . $validate_tip . $validate_error;
-        elseif($cmd == 'selectmultiple')
-            return $this->html_select($column_name, $value, $sql, array(), '', $this->select_first_option_blank, 6) . $validate_tip . $validate_error;
-        elseif($cmd == 'radio')
-            return $this->html_radio($column_name, $value, $sql, array()) . $validate_tip . $validate_error;
-        elseif($cmd == 'checkbox')
-            return $this->html_checkbox($column_name, $value, $sql, array()) . $validate_tip . $validate_error;
-		elseif(is_callable($cmd))
-            return call_user_func($cmd, $column_name, $value, $command, $called_from, $validate_placeholder) . $validate_tip . $validate_error;
+        elseif($type == 'image')
+            return $this->html_image_input($column_name, $value) . $validate_tip . $validate_error_msg;
+        elseif($type == 'document')
+            return $this->html_document_input($column_name, $value) . $validate_tip . $validate_error_msg;
+        elseif($type == 'select')
+            return $this->html_select($column_name, $value, $sql, $sql_param, '', $this->select_first_option_blank, 0) . $validate_tip . $validate_error_msg;
+        elseif($type == 'selectmultiple')
+            return $this->html_select($column_name, $value, $sql, $sql_param, '', $this->select_first_option_blank, 6) . $validate_tip . $validate_error_msg;
+        elseif($type == 'radio')
+            return $this->html_radio($column_name, $value, $sql, $sql_param) . $validate_tip . $validate_error_msg;
+        elseif($type == 'checkbox')
+            return $this->html_checkbox($column_name, $value, $sql, $sql_param) . $validate_tip . $validate_error_msg;
+        elseif(is_callable($type))
+            return call_user_func($type, $column_name, $value, $legacy_control, $called_from, $validate_placeholder) . $validate_tip . $validate_error_msg;
         else
-            $this->display_error("Input command or user function not found: $cmd. Be sure to prefix control type with 2 dashes --", 'get_input_control()');
+            $this->display_error("Input command or user function not found: $type", 'get_input_control()');
 
     }
 
 
-    function get_output_control($column_name, $value, $command, $called_from){
+    function get_output_control($column_name, $value, $control, $called_from){
 
         // purpose: render html output based "command", if command is then try to call a user function
         // returns: html 
 
-        // get command only, no '--'
-        $cmd = trim(mb_substr($command, mb_strrpos($command, '--') + 2));
+        $type = 'text'; // default
+        if(isset($control['type']))
+            $type = $control['type'];
 
-        // default
-        if(mb_strlen($cmd) == 0)
-            $cmd = 'text';
+        // subtle backward compatible madness
+        $legacy_control = $control;
+        if(isset($control['legacy_control']))
+            $legacy_control = $control['legacy_control'];
 
-        if($cmd == 'text')
+        if($type == 'text')
             return $this->clean_out($value, $this->grid_ellipse_at); 
-        elseif($cmd == 'date')
+        elseif($type == 'date')
             return $this->date_out($value); 
-        elseif($cmd == 'datetime')
+        elseif($type == 'datetime')
             return $this->date_out($value, true); 
-        elseif($cmd == 'email')
+        elseif($type == 'email')
             return "<a href='mailto:$value'>$value</a>";
-        elseif($cmd == 'document')
+        elseif($type == 'document')
             return $this->html_document_output($value);
-        elseif($cmd == 'image')
+        elseif($type == 'image')
             return $this->html_image_output($value);
-        elseif($cmd == 'html')
+        elseif($type == 'html')
             return $this->html_html_output($value);
-		elseif(is_callable($cmd))
-            return call_user_func($cmd, $column_name, $value, $command, $called_from);
+        elseif(is_callable($type))
+            return call_user_func($type, $column_name, $value, $legacy_control, $called_from);
         else
-            $this->display_error("Output command or user function not found: $cmd. Be sure to prefix control type with 2 dashes --", 'get_output_control()');
+            $this->display_error("Output command or user function not found: $type. Be sure to prefix control type with 2 dashes --", 'get_output_control()');
 
     }
 
@@ -1689,8 +1763,14 @@ class lazy_mofo{
             $sql_param = $this->form_sql_param;
         }
 
-        if($sql == '')
+        // no query defined, just make one
+        if(strlen($sql) == 0){
+
+            if(mb_strlen($this->table) == 0)
+                return $this->display_error("missing property: table", 'get_columns');
+
             $sql = "select * from `$table`";
+        }
 
         // remove last semicolon        
         $sql = rtrim($sql, "\r\n\t; ");
@@ -1701,14 +1781,14 @@ class lazy_mofo{
             $match = end($matches[0]);
             $sql = mb_substr($sql, 0, $match[1]);
         }
-        $sql .= ' limit 0 ';                                    // add limit
+        $sql .= ' limit 0 '; // add limit, we don't need any data, just meta data
 
         $sth = $this->dbh->prepare($sql);
         if(!$sth->execute($sql_param)){
             $arr = $sth->errorInfo();
             $error = $arr[2];
             $this->display_error("$error\nsql: $sql\narr_sql_param: " . print_r($sql_param, true), 'get_columns');
-            return $columns;
+            return array();
         }
 
         $i = 0;
@@ -1730,17 +1810,18 @@ class lazy_mofo{
                 continue;
 
             if($type == 'date')
-                $this->form_input_control[$column_name] = '--date';
+                $this->form_input_control[$column_name]['type'] = 'date';
             elseif($type == 'datetime' || $type == 'timestamp')
-                $this->form_input_control[$column_name] = '--datetime';
+                $this->form_input_control[$column_name]['type'] = 'datetime';
             elseif($type == 'blob')
-                $this->form_input_control[$column_name] = '--textarea';
+                $this->form_input_control[$column_name]['type'] = 'textarea';
             elseif(mb_strstr($type, 'short') || mb_strstr($type, 'int') || mb_strstr($type, 'long') || mb_strstr($type, 'float') || mb_strstr($type, 'double') || mb_strstr($type, 'decimal'))
-                $this->form_input_control[$column_name] = '--number';
+                $this->form_input_control[$column_name]['type'] = 'number';
 
         }
 
-        // populate grid_output_control with --date, --datetime
+
+        // populate grid_output_control with type date or datetime
         $i = 0;
         while($context == 'grid' && $column = $sth->getColumnMeta($i++)){
             
@@ -1750,21 +1831,21 @@ class lazy_mofo{
                 continue;
 
             if($type == 'date')
-                $this->grid_output_control[$column_name] = '--date';
+                $this->grid_output_control[$column_name]['type'] = 'date';
             elseif($type == 'datetime' || $type == 'timestamp')
-                $this->grid_output_control[$column_name] = '--datetime';
+                $this->grid_output_control[$column_name]['type'] = 'datetime';
 
         }
 
-        // populate default values
-        $sql = "select column_name, column_default from information_schema.columns where column_default is not null and table_name = :table and table_schema = database()";
+        // populate default values - user must have read access to information_schema.columns, aliases added for mysql 8
+        $sql = "select column_name as 'column_name', column_default as 'column_default' from information_schema.columns where column_default != 'NULL' and column_default is not null and table_name = :table and table_schema = database()";
         $sql_param = array(':table' => $table);
         $result = $this->query($sql, $sql_param, 'get_columns() - populate form_default_value');
         foreach($result as $row){
             
             if($context == 'form')
                 if(!array_key_exists($row['column_name'], $this->form_default_value))
-                    $this->form_default_value[$row['column_name']] = $row['column_default'];
+                    $this->form_default_value[$row['column_name']] = trim($row['column_default'], "'"); // weird, string values are quoted
 
         }
 
@@ -1777,29 +1858,29 @@ class lazy_mofo{
 
         // purpose: pagination for grid
 
-        static $id = 0;    // for unique active page input id
+        if($count <= 0 || $limit <= 0)
+            return;
+
         $get = $this->get_qs('_order_by,_desc,_search');
         $active_page = floor($_offset / $limit) + 1; 
         $total_page = ceil($count / $limit);
         $uri_path = $this->get_uri_path();
 
-        if($count <= 0)
-            return;
 
         $use_paging_link = '';
         if($_pagination_off == 1)
-            $use_paging_link = "<a href='{$uri_path}_pagination_off=0&amp;$get' rel='nofollow'>$this->pagination_text_use_paging</a>";
+            $use_paging_link = "<a href='{$uri_path}_pagination_off=0&$get' rel='nofollow'>$this->pagination_text_use_paging</a>";
 
         if($_pagination_off == 1 || $count <= $limit) 
             return number_format($count) . " $this->pagination_text_records $use_paging_link";
 
         // simple text input for page number on giant datasets. use drop-down for smaller datasets.
         if($count > 100000){
-            $input = "<input type='text' size='7' id='active_page_$id' value='$active_page' ><input type='button' value='$this->pagination_text_go' onclick='window.location.href=\"{$uri_path}_offset=\" + ((document.getElementById(\"active_page_$id\").value * $limit) - $limit) + \"&amp;$get\"'>";
+            $input = "<input type='text' size='7' class='lm_active_page' value='$active_page' onkeyup='document.getElementsByClassName(\"lm_active_page\")[0].value = this.value; // send data to first input' > <input type='button' class='lm_button' value='$this->pagination_text_go' onclick='window.location.href=\"{$uri_path}_offset=\" + ((document.getElementsByClassName(\"lm_active_page\")[0].value * $limit) - $limit) + \"&$get\"'>";
         }
         else
         {
-            $input = "<select onchange='window.location.href=\"{$uri_path}_offset=\" + this.options[this.selectedIndex].value + \"&amp;$get\"'>";
+            $input = "<select onchange='window.location.href=\"{$uri_path}_offset=\" + this.options[this.selectedIndex].value + \"&$get\"'>";
             for($i = 0, $p = 1; $i < $count; $i += $limit, $p++){
                 $sel = '';
                 if($p == $active_page)
@@ -1815,16 +1896,15 @@ class lazy_mofo{
         if($_offset == 0)
             $pagination .= " $this->pagination_text_back ";
         else
-            $pagination .= " <a href='{$uri_path}_offset=" . ($_offset - $limit) . "&amp;$get'>$this->pagination_text_back</a> ";
+            $pagination .= " <a href='{$uri_path}_offset=" . ($_offset - $limit) . "&$get'>$this->pagination_text_back</a> ";
 
         if($active_page >= $total_page)
             $pagination  .= " $this->pagination_text_next ";
         else
-            $pagination  .= " <a href='{$uri_path}_offset=" . ($_offset + $limit) . "&amp;$get'>$this->pagination_text_next</a> ";
+            $pagination  .= " <a href='{$uri_path}_offset=" . ($_offset + $limit) . "&$get'>$this->pagination_text_next</a> ";
 
-        $pagination .= " &nbsp; " . number_format($count) . " $this->pagination_text_records <a href='{$uri_path}_pagination_off=1&amp;$get' rel='nofollow'>$this->pagination_text_show_all</a> ";
+        $pagination .= " &nbsp; " . number_format($count) . " $this->pagination_text_records <a href='{$uri_path}_pagination_off=1&$get' rel='nofollow'>$this->pagination_text_show_all</a> ";
 
-        $id++;
         return $pagination;
 
     }
@@ -1841,14 +1921,10 @@ class lazy_mofo{
 
         $get = '';
         $arr = explode(',', trim($query_string_list, ','));
-        foreach($arr as $var){
-            if(mb_strlen(@$_REQUEST[$var]) > 0)
+        foreach($arr as $var)
+            if(isset($_REQUEST[$var]) && mb_strlen($_REQUEST[$var]) > 0)
                 $get .= "&$var=" . urlencode($_REQUEST[$var]);
-                // $get .= "&amp;$var=" . urlencode($_REQUEST[$var]);
-        }
 
-        // return mb_substr($get, 5);
-        // return substr($get, 5);
         return ltrim($get, '&');
 
     }
@@ -1874,7 +1950,7 @@ class lazy_mofo{
 
         foreach($columns as $column_name){
 
-            $control = @$input_control[$column_name];
+            $type = @$input_control[$column_name]['type'];
 
             // uploads only
             if(!$this->is_upload($input_control, $column_name))
@@ -1888,13 +1964,13 @@ class lazy_mofo{
                 else
                     $input_name = "$column_name-$identity_id"; // updating 
 
-            if(!file_exists($this->upload_path) && mb_strlen($this->upload_path) > 0){
-                mkdir($this->upload_path, 0755);
+            if(!file_exists($this->get_upload_path()) && mb_strlen($this->get_upload_path()) > 0){
+                mkdir($this->get_upload_path(), 0755);
                 usleep(500);
             }
 
-            if(!file_exists($this->thumb_path) && mb_strlen($this->thumb_path) > 0){
-                mkdir($this->thumb_path, 0755);
+            if(!file_exists($this->get_thumb_path()) && mb_strlen($this->get_thumb_path()) > 0){
+                mkdir($this->get_thumb_path(), 0755);
                 usleep(500);
             }
 
@@ -1906,32 +1982,32 @@ class lazy_mofo{
             $file_name = $this->upload_file($input_name, $notice, $field_index);
 
             // reloop - no new file uploaded
-            if(mb_strlen($file_name) == 0)
-                continue;    
+            if(!isset($file_name) || mb_strlen($file_name) == 0)
+                continue;
                 
             // delete previous existing file
             $this->upload_delete($table_name, $identity_name, $identity_id, $column_name, $input_control);
 
             // copy upload to thumbnail path
-            if(mb_strlen($this->thumb_path) > 0 && $control == '--image')
-                if(!copy("$this->upload_path/$file_name", "$this->thumb_path/$file_name")){
-                    $this->display_error("Error: Unable to copy uploaded to thumb_path. Make sure path: $this->thumb_path exists and is writeable. Try chmod 0755 (or 0777 if you must) on the destination path.", 'get_upload()');
+            if(mb_strlen($this->get_thumb_path()) > 0 && $type == 'image')
+                if(!copy($this->get_upload_path() . "/$file_name", $this->get_thumb_path() . "/$file_name")){
+                    $this->display_error("Unable to copy uploaded to thumb_path. Make sure path: " . $this->get_thumb_path() . " exists and is writeable. Try chmod 0755 (or 0777 if you must) on the destination path.", 'get_upload()');
                     return false;
                 }
 
             // resize or crop main image
-            if($control == '--image')
+            if($type == 'image')
                 if($upload_crop)
-                    $this->image_crop("$this->upload_path/$file_name", $upload_width, $upload_height);
+                    $this->image_crop($this->get_upload_path() . "/$file_name", $upload_width, $upload_height);
                 else
-                    $this->image_resize("$this->upload_path/$file_name", $upload_width, $upload_height);
+                    $this->image_resize($this->get_upload_path() . "/$file_name", $upload_width, $upload_height);
 
             // thumbs - resize or crop 
-            if($control == '--image' && mb_strlen($this->thumb_path) > 0)
+            if($type == 'image' && mb_strlen($this->get_thumb_path()) > 0)
                 if($thumb_crop)
-                    $this->image_crop("$this->thumb_path/$file_name", $thumb_width, $thumb_height);
+                    $this->image_crop($this->get_thumb_path() . "/$file_name", $thumb_width, $thumb_height);
                 else
-                    $this->image_resize("$this->thumb_path/$file_name", $thumb_width, $thumb_height);
+                    $this->image_resize($this->get_thumb_path() . "/$file_name", $thumb_width, $thumb_height);
 
             // update file name in table 
             $sql_param = array();
@@ -1982,7 +2058,7 @@ class lazy_mofo{
         if($size <= 0 || mb_strlen($file_name) == 0)
             return;
         
-        if(mb_strlen($file_name) > 500){
+        if(mb_strlen($file_name) > 250){
             $notice .= "File name is too long.\n";
             return;
         }
@@ -1992,10 +2068,10 @@ class lazy_mofo{
             return;
         }
 
-        $file_name = $this->upload_rename_if_exists($this->upload_path, $file_name);
+        $file_name = $this->upload_rename_if_exists($this->get_upload_path(), $file_name);
 
-        if(!move_uploaded_file($tmp_name, "$this->upload_path/$file_name")){
-            $notice .= "Error: Unable to move uploaded file. Make sure path: $this->upload_path exists and is writeable. Try chmod 0755 (or 0777 is you must) on the destination path.\n";
+        if(!move_uploaded_file($tmp_name, $this->get_upload_path() . "/$file_name")){
+            $notice .= "Unable to move uploaded file. Make sure path: " . $this->get_upload_path() . " exists and is writeable. Try chmod 0755 (or 0777 is you must) on the destination path.\n";
             return;
         }
 
@@ -2032,7 +2108,7 @@ class lazy_mofo{
         $row = $result[0];
         foreach($row as $column_name => $val){
 
-            if(mb_strlen($val) == 0)
+            if(!isset($val) || mb_strlen($val) == 0)
                 continue;
 
             // uploads only
@@ -2040,11 +2116,11 @@ class lazy_mofo{
                 continue;
 
             // delete files
-            if(mb_strlen($this->upload_path) > 0)
-                @unlink("$this->upload_path/$val");
+            if(mb_strlen($this->get_upload_path()) > 0)
+                @unlink($this->get_upload_path() . "/$val");
 
-            if(mb_strlen($this->thumb_path) > 0)
-                @unlink("$this->thumb_path/$val");
+            if(mb_strlen($this->get_thumb_path()) > 0)
+                @unlink($this->get_thumb_path() . "/$val");
                     
             // empty field now that file is deleted
             $sql = "update `$table_name` set `$column_name` = null where `$identity_name` = :identity_id;";
@@ -2085,12 +2161,41 @@ class lazy_mofo{
         return $file_name;
 
     }
+
+
+    function get_upload_path(){
+
+        // purpose: return the path, prefer the absolute path if available
+        // returns: string path
     
+        if(strlen($this->upload_path_absolute))
+            return rtrim($this->upload_path_absolute, '\/');
+
+        return rtrim($this->upload_path, '\/');
+    }
+
+
+    function get_thumb_path(){
+
+        // purpose: return the path, prefer the absolute path if available
+        // returns: string path to thumbnail folder
+
+        if(strlen($this->thumb_path_absolute))
+            return rtrim($this->thumb_path_absolute, '\/');
+
+        return rtrim($this->thumb_path, '\/');
+    }
+
 
     function image_resize($file_name, $max_width, $max_height, $output_to_browser = false){
 
         // purpose: resize image but keep orignal aspect ratio.  if output_to_browser = false, then file is altered and saved. 
         // returns: nothing 
+
+        if(!function_exists('imagecreatetruecolor'))
+            die("Error: GD must be installed for image resize/cropping");
+
+        $this->image_exif_rotate($file_name);
 
         $ext = mb_strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
 
@@ -2168,6 +2273,11 @@ class lazy_mofo{
         // purpose: crop image changes aspect ratio to match the requested dimensions. if output_to_browser = false, then file is altered and saved. 
         // returns: nothing
 
+        if(!function_exists('imagecreatetruecolor'))
+            die("Error: GD must be installed for image resize/cropping");
+
+        $this->image_exif_rotate($file_name);
+
         $ext = mb_strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
 
         if(!($ext == 'jpg' || $ext == 'jpeg' || $ext == 'gif' || $ext == 'png'))
@@ -2242,6 +2352,58 @@ class lazy_mofo{
 
     }
 
+
+    function image_exif_rotate($file_name){
+
+        // purpose: stand-alone exif image rotation, used by image_crop() and image_resize()
+
+        // tough luck if imagerotate isn't with your gd
+        if(!function_exists('imagerotate'))
+            return;
+
+        $ext = mb_strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+
+        if(!($ext == 'jpg' || $ext == 'jpeg' || $ext == 'gif' || $ext == 'png'))
+            return;
+
+        if($ext == 'png')
+            $image = imagecreatefrompng($file_name);    
+        elseif($ext == 'gif')
+            $image = imagecreatefromgif($file_name);    
+        else
+            $image = imagecreatefromjpeg($file_name);
+
+        $arr = @exif_read_data($file_name);
+
+        $o = 0;
+        if(isset($arr['Orientation']))
+            $o = intval($arr['Orientation']);
+
+        // nothing to do
+        if($o == 0)
+            return;
+
+        if($o == 3 || $o == 4)
+            $image = imagerotate($image, 180, 0);
+        elseif($o == 5 || $o == 6)
+            $image = imagerotate($image, -90, 0);
+        elseif($o == 7 || $o == 8)
+            $image = imagerotate($image, 90, 0);
+
+        if($o == 2 || $o == 4 || $o == 5 || $o == 7)
+            imageflip($image, IMG_FLIP_HORIZONTAL);
+
+        if($ext == 'gif')
+            imagegif($image, $file_name);
+        elseif($ext == 'png')
+            imagepng($image, $file_name);
+        else
+            imagejpeg($image, $file_name, $this->image_quality); 
+
+        unset($image);
+        return;
+    }
+    
     
     function display_error($error, $source_function){
         
@@ -2286,6 +2448,43 @@ class lazy_mofo{
     }
 
 
+    private function query_cache($sql, $sql_param, $source_function){
+
+        // purpose: try return cached result, used by html_select, html_checkbox and html_radio, might help on grid rendering 
+
+        static $results = array();
+        static $miss = 0;
+        $max = 6;
+        $cnt = count($results);
+
+        // things aren't working out, just run the query, skip searching cache
+        if($miss > $max)
+            return $this->query($sql, $sql_param, $source_function);
+
+        // see if result already exists
+        foreach($results as $arr){
+
+            if($arr['sql'] !== $sql)
+                continue;
+
+            if(count(array_diff_assoc($arr['sql_param'], $sql_param)) !== 0)
+                continue;
+                    
+            // hit/success
+            return $arr['result'];
+        }
+
+        $miss++;
+        $result = $this->query($sql, $sql_param, $source_function);
+
+        // save to cache
+        $results[] = array('sql' => $sql, 'sql_param' => $sql_param, 'result' => $result);
+
+        return $result;
+
+    }
+
+
     function safe_np($named_parameter){
 
         // purpose: remove illegal characters from pdo named parameter (w/o colon).
@@ -2310,6 +2509,9 @@ class lazy_mofo{
             foreach($pa_matches as &$ha_match)
                 foreach($ha_match as &$ha_match)
                     $ha_match[1] = mb_strlen(substr($ps_subject, 0, $ha_match[1]), $ps_encoding);
+
+        $pa_matches = array_filter($pa_matches); // php <=5.3 returns array with 1 empty element on non-match, this will change to 0 element
+
         return $ret;
 
     }
@@ -2332,6 +2534,17 @@ class lazy_mofo{
             return;
         }
 
+        // before calling header so any sessions changes are saved
+        if(!isset($_SESSION))
+            session_write_close();
+
+        // relative redirect
+        if(!$this->absolute_redirect){
+            header("Location: $url");
+            die;
+        }
+
+        // absolute redirect, will not work with port forwarding if server port is different from reverse proxy
         $port = '';    
         $host = preg_replace('/:[0-9]+$/', '', $_SERVER['HTTP_HOST']); // host without port number
         $protocol = 'http://';
@@ -2339,9 +2552,7 @@ class lazy_mofo{
             $protocol = 'https://';
         if(!($_SERVER['SERVER_PORT'] == '80' || $_SERVER['SERVER_PORT'] == '443'))
             $port = ':' . $_SERVER['SERVER_PORT'];
-        if(!isset($_SESSION))
-            session_write_close();
-        
+
         header("Location: $protocol$host$port$url");
         die;
     
@@ -2395,8 +2606,9 @@ class lazy_mofo{
         // purpose: see if column is an upload type
         // returns: boolean
 
-        if(@$input_control[$column_name] == '--image' || @$input_control[$column_name] == '--document')
-            return true;
+        foreach($input_control as $col => $ctrl)
+            if($col == $column_name && strstr('image,document', $ctrl['type']))
+                return true;
 
         return false;
 
@@ -2439,6 +2651,7 @@ class lazy_mofo{
         header("Pragma: public");
         header("Content-Type: application/csv");
         header("Content-Disposition: attachment; filename=$file_name");
+        echo chr(0xEF).chr(0xBB).chr(0xBF); // bom here is reported to help
 
         // remove last column if last column is the identity that holds the [edit] and [delete] links
         if(end($columns) == $this->identity_name)
@@ -2490,20 +2703,20 @@ class lazy_mofo{
         // alters the $validate array adding bool flag corresponding to column name
 
         // $validate is an array of arrays
-        // [0] string  $regexp_or_user_function
-        // [1] string  $error_message
-        // [2] string  $tip_placeholder
-        // [3] boolean $optional_input
-        // [4] boolean - holds result from validation process - false means input failed validation 
+        // regexp  regular expression, 'email', or user defined function
+        // error_msg optional
+        // placeholder optional
+        // optional, boolean is input optional?
+        // result, boolean resutls are stored here
 
         $columns = $this->get_columns('form');
         $all_valid = true;
 
         foreach($columns as $column_name){
             
-            $regexp_or_user_func = @$validate[$column_name][0];
+            $regexp_or_user_func = @$validate[$column_name]['regexp'];
             
-            if($regexp_or_user_func == '')
+            if(!isset($regexp_or_user_func))
                 continue;
 
             $val = @$_POST[$column_name];
@@ -2512,7 +2725,7 @@ class lazy_mofo{
             $val = trim($val);
 
             // don't validate empty optional parameters
-            if(@$validate[$column_name][3] === true && $val == '')
+            if($validate[$column_name]['optional'] === true && $val == '')
                 continue;
 
             if($regexp_or_user_func == 'email')
@@ -2522,17 +2735,71 @@ class lazy_mofo{
             else
                 $is_valid = preg_match($regexp_or_user_func, $val);
 
-            $validate[$column_name][4] = (bool)$is_valid;
+            $validate[$column_name]['result'] = (bool)$is_valid;
             
-            // add error msg if missing for some reason
-            if(@$validate[$column_name][1] == '')
-                $validate[$column_name][1] == 'Missing or Invalid Input';
+            // add error msg 
+            if(strlen($validate[$column_name]['error_msg']) == 0)
+                $validate[$column_name]['error_msg'] = $this->validate_text_general;
 
             if(!$is_valid)
                 $all_valid = false;
         }
 
         return $all_valid;
+
+    }
+
+
+    function modernize_control($control, $column_name){
+
+        // purpose: change control definition to new style, keep backward compatibility
+        // returns array in new style format
+        //  old style: 'select col_1, col_2 from table; --select'
+        //  new style: array('type' => 'select', 'sql' => 'select id, text from table', 'sql_param' => array());
+
+        if(is_array($control)){
+            if(isset($control['type']) && strlen($control['type']) > 0)
+                return $control;
+            die("Error: control for $column_name appears to be invalid");
+        }
+
+        $pos = strrpos($control, '--');
+        $sql = substr($control, 0, $pos);
+        $type = trim(substr($control, $pos + 2));
+        if($pos === false || strlen($type) == 0)
+            die("Error: control for $column_name appears to be invalid");
+
+        return array('type' => $type, 'sql' => $sql, 'sql_param' => null, 'legacy_control' => $control);
+    }
+
+
+    function modernize_validate($arr, $column_name){
+
+        // purpose: change validation array to new style with keys but keep backward compatibility
+        // returns array in new style format
+        //  old style: array('/.+/', 'Missing Market Name', 'this is required', false)
+        //  new style: array('regexp' => '/.+/', 'error_msg' => 'Missing Market Name', 'placeholder' => 'this is required', 'optional' => false)
+
+        $regexp = '';
+        $error_msg = '';
+        $placeholder = '';
+        $optional = false;
+        foreach($arr as $key => $val){
+
+            if($key === 0 || $key == 'regexp')
+                $regexp = $val;
+            elseif($key === 1 || $key == 'error_msg')
+                $error_msg = $val;
+            elseif($key === 2 || $key == 'placeholder')
+                $placeholder = $val;
+            elseif($key === 3 || $key == 'optional')
+                $optional = $val;
+        }
+
+        if(strlen($regexp) == 0)
+            die("error: validation setting for column $column_name appears to be invalid");
+
+        return array('regexp' => $regexp, 'error_msg' => $error_msg, 'placeholder' => $placeholder, 'optional' => $optional);
 
     }
 
