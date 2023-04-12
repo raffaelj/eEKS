@@ -258,7 +258,7 @@ class eEKS extends lazy_mofo {
 
         $html = "";
 
-        $html .= "<div class='lm_error'><p>Dashboard - coming soon</p></div>";
+        // $html .= "<div class='lm_error'><p>Dashboard - coming soon</p></div>";
 
         $html .= "<div class='center'>";
 
@@ -269,17 +269,18 @@ class eEKS extends lazy_mofo {
         $_GET['_missing_date'][]  = "value_date";
         $_GET['_amount']          = "pos";
 
-        $this->multi_column_on          = false;
-        $tmp_active_columns             = $this->config['active_columns'];
+        $this->multi_column_on = false;
+        $tmp_active_columns    = $this->config['active_columns'];
+
         $this->config['active_columns'] = [
-            "ID"                  => 1
-            ,"invoice_number"     => 1
-            ,"value_date"         => 1
-            ,"voucher_date"       => 1
-            ,"gross_amount"       => 1
-            ,"customer_supplier"  => 1
-            ,"item"               => 1
-            ,"edit_delete_column" => 1
+            "ID"                 => 1,
+            "invoice_number"     => 1,
+            "value_date"         => 1,
+            "voucher_date"       => 1,
+            "gross_amount"       => 1,
+            "customer_supplier"  => 1,
+            "item"               => 1,
+            "edit_delete_column" => 1,
         ];
 
         $this->set_grid_view_parameters("default");
@@ -298,13 +299,13 @@ class eEKS extends lazy_mofo {
         $_GET['_amount'] = "neg";
 
         $this->config['active_columns'] = [
-            "ID"                  => 1
-            ,"value_date"         => 1
-            ,"voucher_date"       => 1
-            ,"gross_amount"       => 1
-            ,"customer_supplier"  => 1
-            ,"item"               => 1
-            ,"edit_delete_column" => 1
+            "ID"                 => 1,
+            "value_date"         => 1,
+            "voucher_date"       => 1,
+            "gross_amount"       => 1,
+            "customer_supplier"  => 1,
+            "item"               => 1,
+            "edit_delete_column" => 1,
         ];
 
         $this->set_grid_view_parameters("default");
@@ -350,16 +351,16 @@ class eEKS extends lazy_mofo {
         $html .= "</div>";
 
         // graphs
-        $html .= "<div class='dash_box'>";
-        $html .= "<h3>maybe a graph, because it looks cool</h3>";
+        // $html .= "<div class='dash_box'>";
+        // $html .= "<h3>maybe a graph, because it looks cool</h3>";
 
-        $html .= "</div>";
+        // $html .= "</div>";
 
         // a wide one
-        $html .= "<div class='dash_box wide'>";
-        $html .= "<h3>another table with a lot of columns</h3>";
+        // $html .= "<div class='dash_box wide'>";
+        // $html .= "<h3>another table with a lot of columns</h3>";
 
-        $html .= "</div>";
+        // $html .= "</div>";
 
         $html .= "</div>";// close surrounding div
 
