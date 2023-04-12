@@ -4,13 +4,14 @@
 error_reporting(E_ALL);
 
 // speed things up with gzip plus ob_start() is required for csv export
-if(!ob_start('ob_gzhandler'))
+if (!ob_start('ob_gzhandler')) {
     ob_start();
+}
 
 header('Content-Type: text/html; charset=utf-8');
 
 
-function validate_is_income(){
+function validate_is_income() {
 
     // purpose: check for correct sign of amount in form if type_of_costs is set
     // returns true if is income, else false
@@ -19,30 +20,36 @@ function validate_is_income(){
 
     $toc = $eeks->clean_out(@$_POST['type_of_costs']);
 
-    if(mb_strlen($toc) == 0) // can't validate without type_of_costs
+    // can't validate without type_of_costs
+    if (mb_strlen($toc) == 0) {
         return true;
-    else{
-        $sql = "SELECT ID FROM type_of_costs WHERE ID = $toc AND is_income = true";
-        $result = $eeks->query($sql);
-
-        $amount = $eeks->clean_out(@$_POST['gross_amount']);
-
-        // reimbursements
-        $is_reimbursement = false;
-        if( $eeks->clean_out(@$_POST['is_reimbursement']) == 1 )
-        $is_reimbursement = true;
-
-        if( !empty($result) && $amount >= 0 && !$is_reimbursement )
-        return true; // is income and has plus sign
-        elseif( empty($result) && $amount <= 0 && !$is_reimbursement )
-        return true; // is cost and has minus sign
-        elseif( !empty($result) && $amount <= 0 && $is_reimbursement )
-        return true; // is income, has minus sign, but is reimbursement
-        elseif( empty($result) && $amount >= 0 && $is_reimbursement )
-        return true; // is cost, has plus sign, but is reimbursement
-        else
-        return false;
     }
+
+    $sql = "SELECT ID FROM type_of_costs WHERE ID = $toc AND is_income = true";
+    $result = $eeks->query($sql);
+
+    $amount = $eeks->clean_out(@$_POST['gross_amount']);
+
+    // reimbursements
+    $is_reimbursement = false;
+    if($eeks->clean_out(@$_POST['is_reimbursement']) == 1) {
+        $is_reimbursement = true;
+    }
+
+    if(!empty($result) && $amount >= 0 && !$is_reimbursement) {
+        return true; // is income and has plus sign
+    }
+    elseif(empty($result) && $amount <= 0 && !$is_reimbursement) {
+        return true; // is cost and has minus sign
+    }
+    elseif(!empty($result) && $amount <= 0 && $is_reimbursement) {
+        return true; // is income, has minus sign, but is reimbursement
+    }
+    elseif(empty($result) && $amount >= 0 && $is_reimbursement) {
+        return true; // is cost, has plus sign, but is reimbursement
+    }
+
+    return false;
 
 }
 
@@ -105,7 +112,7 @@ FROM accounting a
 WHERE a.ID = :ID
 ";
 
-$eeks->form_sql_param[":$eeks->identity_name"] = @$_REQUEST[$eeks->identity_name]; 
+$eeks->form_sql_param[":$eeks->identity_name"] = @$_REQUEST[$eeks->identity_name];
 
 // may not be here
 
@@ -128,11 +135,11 @@ $eeks->grid_output_control['file_01'] = ['type' => 'document']; // image clickab
 $eeks->grid_output_control['file_02'] = ['type' => 'image']; // image clickable
 $eeks->grid_output_control['file_03'] = ['type' => 'image']; // image clickable
 
-$eeks->grid_output_control['gross_amount'] = ['type' => 'number']; // 
-// $eeks->form_input_control['gross_amount'] = ['type' => 'number']; // 
+$eeks->grid_output_control['gross_amount'] = ['type' => 'number']; //
+// $eeks->form_input_control['gross_amount'] = ['type' => 'number']; //
 
 
-$eeks->on_insert_validate['gross_amount'] = array('validate_is_income', 'Only costs have negative signs.', '-0'.$eeks->dec_point.'00');
+$eeks->on_insert_validate['gross_amount'] = ['validate_is_income', 'Only costs have negative signs.', '-0'.$eeks->dec_point.'00'];
 
 // copy validation rules to update - same rules
 $eeks->on_update_validate = $eeks->on_insert_validate;
@@ -158,7 +165,9 @@ $eeks->run();
 function debug($var, $str = "", $out = "print") {
 
     static $debug_count;
-    if ($debug_count === null) $debug_count = 0;
+    if ($debug_count === null) {
+        $debug_count = 0;
+    }
 
     // purpose: output of readable content for arrays and variables
 
@@ -168,15 +177,17 @@ function debug($var, $str = "", $out = "print") {
     $html .= "<div class='debug'>";
     $html .= "<input type='checkbox' id='debug$debug_count' /><label for='debug$debug_count' class='lm_button'>$str</label>";
     $html .= "<pre>";
-    if($out == "export")
+    if ($out == "export") {
         $html .= var_export($var, true);
-    elseif($out == "dump"){
+    }
+    elseif ($out == "dump") {
         ob_start();
         var_dump($var);
         $html .= ob_get_clean();
     }
-    else
+    else {
         $html .= print_r($var, true);
+    }
     $html .= "</pre>";
     $html .= "</div>";
 

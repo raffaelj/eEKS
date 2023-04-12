@@ -20,12 +20,12 @@ $this->update_grid_confirm = 'Are you sure you want to delete [count] record(s)?
 
 // form buttons
 $this->form_add_button    = "<input type='submit' value='Add' class='lm_button'>";
-$this->form_update_button = "<input type='submit' value='Update' class='lm_button'>"; 
+$this->form_update_button = "<input type='submit' value='Update' class='lm_button'>";
 $this->form_back_button   = "<input type='button' value='&lt; Back' class='lm_button dull' onclick='_back();'>";
-$this->form_delete_button = "<input type='button' value='Delete' class='lm_button error' onclick='_delete();'>"; 
+$this->form_delete_button = "<input type='button' value='Delete' class='lm_button error' onclick='_delete();'>";
 
-// titles in the <th> of top of the edit form 
-$this->form_text_title_add    = 'Add Record';   
+// titles in the <th> of top of the edit form
+$this->form_text_title_add    = 'Add Record';
 $this->form_text_title_edit   = 'Edit Record';
 $this->form_text_record_saved = 'Record Saved';
 $this->form_text_record_added = 'Record Added';
@@ -43,7 +43,7 @@ $this->grid_search_box = "
     <a href='[script_name]' style='margin: 0 10px 0 -20px; display: inline-block;' title='Clear Search'>x</a> <!-- this title attribute may be localized -->
     <input type='submit' class='lm_button lm_search_button' value='Search'> <!-- this value attribute may be localized --> 
     <input type='hidden' name='action' value='search'>[query_string_list]
-</form>"; 
+</form>";
 
 
 // grid messages
@@ -76,4 +76,3 @@ $this->thumb_path = 'thumbs';              // optional, leave blank if you don't
 // output date formats
 $this->date_out = 'd/m/Y';
 $this->datetime_out = 'd/m/Y h:i A';
-

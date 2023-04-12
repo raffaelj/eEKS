@@ -8,6 +8,9 @@ last_commit.txt
 node_modules
 package-lock.json
 config/config.php
+.php-cs-fixer.*
+*.kate-swp
+tools/
 
 # Windows image file caches
 Thumbs.db

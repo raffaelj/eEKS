@@ -23,8 +23,8 @@ $this->form_add_button_text    = "Hinzufügen";
 $this->form_update_button_text = "Aktualisieren";
 $this->form_duplicate_button_text = "Duplizieren";
 
-// titles in the <th> of top of the edit form 
-$this->form_text_title_add    = 'Eintrag hinzufügen';   
+// titles in the <th> of top of the edit form
+$this->form_text_title_add    = 'Eintrag hinzufügen';
 $this->form_text_title_edit   = 'Eintrag bearbeiten';
 $this->form_text_record_saved = 'Eintrag gespeichert';
 $this->form_text_record_added = 'Eintrag hinzugefügt';
