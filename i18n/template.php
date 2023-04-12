@@ -65,14 +65,14 @@ $this->pagination_text_next       = 'Next&gt;';
 $this->pagination_text_back       = '&lt;Back';
 
 // delete upload link text
-$this->text_delete_image = 'delete image';
+$this->text_delete_image    = 'delete image';
 $this->text_delete_document = 'delete document';
 
 // relative paths for --image or --document uploads
 // paths are created at runtime as needed
 $this->upload_path = 'uploads';            // required when using  input types
-$this->thumb_path = 'thumbs';              // optional, leave blank if you don't need thumbnails
+$this->thumb_path  = 'thumbs';              // optional, leave blank if you don't need thumbnails
 
 // output date formats
-$this->date_out = 'd/m/Y';
+$this->date_out     = 'd/m/Y';
 $this->datetime_out = 'd/m/Y h:i A';

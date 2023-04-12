@@ -25,7 +25,7 @@ function validate_is_income() {
         return true;
     }
 
-    $sql = "SELECT ID FROM type_of_costs WHERE ID = $toc AND is_income = true";
+    $sql    = "SELECT ID FROM type_of_costs WHERE ID = $toc AND is_income = true";
     $result = $eeks->query($sql);
 
     $amount = $eeks->clean_out(@$_POST['gross_amount']);
@@ -123,11 +123,25 @@ $eeks->form_input_control['file_03'] = ['type' => 'image'];
 
 $eeks->form_input_control['is_reimbursement'] = ['type' => 'checkbox'];
 
-$eeks->form_input_control['type_of_costs'] = ['type' => 'select', 'sql' => 'SELECT ID AS val, type_of_costs AS opt FROM type_of_costs ORDER BY is_income DESC, sort_order ASC, type_of_costs ASC'];
-$eeks->form_input_control['mode_of_employment'] = ['type' => 'select', 'sql' => 'SELECT ID, mode_of_employment FROM mode_of_employment ORDER BY sort_order ASC, mode_of_employment ASC'];
-$eeks->form_input_control['scope'] = ['type' => 'select', 'sql' => 'SELECT ID, scope FROM scope ORDER BY sort_order ASC, scope ASC'];
-$eeks->form_input_control['project'] = ['type' => 'select', 'sql' => 'SELECT ID, project FROM project ORDER BY sort_order ASC, project ASC'];
-$eeks->form_input_control['account'] = ['type' => 'radio', 'sql' => 'SELECT NULL, "nicht angegeben" UNION SELECT "Girokonto", "Girokonto" UNION SELECT "Barkasse", "Barkasse"'];
+$eeks->form_input_control['type_of_costs'] = [
+    'type' => 'select',
+    'sql'  => 'SELECT ID AS val, type_of_costs AS opt FROM type_of_costs ORDER BY is_income DESC, sort_order ASC, type_of_costs ASC'
+];
+$eeks->form_input_control['mode_of_employment'] = [
+    'type' => 'select', 'sql' => 'SELECT ID, mode_of_employment FROM mode_of_employment ORDER BY sort_order ASC, mode_of_employment ASC'
+];
+$eeks->form_input_control['scope'] = [
+    'type' => 'select',
+    'sql'  => 'SELECT ID, scope FROM scope ORDER BY sort_order ASC, scope ASC'
+];
+$eeks->form_input_control['project'] = [
+    'type' => 'select',
+    'sql'  => 'SELECT ID, project FROM project ORDER BY sort_order ASC, project ASC'
+];
+$eeks->form_input_control['account'] = [
+    'type' => 'radio',
+    'sql'  => 'SELECT NULL, "nicht angegeben" UNION SELECT "Girokonto", "Girokonto" UNION SELECT "Barkasse", "Barkasse"'
+];
 
 // $eeks->grid_output_control['file_01'] = '--image'; // image clickable
 

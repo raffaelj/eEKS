@@ -4,18 +4,18 @@ class eEKS extends lazy_mofo {
 
     /////////////// custom non-LM variables
 
-    public $software_name = "eEKS";
-    public $slogan = "";
+    public $software_name    = "eEKS";
+    public $slogan           = "";
     public $background_image = "";
 
     // column names in this array are shown together in a multi-value column
-    public $multi_column_on = false;
+    public $multi_column_on          = false;
     public $multi_value_column_title = "Multiple Values";
-    public $multi_column = [];
+    public $multi_column             = [];
 
     // number format
-    public $decimals = 2;
-    public $dec_point = '.';
+    public $decimals      = 2;
+    public $dec_point     = '.';
     public $thousands_sep = ',';
 
     // language for html lang attribute
@@ -26,7 +26,7 @@ class eEKS extends lazy_mofo {
 
     // placeholders for date filters
     public $date_filter_from = "from";
-    public $date_filter_to = "to";
+    public $date_filter_to   = "to";
 
     // other words that need translation and may appear somewhere
     // example in i18n file: $this->translations['all'] = "alle";
@@ -39,14 +39,14 @@ class eEKS extends lazy_mofo {
     // filter settings for search bar and configurable grid sql
     // Set column names to use for filtering
     // Arrays can contain multiple columns, variables can contain one column name
-    public $date_filters = [];       // date range filter(s)
-    public $category_filters = [];   // category filters
+    public $date_filters      = [];       // date range filter(s)
+    public $category_filters  = [];   // category filters
     public $search_in_columns = [];  // full text search
-    public $amount_filter = "";           // positive/negative/all amounts
+    public $amount_filter     = "";           // positive/negative/all amounts
 
     // display sums of columns in the last row of the grid
     public $grid_show_column_sums = false;
-    public $sum_these_columns = [];
+    public $sum_these_columns     = [];
 
     // inject rows into grid for column sums, carryovers, additional infos etc.
     public $inject_rows = [];
@@ -84,41 +84,41 @@ class eEKS extends lazy_mofo {
     /////////////// overwrite LM variables
     // some of them are new for i18n
 
-    public $table = 'accounting';    // table name for updates, inserts and deletes
+    public $table         = 'accounting';    // table name for updates, inserts and deletes
     public $identity_name = 'ID';    // identity / primary key for table
 
     // links on grid
-    public $grid_add_link_text    = "Add a Record";
-    public $grid_add_link    = "<a href='[script_name]action=edit&amp;[qs]' class='lm_button confirm lm_grid_add_link'>[grid_add_link_text]</a>";
+    public $grid_add_link_text = "Add a Record";
+    public $grid_add_link      = "<a href='[script_name]action=edit&amp;[qs]' class='lm_button confirm lm_grid_add_link'>[grid_add_link_text]</a>";
 
-    public $grid_edit_link_text   = "edit";
-    public $grid_edit_link   = "<a href='[script_name]action=edit&amp;[identity_name]=[identity_id]&amp;[qs]' class='lm_button lm_icon lm_grid_edit_link' title='[grid_edit_link_text]'>[[grid_edit_link_text]]</a>";
+    public $grid_edit_link_text = "edit";
+    public $grid_edit_link      = "<a href='[script_name]action=edit&amp;[identity_name]=[identity_id]&amp;[qs]' class='lm_button lm_icon lm_grid_edit_link' title='[grid_edit_link_text]'>[[grid_edit_link_text]]</a>";
 
     // lm used a hidden form and javascript
     // this solution uses CSS, a checkbox and a confirm button
     public $grid_delete_link = "<input type='checkbox' name='[identity_name]' id='delete_[identity_id]' value='[identity_id]' class='button_delete'><label for='delete_[identity_id]' class='lm_button lm_icon alarm'>X</label><div class='delete_confirm'><p>[delete_confirm]</p><input type='submit' name='confirm_delete' value='[grid_text_delete]' class='button_delete_confirm lm_button alarm'></div>";
 
     public $grid_export_link_text = "Export CSV";
-    public $grid_export_link = "<a href='[script_name]_export=1&amp;[qs]' title='[grid_export_link_text]' class='lm_button grid_export_link'>CSV</a>";
+    public $grid_export_link      = "<a href='[script_name]_export=1&amp;[qs]' title='[grid_export_link_text]' class='lm_button grid_export_link'>CSV</a>";
 
     // form buttons
-    public $form_add_button_text    = "Add";
-    public $form_add_button    = "<input type='submit' value='[form_add_button_text]' class='lm_button confirm'>";
+    public $form_add_button_text = "Add";
+    public $form_add_button      = "<input type='submit' value='[form_add_button_text]' class='lm_button confirm'>";
 
     public $form_update_button_text = "Update";
-    public $form_update_button = "<input type='submit' value='[form_update_button_text]' class='lm_button confirm'>";
+    public $form_update_button      = "<input type='submit' value='[form_update_button_text]' class='lm_button confirm'>";
 
     public $form_delete_button = "<input type='checkbox' name='delete_check' id='delete_check' value='not-important' class='button_delete alarm'><label for='delete_check' class='lm_button alarm'>[grid_text_delete]</label><div class='delete_confirm'><p>[delete_confirm]</p><input type='submit' name='confirm_delete' value='[grid_text_delete]' class='lm_button alarm'></div>";
 
     public $form_duplicate_button_text = "Copy to new entry";
-    public $form_duplicate_button = "<input type='submit' name='duplicate' value='[form_duplicate_button_text]' class='lm_button attention'>";
+    public $form_duplicate_button      = "<input type='submit' name='duplicate' value='[form_duplicate_button_text]' class='lm_button attention'>";
 
-    public $form_back_button_text   = "Back";
+    public $form_back_button_text = "Back";
 
     // search box
-    public $grid_search_box_clear = "Clear Search";
+    public $grid_search_box_clear  = "Clear Search";
     public $grid_search_box_search = "Search";
-    public $grid_search_box = "
+    public $grid_search_box        = "
     <form action='[script_name]' class='lm_search_box'>
       [filters]
       <fieldset>
@@ -136,7 +136,7 @@ class eEKS extends lazy_mofo {
     * custom category filters: _cat_01... - coming soon
     */
 
-    public $query_string_list = "";
+    public $query_string_list      = "";
     public $query_string_list_post = "";
 
     public $debug = false;
@@ -280,19 +280,19 @@ class eEKS extends lazy_mofo {
 
       // income
       $_GET['_missing_date_on'] = "1";
-      $_GET['_missing_date'][] = "value_date";
-      $_GET['_amount'] = "pos";
+      $_GET['_missing_date'][]  = "value_date";
+      $_GET['_amount']          = "pos";
 
-      $this->multi_column_on = false;
-      $tmp_active_columns = $this->config['active_columns'];
+      $this->multi_column_on          = false;
+      $tmp_active_columns             = $this->config['active_columns'];
       $this->config['active_columns'] = [
-        "ID" => 1
-        ,"invoice_number" => 1
-        ,"value_date" => 1
-        ,"voucher_date" => 1
-        ,"gross_amount" => 1
-        ,"customer_supplier" => 1
-        ,"item" => 1
+        "ID"                  => 1
+        ,"invoice_number"     => 1
+        ,"value_date"         => 1
+        ,"voucher_date"       => 1
+        ,"gross_amount"       => 1
+        ,"customer_supplier"  => 1
+        ,"item"               => 1
         ,"edit_delete_column" => 1
       ];
 
@@ -313,12 +313,12 @@ class eEKS extends lazy_mofo {
       $_GET['_amount'] = "neg";
 
       $this->config['active_columns'] = [
-        "ID" => 1
-        ,"value_date" => 1
-        ,"voucher_date" => 1
-        ,"gross_amount" => 1
-        ,"customer_supplier" => 1
-        ,"item" => 1
+        "ID"                  => 1
+        ,"value_date"         => 1
+        ,"voucher_date"       => 1
+        ,"gross_amount"       => 1
+        ,"customer_supplier"  => 1
+        ,"item"               => 1
         ,"edit_delete_column" => 1
       ];
 
@@ -393,7 +393,7 @@ class eEKS extends lazy_mofo {
       $html .= "<h3>Einnahmen</h3>";
 
       $_GET['_amount'] = "pos";
-      $this->grid_sql = $this->generate_grid_sql_interval("yearly");
+      $this->grid_sql  = $this->generate_grid_sql_interval("yearly");
 
       $html .= $this->grid('', true);
 
@@ -401,7 +401,7 @@ class eEKS extends lazy_mofo {
       $html .= "<h3>Ausgaben</h3>";
 
       $_GET['_amount'] = "neg";
-      $this->grid_sql = $this->generate_grid_sql_interval("yearly");
+      $this->grid_sql  = $this->generate_grid_sql_interval("yearly");
 
       $html .= $this->grid('', true);
 
@@ -434,7 +434,7 @@ class eEKS extends lazy_mofo {
 
       // var_dump($this->config);
 
-      foreach($this->config as $group=>$arr) {
+      foreach($this->config as $group => $arr) {
 
           // debug is a boolean key
           if (!is_array($arr)) {
@@ -443,14 +443,14 @@ class eEKS extends lazy_mofo {
 
           $html .= "<div style='display:inline-block;vertical-align:top;border:1px solid #ccc;height:300px;margin:5px;padding:5px;overflow:auto;'>";
           $html .= "<h3>$group</h3>";
-          foreach($arr as $key=>$val) {
+          foreach($arr as $key => $val) {
 
               if(is_array($val)) {
 
                   $html .= '<label for="'.htmlspecialchars($key).'">'.$key."</label>";
                   $html .= "<fieldset id='$key'>";
 
-                  foreach($val as $k=>$v) {
+                  foreach($val as $k => $v) {
 
                       if(is_bool($v)) {
                           $v ? $checked = ' checked="checked"' : $checked = '';
@@ -563,8 +563,8 @@ class eEKS extends lazy_mofo {
       // --> inside `views/eks.inc.php`
 
       $uri_path = $this->get_uri_path();
-      $qs = $this->get_qs();
-      $eks = $this->eks_config;
+      $qs       = $this->get_qs();
+      $eks      = $this->eks_config;
 
       $estimated = false;
       if(@$_GET['_eks'] == 'estimated') {
@@ -590,7 +590,7 @@ class eEKS extends lazy_mofo {
       //     * follow checkboxes in the DOM
       //     * have the same parent
 
-      for($i=1; $i <=6; $i++) {
+      for($i = 1; $i <= 6; $i++) {
           $checked = "";
           if(!empty($_GET['_hide_page']) && in_array($i, $_GET['_hide_page'])) {
               $checked .= " checked=checked";
@@ -606,14 +606,14 @@ class eEKS extends lazy_mofo {
 
       // 1.1 personal data of applicant
       $html .= "<fieldset>";
-      foreach($eks['personal_data'] as $key=>$val) {
+      foreach($eks['personal_data'] as $key => $val) {
           $html .= '<input type="text" value="'.htmlspecialchars($val).'" name="'.htmlspecialchars($key).'">';
       }
       $html .= "</fieldset>";
 
       $html .= "<fieldset>";
       // 1.2 personal data of person to whom the data of this attachment refers to
-      foreach($eks['personal_data_refer'] as $key=>$val) {
+      foreach($eks['personal_data_refer'] as $key => $val) {
           if(mb_strlen($val) > 0) {
               $html .= '<input type="text" value="'.htmlspecialchars($val).'" name="'.htmlspecialchars($key).'_refer">';
           }
@@ -644,7 +644,7 @@ class eEKS extends lazy_mofo {
 
       // 4.1 company data
       $html .= "<fieldset>";
-      foreach($eks['company_data'] as $key=>$val) {
+      foreach($eks['company_data'] as $key => $val) {
           $html .= '<input type="text" value="'.htmlspecialchars($val).'" name="'.htmlspecialchars($key).'">';
       }
 
@@ -672,7 +672,7 @@ class eEKS extends lazy_mofo {
 
       // 5. subsidies
       $html .= "<fieldset>";
-      foreach($eks['subsidies'] as $key=>$val) {
+      foreach($eks['subsidies'] as $key => $val) {
           if(is_bool($val)) {
               $val ? $checked = ' checked="checked"' : $checked = '';
               $html .= '<input type="checkbox" id="subsidies_'.$key.'" name="subsidies_'.$key.'"'.$checked.'>';
@@ -687,7 +687,7 @@ class eEKS extends lazy_mofo {
 
       // 6. loan
       $html .= "<fieldset>";
-      foreach($eks['loan'] as $key=>$val) {
+      foreach($eks['loan'] as $key => $val) {
           if(is_bool($val)) {
               $val ? $checked = ' checked="checked"' : $checked = '';
               $html .= '<input type="checkbox" id="loan_'.$key.'" name="loan_'.$key.'"'.$checked.'>';
@@ -702,7 +702,7 @@ class eEKS extends lazy_mofo {
 
       // 7. home office
       $html .= "<fieldset>";
-      foreach($eks['home_office'] as $key=>$val) {
+      foreach($eks['home_office'] as $key => $val) {
           if(is_bool($val)) {
               $val ? $checked = ' checked="checked"' : $checked = '';
               $html .= '<input type="checkbox" id="home_office_'.$key.'" name="home_office_'.$key.'"'.$checked.'>';
@@ -776,8 +776,8 @@ class eEKS extends lazy_mofo {
       // inject rows with sums/carryover
       $sum_page_3 = $this->sum_result($this->query($this->grid_sql, $this->grid_sql_param)); // sum of page 3
 
-      $this->inject_rows['last'] = $sum_page_3;
-      $this->inject_rows['last'][0]['ID'] = "";
+      $this->inject_rows['last']                     = $sum_page_3;
+      $this->inject_rows['last'][0]['ID']            = "";
       $this->inject_rows['last'][0]['type_of_costs'] = "Summe A1-A7";
 
       // grid
@@ -797,8 +797,8 @@ class eEKS extends lazy_mofo {
       // inject rows with sums/carryover
       $sum_page_4 = $this->sum_result($this->query($this->grid_sql, $this->grid_sql_param)); // sum of page 4
 
-      $this->inject_rows["last"] = $sum_page_4;
-      $this->inject_rows['last'][0]['ID'] = "";
+      $this->inject_rows["last"]                     = $sum_page_4;
+      $this->inject_rows['last'][0]['ID']            = "";
       $this->inject_rows['last'][0]['type_of_costs'] = "Zwischensumme B1-B7";
 
       // grid
@@ -814,27 +814,27 @@ class eEKS extends lazy_mofo {
       $html .= "<page id='eks_page5' class='eks_page landscape'>";
 
       // inject rows with sums/carryover
-      $this->inject_rows[1] = $sum_page_4; // carryover from page 4
-      $this->inject_rows[1][0]['ID'] = "";
+      $this->inject_rows[1]                     = $sum_page_4; // carryover from page 4
+      $this->inject_rows[1][0]['ID']            = "";
       $this->inject_rows[1][0]['type_of_costs'] = "Übertrag B1-B7";
 
       $this->grid_sql = $this->generate_grid_sql_eks(5);
 
       $sum_page_5 = $this->sum_result($this->query($this->grid_sql, $this->grid_sql_param)); // sum of page 5
 
-      foreach($sum_page_4[0] as $key=>$val) {
+      foreach($sum_page_4[0] as $key => $val) {
           $sum_costs[0][$key] = $val + $sum_page_5[0][$key];
       }
-      foreach($sum_page_3[0] as $key=>$val) {
+      foreach($sum_page_3[0] as $key => $val) {
           $sum_all[0][$key] = $val + $sum_costs[0][$key];
       }
 
-      $this->inject_rows[22] = $sum_costs;
-      $this->inject_rows[22][0]['ID'] = "";
+      $this->inject_rows[22]                     = $sum_costs;
+      $this->inject_rows[22][0]['ID']            = "";
       $this->inject_rows[22][0]['type_of_costs'] = "Summe B1-B18";
 
-      $this->inject_rows[23] = $sum_all;
-      $this->inject_rows[23][0]['ID'] = "";
+      $this->inject_rows[23]                     = $sum_all;
+      $this->inject_rows[23][0]['ID']            = "";
       $this->inject_rows[23][0]['type_of_costs'] = "Gewinn";
 
       // grid
@@ -877,8 +877,8 @@ class eEKS extends lazy_mofo {
 
   public function back_button($identity_id = 0) {
 
-      $uri_path = $this->get_uri_path();
-      $qs = $this->get_qs();
+      $uri_path  = $this->get_uri_path();
+      $qs        = $this->get_qs();
       $back_link = $uri_path . $qs;
 
       // append id for row highlighting
@@ -892,8 +892,8 @@ class eEKS extends lazy_mofo {
 
 
   public function add_button() {
-      $qs = $this->get_qs();
-      $uri_path = $this->get_uri_path();
+      $qs            = $this->get_qs();
+      $uri_path      = $this->get_uri_path();
       $grid_add_link = $this->grid_add_link;
       $grid_add_link = str_replace('[script_name]', $uri_path, $grid_add_link);
       $grid_add_link = str_replace('[qs]', $qs, $grid_add_link);
@@ -903,8 +903,8 @@ class eEKS extends lazy_mofo {
 
 
   public function export_button() {
-      $qs = $this->get_qs();
-      $uri_path = $this->get_uri_path();
+      $qs               = $this->get_qs();
+      $uri_path         = $this->get_uri_path();
       $grid_export_link = $this->grid_export_link;
       $grid_export_link = str_replace('[script_name]', $uri_path, $grid_export_link);
       $grid_export_link = str_replace('[qs]', $qs, $grid_export_link);
@@ -943,8 +943,8 @@ class eEKS extends lazy_mofo {
       // class name generated by page name/type for easier styling
       $body_class = $this->get_action();
 
-      $uri = $this->get_uri_path();
-      $qs = $this->get_qs();
+      $uri             = $this->get_uri_path();
+      $qs              = $this->get_qs();
       $qs_without_lang = $this->get_qs('_order_by,_desc,_offset,_search,_pagination_off,_view,action');// + action
 
       // optional background image
@@ -953,16 +953,16 @@ class eEKS extends lazy_mofo {
           $css .= "@media print{main{background-image:none;}}";
       }
 
-      $html_lang = substr($this->i18n, 0, 2);
-      $title = $this->get_page_name();
+      $html_lang     = substr($this->i18n, 0, 2);
+      $title         = $this->get_page_name();
       $software_name = htmlspecialchars($this->software_name);
-      $slogan = htmlspecialchars($this->slogan);
+      $slogan        = htmlspecialchars($this->slogan);
       // $version = $this->version();
       $version = $this->version;
-      $debug = $this->debug;
+      $debug   = $this->debug;
 
       $page_name = $this->get_page_name("", false);
-      $date_now = date($this->datetime_out);
+      $date_now  = date($this->datetime_out);
 
       // user CSS
       $user_css = "";
@@ -971,13 +971,13 @@ class eEKS extends lazy_mofo {
       }
 
       // buttons
-      $settings_button = "<a href='{$uri}action=settings' class='lm_button'>".$this->translate("settings", "pretty")."</a>";
-      $dashboard_button = "<a href='{$uri}action=dashboard' class='lm_button'>Dashboard</a>";
-      $add_button = $this->add_button();
+      $settings_button   = "<a href='{$uri}action=settings' class='lm_button'>".$this->translate("settings", "pretty")."</a>";
+      $dashboard_button  = "<a href='{$uri}action=dashboard' class='lm_button'>Dashboard</a>";
+      $add_button        = $this->add_button();
       $export_button_csv = $this->export_button();
       // $export_button_pdf = "<a target='_blank' href='{$uri}_pdf=1&amp;{$qs}' class='lm_button' title='PDF Export'>PDF</a>";
       // language buttons
-      $langs = ["de-de", "en-us"];
+      $langs           = ["de-de", "en-us"];
       $language_button = "";
       foreach($langs as $lang) {
           if($lang != $this->i18n) {
@@ -985,8 +985,8 @@ class eEKS extends lazy_mofo {
           }
       }
 
-      $list_of_views = $this->list_of_views();
-      $searchbox = $this->search_box();
+      $list_of_views           = $this->list_of_views();
+      $searchbox               = $this->search_box();
       $list_of_editable_tables = $this->list_of_editable_tables(); // empty if _view != "edit_tables"
 
       // javascript
@@ -1032,7 +1032,7 @@ class eEKS extends lazy_mofo {
       // purpose: if image exists, display image and delete checkbox. also display file input
       // returns: html
 
-      $html = '';
+      $html  = '';
       $class = $this->get_class_name($field_name);
 
       if(mb_strlen($file_name) > 0) {
@@ -1184,10 +1184,10 @@ class eEKS extends lazy_mofo {
       }
 
       // local copies
-      $sql = trim($this->grid_sql);
-      $sql_param = $this->grid_sql_param;
-      $grid_limit = intval($this->grid_limit);
-      $uri_path = $this->get_uri_path();
+      $sql              = trim($this->grid_sql);
+      $sql_param        = $this->grid_sql_param;
+      $grid_limit       = intval($this->grid_limit);
+      $uri_path         = $this->get_uri_path();
       $default_order_by = $this->grid_default_order_by;
 
       if($default_order_by == '') {
@@ -1206,13 +1206,13 @@ class eEKS extends lazy_mofo {
       $sql = preg_replace('/^select/i', 'select sql_calc_found_rows', $sql);
 
       // get input
-      $_posted = intval(@$_REQUEST['_posted']);
-      $_search = $this->clean_out(@$_REQUEST['_search']);
+      $_posted         = intval(@$_REQUEST['_posted']);
+      $_search         = $this->clean_out(@$_REQUEST['_search']);
       $_pagination_off = intval(@$_REQUEST['_pagination_off']);
-      $_order_by = abs(intval(@$_REQUEST['_order_by'])); // order by is numeric index to column
-      $_desc = abs(intval(@$_REQUEST['_desc']));         // descending order flag
-      $_offset = abs(intval(@$_REQUEST['_offset']));     // pagination offset
-      $_export = intval(@$_REQUEST['_export']);
+      $_order_by       = abs(intval(@$_REQUEST['_order_by'])); // order by is numeric index to column
+      $_desc           = abs(intval(@$_REQUEST['_desc']));         // descending order flag
+      $_offset         = abs(intval(@$_REQUEST['_offset']));     // pagination offset
+      $_export         = intval(@$_REQUEST['_export']);
 
       $qs = $this->get_qs();
 
@@ -1238,7 +1238,7 @@ class eEKS extends lazy_mofo {
       }
 
       // column array and column count
-      $columns = $this->get_columns('grid');
+      $columns      = $this->get_columns('grid');
       $column_count = count($columns);
       if($column_count == 0) {
           return;
@@ -1258,7 +1258,7 @@ class eEKS extends lazy_mofo {
           $this->mb_preg_match_all('/order\s+by\s/im', $sql, $matches, PREG_OFFSET_CAPTURE);
           if(count($matches) > 0) {
               $match = end($matches[0]);
-              $sql = mb_substr($sql, 0, $match[1]);
+              $sql   = mb_substr($sql, 0, $match[1]);
           }
 
           $sql .= " order by $_order_by $desc_str"; // add requested sort order
@@ -1279,8 +1279,8 @@ class eEKS extends lazy_mofo {
       }
 
       // get count
-      $count = 0;
-      $sql = 'select found_rows() as cnt';
+      $count        = 0;
+      $sql          = 'select found_rows() as cnt';
       $result_count = $this->query($sql);
       foreach($result_count as $row) {
           $count = $row['cnt'];
@@ -1293,22 +1293,22 @@ class eEKS extends lazy_mofo {
       }
 
       // populate link placeholders
-      $grid_edit_link = $this->grid_edit_link;
+      $grid_edit_link   = $this->grid_edit_link;
       $grid_delete_link = $this->grid_delete_link;
-      $grid_edit_link = str_replace('[script_name]', $uri_path, $grid_edit_link);
-      $grid_edit_link = str_replace('[qs]', $qs, $grid_edit_link);
-      $grid_edit_link = str_replace('[grid_edit_link_text]', $this->grid_edit_link_text, $grid_edit_link);
-      $grid_edit_link = str_replace('[identity_name]', $this->identity_name, $grid_edit_link);
+      $grid_edit_link   = str_replace('[script_name]', $uri_path, $grid_edit_link);
+      $grid_edit_link   = str_replace('[qs]', $qs, $grid_edit_link);
+      $grid_edit_link   = str_replace('[grid_edit_link_text]', $this->grid_edit_link_text, $grid_edit_link);
+      $grid_edit_link   = str_replace('[identity_name]', $this->identity_name, $grid_edit_link);
       $grid_delete_link = str_replace('[script_name]', $uri_path, $grid_delete_link);
       $grid_delete_link = str_replace('[qs]', $qs, $grid_delete_link);
       $grid_delete_link = str_replace('[identity_name]', $this->identity_name, $grid_delete_link);
       $grid_delete_link = str_replace('[delete_confirm]', $this->delete_confirm, $grid_delete_link);
       $grid_delete_link = str_replace('[grid_text_delete]', $this->grid_text_delete, $grid_delete_link);
-      $links = $grid_edit_link . ' ' . $grid_delete_link;
+      $links            = $grid_edit_link . ' ' . $grid_delete_link;
 
       // pagination and save changes link bar
       $pagination = $this->get_pagination($count, $grid_limit, $_offset, $_pagination_off);
-      $button = '';
+      $button     = '';
       if(count($this->grid_input_control) > 0 || $this->grid_multi_delete == true) {
           $button = "<input type='submit' name='__update_grid' value='$this->grid_text_save_changes' class='lm_button lm_save_changes_button'>";
       }
@@ -1322,7 +1322,7 @@ class eEKS extends lazy_mofo {
 
 
       $edit_delete = "";
-      $i = 0;
+      $i           = 0;
       foreach($columns as $column_name) {
 
           $title = $this->format_title($column_name, @$this->rename[$column_name]);
@@ -1418,7 +1418,7 @@ class eEKS extends lazy_mofo {
               }
           }
           // inject row with sums into result
-          $this->inject_rows['last'][0] = $sum;
+          $this->inject_rows['last'][0]       = $sum;
           $this->inject_rows['last'][0]["ID"] = $this->translate("sum");
       }
 
@@ -1469,7 +1469,7 @@ class eEKS extends lazy_mofo {
 
           // set empty variables for test with multi-value column
           $multi_column_content = "";
-          $edit_delete = "";
+          $edit_delete          = "";
 
           // print columns
           $i = 0;
@@ -1565,18 +1565,18 @@ class eEKS extends lazy_mofo {
       // $this->grid_sql_param = [];
 
       $search_in_columns = $this->search_in_columns;
-      $date_filters = $this->date_filters;
+      $date_filters      = $this->date_filters;
 
       $query = "";
       $query .= "SELECT\r\n";
 
       $missing_identity_name = true;
-      $where = [];
-      $date_filter = [];
+      $where                 = [];
+      $date_filter           = [];
 
       // get active columns
       $active_columns = [];
-      foreach($this->config['active_columns'] as $key=>$val) {
+      foreach($this->config['active_columns'] as $key => $val) {
           if($val && $key != "edit_delete_column") {
               $active_columns[] = $key;
           }
@@ -1638,7 +1638,7 @@ class eEKS extends lazy_mofo {
 
       // add LEFT JOIN
       // if no grid_input_control for this column defined
-      foreach($this->config['sql_joins'] as $key=>$val) {
+      foreach($this->config['sql_joins'] as $key => $val) {
 
           $cmd = false;
           if(isset($this->grid_input_control[$key])) {
@@ -1713,14 +1713,14 @@ class eEKS extends lazy_mofo {
 
           // add grid_sql_param
           $this->grid_sql_param[':_from'] = $this->date_in(@$_REQUEST['_from']);
-          $this->grid_sql_param[':_to'] = $this->date_in(@$_REQUEST['_to']);
+          $this->grid_sql_param[':_to']   = $this->date_in(@$_REQUEST['_to']);
       }
 
       // add AND clause for no-date filter
-      if(!empty($_GET['_missing_date_on']) && !empty($_GET['_missing_date'])==1 && !empty($_GET['_missing_date'])) {
+      if(!empty($_GET['_missing_date_on']) && !empty($_GET['_missing_date']) == 1 && !empty($_GET['_missing_date'])) {
           $query .= "AND (";
 
-          foreach($_GET['_missing_date'] as $key=>$val) {
+          foreach($_GET['_missing_date'] as $key => $val) {
               if($key == 0) {
                   $query .= "a.$val IS NULL";
               }
@@ -1735,7 +1735,7 @@ class eEKS extends lazy_mofo {
 
       // add ORDER BY
       $sort_order = $this->config['sort_order'];
-      $count = count($sort_order);
+      $count      = count($sort_order);
       if($count > 0) {
           $query .= "ORDER BY ";
 
@@ -1765,24 +1765,24 @@ class eEKS extends lazy_mofo {
               // case: _from and _to given
               // --> set first day of _from and last day of _to
               $from = (new DateTime($this->date_in($_GET['_from'])))->modify('first day of this month')->format('Y-m-d');
-              $to = (new DateTime($this->date_in($_GET['_to'])))->modify('last day of this month')->format('Y-m-d');
+              $to   = (new DateTime($this->date_in($_GET['_to'])))->modify('last day of this month')->format('Y-m-d');
           }
           elseif(!empty($_GET['_from'])) {
               // case: _from given, _to = ""
               // --> from = first day of _from-month and to = today
               $from = (new DateTime($this->date_in($_GET['_from'])))->modify('first day of this month')->format('Y-m-d');
-              $to = (new DateTime())->format('Y-m-d');//today
+              $to   = (new DateTime())->format('Y-m-d');//today
           }
           elseif(!empty($_GET['_to'])) {
               // case: _to given, _from = ""
               // --> from = first day of _to-year, to = last day of _to-month
-              $to = (new DateTime($this->date_in($_GET['_to'])))->modify('last day of this month')->format('Y-m-d');
+              $to   = (new DateTime($this->date_in($_GET['_to'])))->modify('last day of this month')->format('Y-m-d');
               $from = (new DateTime($to))->modify('first day of Jan this year')->format("Y-m-d");// first day of to-year
           }
           else {// no input, expect this year
-              $now = new DateTime();
+              $now  = new DateTime();
               $from = $now->modify('first day of Jan this year')->format('Y-m-d');
-              $to = $now->modify('last day of Dec this year')->format('Y-m-d');
+              $to   = $now->modify('last day of Dec this year')->format('Y-m-d');
           }
 
       }
@@ -1791,29 +1791,29 @@ class eEKS extends lazy_mofo {
               // case: _from and _to given
               // --> from = first day of _from-year, to = last day of _to-year
               $from = (new DateTime($this->date_in($_GET['_from'])))->modify('first day of Jan this year')->format('Y-m-d');
-              $to = (new DateTime($this->date_in($_GET['_to'])))->modify('last day of Dec this year')->format('Y-m-d');
+              $to   = (new DateTime($this->date_in($_GET['_to'])))->modify('last day of Dec this year')->format('Y-m-d');
           }
           elseif(!empty($_GET['_from'])) {
               // case: _from given, _to = ""
               // --> from = first day of _from-year, to = today
               $from = (new DateTime($this->date_in($_GET['_from'])))->modify('first day of Jan this year')->format('Y-m-d');
-              $to = (new DateTime())->modify('last day of Dec this year')->format('Y-m-d');//Dec this year
+              $to   = (new DateTime())->modify('last day of Dec this year')->format('Y-m-d');//Dec this year
           }
           elseif(!empty($_GET['_to'])) {
               // case: _to given, _from = ""
               // --> from = first day of _to-year, to = last day of _to-year
-              $to = (new DateTime($this->date_in($_GET['_to'])))->modify('last day of Dec this year')->format('Y-m-d');
+              $to   = (new DateTime($this->date_in($_GET['_to'])))->modify('last day of Dec this year')->format('Y-m-d');
               $from = (new DateTime($to))->modify('first day of Jan this year')->modify('- 2 years')->format("Y-m-d");// first day of to-year
           }
           else {// no input, expect this year and last two years
               // $now = new DateTime();
               $from = (new DateTime())->modify('first day of Jan this year')->modify('- 2 years')->format('Y-m-d');
-              $to = (new DateTime())->modify('last day of Dec this year')->format('Y-m-d');
+              $to   = (new DateTime())->modify('last day of Dec this year')->format('Y-m-d');
           }
       }
       else {
           $from = @$_GET['_from'];
-          $to = @$_GET['_to'];
+          $to   = @$_GET['_to'];
       }
 
       // set GET parameters to calculated params
@@ -1830,24 +1830,24 @@ class eEKS extends lazy_mofo {
 
       if($interval == "monthly") {
           // add montly summed columns in sql query in date range
-          $start    = (new DateTime($from))->modify('first day of this month');
-          $end      = (new DateTime($to))->modify('first day of next month');
+          $start = (new DateTime($from))->modify('first day of this month');
+          $end   = (new DateTime($to))->modify('first day of next month');
           $inter = DateInterval::createFromDateString('1 month');
       }
       if($interval == "yearly") {
           // add montly summed columns in sql query in date range
-          $start    = (new DateTime($from))->modify('first day of this year');
-          $end      = (new DateTime($to))->modify('last day of this year');
+          $start = (new DateTime($from))->modify('first day of this year');
+          $end   = (new DateTime($to))->modify('last day of this year');
           $inter = DateInterval::createFromDateString('1 year');
       }
 
       $period = new DatePeriod($start, $inter, $end);
 
-      $query = "";
+      $query      = "";
       $count_cols = 0;
       foreach ($period as $dt) {
           $month = $dt->format('m');
-          $year = $dt->format('Y');
+          $year  = $dt->format('Y');
 
           if($interval == "monthly") {
               $col = $this->translate($dt->format('M')) . $dt->format(' (y)');
@@ -1868,7 +1868,7 @@ class eEKS extends lazy_mofo {
       }
 
       // set grid output control
-      $this->grid_output_control['sum'] = ['type' => 'number'];
+      $this->grid_output_control['sum']     = ['type' => 'number'];
       $this->grid_output_control['average'] = ['type' => 'number'];
 
       // set column sums
@@ -1937,8 +1937,8 @@ class eEKS extends lazy_mofo {
       }
 
       $from_to = $this->expect_sloppy_date_filter_inputs($interval);
-      $from = $from_to[0];
-      $to = $from_to[1];
+      $from    = $from_to[0];
+      $to      = $from_to[1];
 
       // add select summed columns in month/year interval
       $query .= $this->select_interval($from, $to, $date, $interval);
@@ -1994,7 +1994,7 @@ class eEKS extends lazy_mofo {
       $query = "";
 
       $from = (new DateTime($this->date_in($_GET['_from'])))->modify('first day of this month')->format('Y-m-d');
-      $to = (new DateTime($from))->modify('+ 5 months')->modify('last day of this month')->format('Y-m-d');
+      $to   = (new DateTime($from))->modify('+ 5 months')->modify('last day of this month')->format('Y-m-d');
 
       // use data in different date range to estimate future income
       $range = 6;
@@ -2011,11 +2011,11 @@ class eEKS extends lazy_mofo {
           if(empty($_GET['_eks_est_from'])) {
               // if nothing specified, use six months before estimation date
               $eks_est_from = (new DateTime($from))->modify('- '.$range.' months')->format('Y-m-d');
-              $eks_est_to = (new DateTime($from))->modify('+ ' . ($range - 1) . ' months')->modify('last day of this month')->format('Y-m-d');
+              $eks_est_to   = (new DateTime($from))->modify('+ ' . ($range - 1) . ' months')->modify('last day of this month')->format('Y-m-d');
           }
           else {
               $eks_est_from = (new DateTime($this->date_in($_GET['_eks_est_from'])))->modify('first day of this month')->format('Y-m-d');
-              $eks_est_to = (new DateTime($eks_est_from))->modify('+ ' . ($range - 1) . ' months')->modify('last day of this month')->format('Y-m-d');
+              $eks_est_to   = (new DateTime($eks_est_from))->modify('+ ' . ($range - 1) . ' months')->modify('last day of this month')->format('Y-m-d');
           }
       }
 
@@ -2027,12 +2027,12 @@ class eEKS extends lazy_mofo {
       $period   = new DatePeriod($start, $interval, $end);
 
       $select_months = "";// contains query for summed months
-      $i = "a";// temporary column name for estimated months
-      $cols = [];// contains temporary month names and
+      $i             = "a";// temporary column name for estimated months
+      $cols          = [];// contains temporary month names and
       foreach ($period as $dt) {
 
           $month = $dt->format('m');
-          $year = $dt->format('Y');
+          $year  = $dt->format('Y');
 
           $col = $this->translate($dt->format('M')) . $dt->format(' (y)');
 
@@ -2050,12 +2050,12 @@ class eEKS extends lazy_mofo {
 
               // $multiplier = $this->eks_config['eks']['intended_growth'] / 100;
               $multiplier_income = $multiplier * 2 + 1;
-              $multiplier_cost = $multiplier + 1;
+              $multiplier_cost   = $multiplier + 1;
 
               $exclude_growing = false;
               if(isset($this->eks_config['eks']['exclude_growth'])) {
                   $exclude_growing = true;
-                  $exclude_growth = implode(",", $this->eks_config['eks']['exclude_growth']);
+                  $exclude_growth  = implode(",", $this->eks_config['eks']['exclude_growth']);
               }
 
               $select_months .= ", ROUND( COALESCE( SUM(\r\n";
@@ -2082,7 +2082,7 @@ class eEKS extends lazy_mofo {
           }
 
           // grid output control
-          $this->grid_output_control[$col] = ['type' => 'number'];
+          $this->grid_output_control[$col]  = ['type' => 'number'];
           $this->grid_output_control['sum'] = ['type' => 'number'];
 
           $cols[$i] = $col;
@@ -2092,7 +2092,7 @@ class eEKS extends lazy_mofo {
       // add sub-query for estimated EKS to avoid rounding issues in calculated sums
       if($estimated) {
           $query .= "SELECT ID, type_of_costs\r\n";
-          foreach($cols as $key=>$val) {
+          foreach($cols as $key => $val) {
               $query .= ", $key AS '$val'\r\n";
           }
           $query .= ", ". implode('+', array_keys($cols)) ." AS sum\r\n";
@@ -2155,10 +2155,10 @@ class eEKS extends lazy_mofo {
         // purpose: return inputs for date filter
 
         $date_filters = $this->date_filters;
-        $_from = $this->clean_out(@$_GET['_from']);
-        $_to = $this->clean_out(@$_GET['_to']);
-        $html = "";
-        $count = count($date_filters);
+        $_from        = $this->clean_out(@$_GET['_from']);
+        $_to          = $this->clean_out(@$_GET['_to']);
+        $html         = "";
+        $count        = count($date_filters);
         if ($count > 0) {
             $html .= "<fieldset>\r\n";
 
@@ -2228,8 +2228,8 @@ class eEKS extends lazy_mofo {
         // needs better sorting
 
         $category_filters = $this->category_filters;
-        $html = "";
-        $count = count($category_filters);
+        $html             = "";
+        $count            = count($category_filters);
         if ($count > 0) {
             $html .= "<fieldset>\r\n";
 
@@ -2246,7 +2246,7 @@ class eEKS extends lazy_mofo {
                 // empty field first
                 $html .= "    <option value='' class='select_title'>" . $this->format_title($cat, @$this->rename[$cat]) . " (".$this->translate('all').")</option>\r\n";
 
-                foreach ($arr as $key=>$val) {
+                foreach ($arr as $key => $val) {
 
                     $selected = "";
                     if (!empty($_GET["_$cat"]) && $val['ID'] == $_GET["_$cat"]) {
@@ -2305,7 +2305,7 @@ class eEKS extends lazy_mofo {
         // purpose: return input field for full text search
 
         // get input
-        $_search = $this->clean_out(@$_REQUEST['_search']);
+        $_search     = $this->clean_out(@$_REQUEST['_search']);
         $script_name = $this->get_uri_path() . $this->get_qs('_view,_lang');
 
         $html = "";
@@ -2322,7 +2322,7 @@ class eEKS extends lazy_mofo {
         // used in EKS view
 
         $search_box = "";
-        $start = new DateTime($this->date_in($this->eks_config['eks']['eks_start_date']));
+        $start      = new DateTime($this->date_in($this->eks_config['eks']['eks_start_date']));
 
         $today = new DateTime();
 
@@ -2389,12 +2389,12 @@ class eEKS extends lazy_mofo {
         $html = "";
 
         !empty($_GET['_profile']) ? $profile = $_GET['_profile'] : $profile = 0;
-        $profiles = glob('profiles/*.ini.php');
+        $profiles                            = glob('profiles/*.ini.php');
 
         $html .= "<select name='_profile' title='".$this->translate("Choose Profile", "pretty")."'>";
 
-        foreach ($profiles as $key=>$val) {
-            $name = $this->translate(mb_substr($val, 9, (mb_strpos($val, '.ini.php')-9)), "pretty");
+        foreach ($profiles as $key => $val) {
+            $name     = $this->translate(mb_substr($val, 9, (mb_strpos($val, '.ini.php') - 9)), "pretty");
             $selected = "";
             if ($profile == $key) {
                 $selected = " selected='selected'";
@@ -2415,7 +2415,7 @@ class eEKS extends lazy_mofo {
         // purpose: return links for estimated or calculated EKS
 
         $uri = $this->get_uri_path();
-        $qs = $this->get_qs();
+        $qs  = $this->get_qs();
         // remove get parameter "_eks" from $qs
         if (!empty($_GET['_eks']) && $_GET['_eks'] == "estimated") {
             $qs = str_replace("&amp;_eks=estimated", "", $qs);
@@ -2482,7 +2482,7 @@ class eEKS extends lazy_mofo {
             // carry values defined in query_string_list
             $query_string_list_inputs = '';
             if (mb_strlen($this->query_string_list_post) > 0) {
-                $arr = explode(',', trim($this->query_string_list_post, ', '));
+                $arr   = explode(',', trim($this->query_string_list_post, ', '));
                 $arr[] = "_view";
                 $arr[] = "_lang";
                 foreach ($arr as $val) {
@@ -2561,7 +2561,7 @@ class eEKS extends lazy_mofo {
         }
 
         $sql_param = [':identity_id' => $identity_id];
-        $sql = "delete from `$this->table` where `$this->identity_name` = :identity_id limit 1";
+        $sql       = "delete from `$this->table` where `$this->identity_name` = :identity_id limit 1";
         if ($this->query($sql, $sql_param, 'delete()') === false) {
             return false;
         }
@@ -2761,12 +2761,12 @@ class eEKS extends lazy_mofo {
         // purpose: render html input based "command", if command is then try to call a user function
         // returns: html
 
-        $type = 'text'; // default
-        $sql = '';
+        $type      = 'text'; // default
+        $sql       = '';
         $sql_param = '';
         if (isset($control['type'])) {
-            $type = $control['type'];
-            $sql = @$control['sql']; // optional
+            $type      = $control['type'];
+            $sql       = @$control['sql']; // optional
             $sql_param = @$control['sql_param']; // optional
         }
 
@@ -2787,10 +2787,10 @@ class eEKS extends lazy_mofo {
         $class = $this->get_class_name($column_name);
 
         $validate_error_msg = ''; // error next to input
-        $validate_tip = '';       // placeholder next to input for some inputs
+        $validate_tip       = '';       // placeholder next to input for some inputs
 
         // text, password, textarea only - placeholder depending on settings, inside or outside the input
-        $validate_placeholder = '';
+        $validate_placeholder             = '';
         $validate_placeholder_alternative = '';
 
         // display tip or error next to input, not both
@@ -2943,13 +2943,13 @@ class eEKS extends lazy_mofo {
             $identity_id = $this->cast_id(@$_POST[$this->identity_name]);
         }
 
-        $sql = $this->form_sql;
+        $sql       = $this->form_sql;
         $sql_param = $this->form_sql_param;
 
         // make sql statement from table name if no sql was provided
         if (mb_strlen($sql) == 0) {
             $sql_param = [':identity_id' => $identity_id];
-            $sql = "select * from `$this->table` where `$this->identity_name` = :identity_id";
+            $sql       = "select * from `$this->table` where `$this->identity_name` = :identity_id";
         }
 
         // run query
@@ -2961,7 +2961,7 @@ class eEKS extends lazy_mofo {
         }
 
         $columns = $this->get_columns('form');
-        $count = count($result);
+        $count   = count($result);
         $_posted = intval(@$_POST['_posted']);
 
         // success messages
@@ -2978,21 +2978,21 @@ class eEKS extends lazy_mofo {
 
         // are we adding (blank form) or editing (populated form) a record
         if ($count == 0) {
-            $action = 'add';
-            $title = $this->form_text_title_add;
+            $action   = 'add';
+            $title    = $this->form_text_title_add;
             $validate = $this->on_insert_validate;
         }
         else {
-            $action = 'edit';
-            $title = $this->form_text_title_edit;
+            $action   = 'edit';
+            $title    = $this->form_text_title_edit;
             $validate = $this->on_update_validate;
         }
 
         // get 1 row of data if available
-        $row = false;
+        $row         = false;
         $identity_id = 0; // id fetched below
         if (count($result) > 0) {
-            $row = $result[0];
+            $row         = $result[0];
             $identity_id = $this->cast_id($row[$this->identity_name]);
         }
 
@@ -3008,7 +3008,7 @@ class eEKS extends lazy_mofo {
 
         $uri_path = $this->get_uri_path();
 
-        $html  = "<div id='lm'>\n";
+        $html = "<div id='lm'>\n";
         $html .= "<form action='$uri_path$qs' method='post' enctype='multipart/form-data'>\n";
         $html .= "<input type='hidden' name='_csrf' value='$_SESSION[_csrf]'>\n";
         $html .= "<input type='hidden' name='_posted' value='1'>\n";
@@ -3082,13 +3082,13 @@ class eEKS extends lazy_mofo {
         }
 
         // populate link placeholders
-        $this->form_delete_button = str_replace('[grid_text_delete]', $this->grid_text_delete, $this->form_delete_button);
-        $this->form_delete_button = str_replace('[delete_confirm]', $this->delete_confirm, $this->form_delete_button);
+        $this->form_delete_button    = str_replace('[grid_text_delete]', $this->grid_text_delete, $this->form_delete_button);
+        $this->form_delete_button    = str_replace('[delete_confirm]', $this->delete_confirm, $this->form_delete_button);
         $this->form_duplicate_button = str_replace('[identity_name]', $this->identity_name, $this->form_duplicate_button);
         $this->form_duplicate_button = str_replace('[identity_id]', $identity_id, $this->form_duplicate_button);
         $this->form_duplicate_button = str_replace('[form_duplicate_button_text]', $this->form_duplicate_button_text, $this->form_duplicate_button);
-        $this->form_update_button = str_replace('[form_update_button_text]', $this->form_update_button_text, $this->form_update_button);
-        $this->form_add_button = str_replace('[form_add_button_text]', $this->form_add_button_text, $this->form_add_button);
+        $this->form_update_button    = str_replace('[form_update_button_text]', $this->form_update_button_text, $this->form_update_button);
+        $this->form_add_button       = str_replace('[form_add_button_text]', $this->form_add_button_text, $this->form_add_button);
 
         // add buttons
         // add extra hidden update button first to prevent wrong submit on `Enter`
@@ -3133,7 +3133,7 @@ class eEKS extends lazy_mofo {
 
         // output buffering required
         $level = 0;
-        $arr = ob_get_status(true);
+        $arr   = ob_get_status(true);
         if ($arr) {
             $level = count($arr);
         }
@@ -3287,7 +3287,7 @@ class eEKS extends lazy_mofo {
                     $get .= "&amp;$var=" . urlencode($_GET[$var]);
                 }
                 else {
-                    foreach ($_GET[$var] as $key=>$val) {
+                    foreach ($_GET[$var] as $key => $val) {
                         $get .= "&amp;{$var}[]=" . urlencode($_GET[$var][$key]);
                     }
                 }
@@ -3319,8 +3319,8 @@ class eEKS extends lazy_mofo {
             return;
         }
 
-        $port = '';
-        $host = preg_replace('/:[0-9]+$/', '', $_SERVER['HTTP_HOST']); // host without port number
+        $port     = '';
+        $host     = preg_replace('/:[0-9]+$/', '', $_SERVER['HTTP_HOST']); // host without port number
         $protocol = 'http://';
         if (@$_SERVER['HTTPS'] != '' && @$_SERVER['HTTPS'] != 'off') {
             $protocol = 'https://';
@@ -3344,10 +3344,10 @@ class eEKS extends lazy_mofo {
         // the keys of $this->inject_rows define the position
         // if string "last" is given --> push
 
-        foreach($this->inject_rows as $key=>$val) {
+        foreach($this->inject_rows as $key => $val) {
 
             if ($key != "last") {
-                array_splice($result, $key-1, 0, $val);
+                array_splice($result, $key - 1, 0, $val);
             }
 
         }
@@ -3366,11 +3366,11 @@ class eEKS extends lazy_mofo {
 
         // changes: added only ',_view,_lang' to get_qs()
 
-        static $id = 0;    // for unique active page input id
-        $get = $this->get_qs('_order_by,_desc,_search,_view,_lang');
-        $active_page = floor($_offset / $limit) + 1;
-        $total_page = ceil($count / $limit);
-        $uri_path = $this->get_uri_path();
+        static $id               = 0;    // for unique active page input id
+        $get                     = $this->get_qs('_order_by,_desc,_search,_view,_lang');
+        $active_page             = floor($_offset / $limit) + 1;
+        $total_page              = ceil($count / $limit);
+        $uri_path                = $this->get_uri_path();
         $pagination_text_records = $this->pagination_text_records;
 
         if ($count <= 0) {
@@ -3419,10 +3419,10 @@ class eEKS extends lazy_mofo {
         }
 
         if ($active_page >= $total_page) {
-            $pagination  .= " $this->pagination_text_next ";
+            $pagination .= " $this->pagination_text_next ";
         }
         else {
-            $pagination  .= " <a href='{$uri_path}_offset=" . ($_offset + $limit) . "&amp;$get'>$this->pagination_text_next</a> ";
+            $pagination .= " <a href='{$uri_path}_offset=" . ($_offset + $limit) . "&amp;$get'>$this->pagination_text_next</a> ";
         }
 
         $pagination .= " &nbsp; " . number_format($count) . " $pagination_text_records <a href='{$uri_path}_pagination_off=1&amp;$get' rel='nofollow'>$this->pagination_text_show_all</a></p>";
@@ -3440,7 +3440,7 @@ class eEKS extends lazy_mofo {
         $class = "";
 
         if (isset($row['type_of_costs'])) {
-            $sql = "SELECT COALESCE(is_income, 0) AS is_income FROM type_of_costs WHERE type_of_costs = '" . $row['type_of_costs']."'";
+            $sql    = "SELECT COALESCE(is_income, 0) AS is_income FROM type_of_costs WHERE type_of_costs = '" . $row['type_of_costs']."'";
             $result = $this->query($sql);
 
             if (isset($result[0]['is_income']) && $result[0]['is_income'] == 1) {
@@ -3464,7 +3464,7 @@ class eEKS extends lazy_mofo {
         foreach ($arr as $v) {
             foreach ($v as $key => $val) {
                 if (!isset($sum[0][$key])) {
-                    $sum[0][$key]  = (float) $val;
+                    $sum[0][$key] = (float) $val;
                 }
                 else {
                     $sum[0][$key] += (float) $val;
@@ -3488,7 +3488,7 @@ class eEKS extends lazy_mofo {
             $file_name = '';
         }
 
-        $html = '';
+        $html  = '';
         $class = $this->get_class_name($field_name);
 
         if (mb_strlen($file_name) > 0) {
@@ -3561,7 +3561,7 @@ class eEKS extends lazy_mofo {
             // see if a new file was uploaded
             // $file_name = $this->upload_file($input_name, $notice, $field_index);
             $fileNamePrefix = $identity_id . '_';
-            $file_name = $this->upload_file($input_name, $notice, $field_index, $fileNamePrefix);
+            $file_name      = $this->upload_file($input_name, $notice, $field_index, $fileNamePrefix);
 
             // reloop - no new file uploaded
             if (!isset($file_name) || mb_strlen($file_name) == 0) {
@@ -3600,9 +3600,9 @@ class eEKS extends lazy_mofo {
             }
 
             // update file name in table
-            $sql_param = [];
-            $sql = "update `$table_name` set `$column_name` = :file_name where `$identity_name` = :identity_id";
-            $sql_param[':file_name'] = $file_name;
+            $sql_param                 = [];
+            $sql                       = "update `$table_name` set `$column_name` = :file_name where `$identity_name` = :identity_id";
+            $sql_param[':file_name']   = $file_name;
             $sql_param[':identity_id'] = $identity_id;
 
             if ($this->query($sql, $sql_param, 'get_upload()') === false) {
@@ -3630,7 +3630,7 @@ class eEKS extends lazy_mofo {
         // difference to lm: use ID as prefix for uploaded files
 
         $pattern = '';
-        $arr = preg_split('/\s+/', $this->upload_allow_list);
+        $arr     = preg_split('/\s+/', $this->upload_allow_list);
         foreach ($arr as $val) {
             $pattern .= '(.' . preg_quote($val) . ')|';
         }
@@ -3639,13 +3639,13 @@ class eEKS extends lazy_mofo {
 
         // get file info
         if (mb_strlen($field_index) > 0) {
-            $size = intval($_FILES[$input_name]['size'][$field_index]);
-            $tmp_name = $_FILES[$input_name]['tmp_name'][$field_index];
+            $size      = intval($_FILES[$input_name]['size'][$field_index]);
+            $tmp_name  = $_FILES[$input_name]['tmp_name'][$field_index];
             $file_name = $this->clean_file_name($_FILES[$input_name]['name'][$field_index]);
         }
         else {
-            $size = intval($_FILES[$input_name]['size']);
-            $tmp_name = $_FILES[$input_name]['tmp_name'];
+            $size      = intval($_FILES[$input_name]['size']);
+            $tmp_name  = $_FILES[$input_name]['tmp_name'];
             $file_name = $this->clean_file_name($_FILES[$input_name]['name']);
         }
 
