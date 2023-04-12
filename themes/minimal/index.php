@@ -12,7 +12,6 @@
         <header>
             <h1><a href='<?=$uri?>'><?=$software_name?></a></h1>
             <?=$add_button?>
-<!--             <?=$export_button_pdf?> -->
             <?=$export_button_csv?>
             <?=$searchbox?>
         </header>

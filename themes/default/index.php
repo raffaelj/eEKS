@@ -15,9 +15,7 @@
             <nav>
             <?=$dashboard_button?>
             <?=$list_of_views?>
-            <?=$settings_button?>
             </nav>
-<!--             <?=$export_button_pdf?> -->
             <?=$export_button_csv?>
             <?=$searchbox?>
             <?=$list_of_editable_tables?>
@@ -31,8 +29,6 @@
             <footer class="center">
             <p><?=$slogan?></p>
             <?=$language_button?>
-<!--             <p><a href="https://github.com/raffaelj/eeks">Sourcecode on Github</a></p> -->
-<!--             <p><?=$version?></p> -->
         </footer>
         <?=$js?>
     </body>

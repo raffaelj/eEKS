@@ -196,15 +196,14 @@ class eEKS extends lazy_mofo {
         $this->set_grid_view_parameters();
 
         switch($this->get_action()) {
-            case "edit":          $this->template($this->edit());        break;
-            case "insert":        $this->insert();      break;
-            case "update":        $this->update();      break;
-            case "update_grid":   $this->update_grid(); break;
-            case "delete":        $this->delete();      break;
-            case "eks":           $this->template($this->eks());         break;
-            case "settings":      $this->template($this->settings());    break;
-            case "dashboard":     $this->template($this->dashboard());    break;
-            case "cba":           $this->template($this->cba());          break;
+            case "edit":          $this->template($this->edit());       break;
+            case "insert":        $this->insert();                      break;
+            case "update":        $this->update();                      break;
+            case "update_grid":   $this->update_grid();                 break;
+            case "delete":        $this->delete();                      break;
+            case "eks":           $this->template($this->eks());        break;
+            case "dashboard":     $this->template($this->dashboard());  break;
+            case "cba":           $this->template($this->cba());        break;
             default:              $this->template($this->index());
         }
 
@@ -403,70 +402,6 @@ class eEKS extends lazy_mofo {
         $this->grid_sql = $this->generate_grid_sql_interval($interval = "yearly", $date = "", $group = "", $no_group_by = true);
 
         $html .= $this->grid('', true);
-
-        return $html;
-
-    }
-
-    public function settings() {
-
-        // purpose: show settings page to user
-
-        $html = "";
-
-        // form(s) for editing config file(S)
-
-        $html .= "<div class='lm_error'><p>Settings - coming soon - form doesn't work</p></div>";
-        // $this->error = "Settings - coming soon";
-
-        $html .= "<div class='center'>";
-
-        // var_dump($this->config);
-
-        foreach ($this->config as $group => $arr) {
-
-            // debug is a boolean key
-            if (!is_array($arr)) {
-                continue;
-            }
-
-            $html .= "<div style='display:inline-block;vertical-align:top;border:1px solid #ccc;height:300px;margin:5px;padding:5px;overflow:auto;'>";
-            $html .= "<h3>$group</h3>";
-            foreach ($arr as $key => $val) {
-
-                if (is_array($val)) {
-
-                    $html .= '<label for="'.htmlspecialchars($key).'">'.$key."</label>";
-                    $html .= "<fieldset id='$key'>";
-
-                    foreach ($val as $k => $v) {
-
-                        if (is_bool($v)) {
-                            $v ? $checked = ' checked="checked"' : $checked = '';
-                            $html .= '<p>'.$k.': <input type="checkbox" name="'.$k.'"'.$checked.'></p>';
-                        }
-                        else {
-                            $html .= '<p>'.$k.': <input type="text" value="'.htmlspecialchars($v).'" name="'.$k.'"></p>';
-                        }
-                    }
-
-                    $html .= "</fieldset>";
-                }
-                else {
-
-                    if (is_bool($val)) {
-                        $val ? $checked = ' checked="checked"' : $checked = '';
-                        $html .= '<p>'.$key.': <input type="checkbox" name="'.$key.'"'.$checked.'></p>';
-                    }
-                    else {
-                        $html .= '<p>'.$key.': <input type="text" value="'.htmlspecialchars($val).'" name="'.$key.'"></p>';
-                    }
-                }
-
-            }
-            $html .= "</div>";
-        }
-        $html .= "</div>";
 
         return $html;
 
@@ -943,7 +878,6 @@ class eEKS extends lazy_mofo {
         }
 
         // buttons
-        $settings_button   = "<a href='{$uri}action=settings' class='lm_button'>".$this->translate("settings", "pretty")."</a>";
         $dashboard_button  = "<a href='{$uri}action=dashboard' class='lm_button'>Dashboard</a>";
         $add_button        = $this->add_button();
         $export_button_csv = $this->export_button();
@@ -3174,7 +3108,7 @@ class eEKS extends lazy_mofo {
         if (!empty($_GET['_view']) && in_array($_GET['_view'], $this->views)) {
             return $_GET['_view'];
         }
-        elseif ($this->get_action() == 'dashboard' || $this->get_action() == 'settings') {
+        elseif ($this->get_action() == 'dashboard') {
             return "";
         }
         else {
