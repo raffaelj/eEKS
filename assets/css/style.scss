@@ -844,34 +844,34 @@ input[name=_missing_date_on]{
 }
 
 ////// dashboard
-.dash_box{
+.dash_box {
   display: inline-block;
-  // width:24%;
-  width:49%;
-  height:auto;
-  max-height:300px;
+  // width: 24%;
+  width: 49%;
+  height: auto;
+  // max-height: 300px;
   margin: .5%;
   padding: 0;
   @include box-sizing(border-box);
-  overflow:auto;
-  text-align:left;
+  overflow: auto;
+  text-align: left;
   border: 1px solid #ccc;
   border-radius: 4px;
   vertical-align: top;
-  background-color:$clr_white_tr;
-  &.wide{
-    width:99%;
+  background-color: $clr_white_tr;
+  &.wide {
+    width: 99%;
   }
-  .lm_pagination{
-    background-color:transparent;
+  .lm_pagination {
+    background-color: transparent;
   }
-  h2{
-    text-align:center;
+  h2 {
+    text-align: center;
     margin: .2em 0;
     font-size: 1em;
   }
-  table{
-    font-size:.6em;
+  table {
+    font-size: .6em;
   }
 }
 
