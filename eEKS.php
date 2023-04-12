@@ -54,15 +54,6 @@ class eEKS extends lazy_mofo {
     // rename column headers to nice names instead of original database headers
     public $rename_csv_headers = false;
 
-    // folder for pdf creation
-    // public $pdf_path = "exports";
-
-    // for PDF export wkhtmltopdf must be installed
-    // you have to define the full path of the wkhtmltopdf executable
-    // Example on Uberspace: '/home/$USER/bin/wkhtmltopdf';
-    // more info in `docs/install.md` (coming soon)
-    // public $wkhtmltopdf_path = 'wkhtmltopdf';
-
     // optional configuration via config file
     public $config = [];
 
@@ -824,26 +815,7 @@ class eEKS extends lazy_mofo {
 
         // purpose: use template file for HTML output
 
-        // wkhtmltopdf has a bug and doesnt't load background images inside @media rules
-        // issue: https://github.com/wkhtmltopdf/wkhtmltopdf/issues/3126
-        // Therefore we have to insert some CSS to overwrite the screen images with
-        // high-resulution images for printing
-        // $_wkhtmltopdf_img_fix = intval(@$_REQUEST['_wkhtmltopdf_img_fix']);
-        // $_pdf = intval(@$_REQUEST['_pdf']);
-
-        // export page to PDF and quit
-        // if ($_pdf == 1){
-        //   $url = $this->get_uri_path() . $this->get_qs();
-        //   // replace escaped ampersands from get_qs() with unescaped ampersands
-        //   $url = str_replace('&amp;', '&', $url);
-        //   $url .= "&_wkhtmltopdf_img_fix=1"; // add parameter to qs of current page for CSS insert
-        //   $this->generate_pdf($url);
-        //   return;
-        // }
-
         $css = "";
-        // if ($_wkhtmltopdf_img_fix == 1) // insert CSS to overwrite background images
-        //   $css .= "body.eks form.eks_form #eks_page1.eks_page{background-image:url('img/eks_1-6_print.png');}body.eks form.eks_form #eks_page2.eks_page{background-image:url('img/eks_2-6_print.png');}body.eks form.eks_form #eks_page3.eks_page{background-image:url('img/eks_3-6_print.png');}body.eks form.eks_form #eks_page4.eks_page{background-image:url('img/eks_4-6_print.png');}body.eks form.eks_form #eks_page5.eks_page{background-image:url('img/eks_5-6_print.png');}body.eks form.eks_form #eks_page6.eks_page{background-image:url('img/eks_6-6_print.png');}";
 
         //// variables for templating
 
@@ -881,7 +853,6 @@ class eEKS extends lazy_mofo {
         $dashboard_button  = "<a href='{$uri}action=dashboard' class='lm_button'>Dashboard</a>";
         $add_button        = $this->add_button();
         $export_button_csv = $this->export_button();
-        // $export_button_pdf = "<a target='_blank' href='{$uri}_pdf=1&amp;{$qs}' class='lm_button' title='PDF Export'>PDF</a>";
         // language buttons
         $langs           = ["de-de", "en-us"];
         $language_button = "";
