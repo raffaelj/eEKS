@@ -436,6 +436,11 @@ class eEKS extends lazy_mofo {
 
       foreach($this->config as $group=>$arr) {
 
+          // debug is a boolean key
+          if (!is_array($arr)) {
+              continue;
+          }
+
           $html .= "<div style='display:inline-block;vertical-align:top;border:1px solid #ccc;height:300px;margin:5px;padding:5px;overflow:auto;'>";
           $html .= "<h3>$group</h3>";
           foreach($arr as $key=>$val) {
