@@ -2607,7 +2607,7 @@ class eEKS extends lazy_mofo {
         $action = 'action=edit&';
 
         // redirect user
-        $url = $this->get_uri_path() . "{$action}_success=1&$this->identity_name=$id&" . $this->get_qs('_view,_lang'); // do carry items defined in query_string_list, '' removes the default
+        $url = $this->get_uri_path() . "{$action}_success=1&$this->identity_name=$id&" . $this->get_qs('_view,_lang,_search'); // do carry items defined in query_string_list, '' removes the default
         $this->redirect($url, $id);
 
     }
