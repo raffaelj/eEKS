@@ -188,52 +188,49 @@ class eEKS extends lazy_mofo {
 
     }
 
+    public function run() {
 
-  public function run() {
+        // purpose: built-in controller
 
-      // purpose: built-in controller
+        // set commands and grid_sql
+        $this->set_grid_view_parameters();
 
-      // set commands and grid_sql
-      $this->set_grid_view_parameters();
+        switch($this->get_action()) {
+            case "edit":          $this->template($this->edit());        break;
+            case "insert":        $this->insert();      break;
+            case "update":        $this->update();      break;
+            case "update_grid":   $this->update_grid(); break;
+            case "delete":        $this->delete();      break;
+            case "eks":           $this->template($this->eks());         break;
+            case "settings":      $this->template($this->settings());    break;
+            case "dashboard":     $this->template($this->dashboard());    break;
+            case "cba":           $this->template($this->cba());          break;
+            default:              $this->template($this->index());
+        }
 
-      switch($this->get_action()) {
-          case "edit":          $this->template($this->edit());        break;
-          case "insert":        $this->insert();      break;
-          case "update":        $this->update();      break;
-          case "update_grid":   $this->update_grid(); break;
-          case "delete":        $this->delete();      break;
-          case "eks":           $this->template($this->eks());         break;
-          case "settings":      $this->template($this->settings());    break;
-          case "dashboard":     $this->template($this->dashboard());    break;
-          case "cba":           $this->template($this->cba());          break;
-          default:              $this->template($this->index());
-      }
+    }
 
-  }
+    public function set_language() {
 
+        // purpose: load internationalization file, default: en-us
 
-  public function set_language() {
+        if ($lang = $_GET['_lang'] ?? false) {
+            if (strlen($lang) === 5 && !strpos($lang, '/')) {
+                $this->i18n = $lang;
+            }
+        }
 
-      // purpose: load internationalization file, default: en-us
+        $i18n = $this->i18n;
 
-      if ($lang = $_GET['_lang'] ?? false) {
-          if (strlen($lang) === 5 && !strpos($lang, '/')) {
-              $this->i18n = $lang;
-          }
-      }
-
-      $i18n = $this->i18n;
-
-      if(strlen($i18n) > 0 && $i18n != 'en-us') {
-          if(!file_exists("i18n/{$i18n}.php")) {
-              $this->error = "Error: Requested i18n file ({$i18n}.php) does not exist.";
-          }
-          else {
-              include("i18n/{$i18n}.php");
-          }
-      }
-  }
-
+        if(strlen($i18n) > 0 && $i18n != 'en-us') {
+            if(!file_exists("i18n/{$i18n}.php")) {
+                $this->error = "Error: Requested i18n file ({$i18n}.php) does not exist.";
+            }
+            else {
+                include("i18n/{$i18n}.php");
+            }
+        }
+    }
 
     public function translate($str = "", $format = "") {
 
@@ -265,1890 +262,1843 @@ class eEKS extends lazy_mofo {
         return $str;
     }
 
+    public function dashboard() {
 
-  public function dashboard() {
+        // purpose: show multiple grids with predefined filters
 
-      // purpose: show multiple grids with predefined filters
+        $html = "";
 
-      $html = "";
+        $html .= "<div class='lm_error'><p>Dashboard - coming soon</p></div>";
 
-      $html .= "<div class='lm_error'><p>Dashboard - coming soon</p></div>";
+        $html .= "<div class='center'>";
 
-      $html .= "<div class='center'>";
+        //// unpayed invoices
 
-      //// unpayed invoices
+        // income
+        $_GET['_missing_date_on'] = "1";
+        $_GET['_missing_date'][]  = "value_date";
+        $_GET['_amount']          = "pos";
 
-      // income
-      $_GET['_missing_date_on'] = "1";
-      $_GET['_missing_date'][]  = "value_date";
-      $_GET['_amount']          = "pos";
+        $this->multi_column_on          = false;
+        $tmp_active_columns             = $this->config['active_columns'];
+        $this->config['active_columns'] = [
+            "ID"                  => 1
+            ,"invoice_number"     => 1
+            ,"value_date"         => 1
+            ,"voucher_date"       => 1
+            ,"gross_amount"       => 1
+            ,"customer_supplier"  => 1
+            ,"item"               => 1
+            ,"edit_delete_column" => 1
+        ];
 
-      $this->multi_column_on          = false;
-      $tmp_active_columns             = $this->config['active_columns'];
-      $this->config['active_columns'] = [
-        "ID"                  => 1
-        ,"invoice_number"     => 1
-        ,"value_date"         => 1
-        ,"voucher_date"       => 1
-        ,"gross_amount"       => 1
-        ,"customer_supplier"  => 1
-        ,"item"               => 1
-        ,"edit_delete_column" => 1
-      ];
+        $this->set_grid_view_parameters("default");
+        $link = $this->get_uri_path() . $this->get_qs();
 
-      $this->set_grid_view_parameters("default");
-      $link = $this->get_uri_path() . $this->get_qs();
+        $html .= "<div class='dash_box'>";
+        $html .= "<a href='$link'>";
+        $html .= "<h3>Do I have to send an admonition?</h3>";
+        $html .= "</a>";
 
-      $html .= "<div class='dash_box'>";
-      $html .= "<a href='$link'>";
-      $html .= "<h3>Do I have to send an admonition?</h3>";
-      $html .= "</a>";
+        $html .= $this->grid('', true);
 
-      $html .= $this->grid('', true);
+        $html .= "</div>";
 
-      $html .= "</div>";
+        // unpayed invoices - costs
+        $_GET['_amount'] = "neg";
 
+        $this->config['active_columns'] = [
+            "ID"                  => 1
+            ,"value_date"         => 1
+            ,"voucher_date"       => 1
+            ,"gross_amount"       => 1
+            ,"customer_supplier"  => 1
+            ,"item"               => 1
+            ,"edit_delete_column" => 1
+        ];
 
-      // unpayed invoices - costs
-      $_GET['_amount'] = "neg";
+        $this->set_grid_view_parameters("default");
+        $link = $this->get_uri_path() . $this->get_qs();
 
-      $this->config['active_columns'] = [
-        "ID"                  => 1
-        ,"value_date"         => 1
-        ,"voucher_date"       => 1
-        ,"gross_amount"       => 1
-        ,"customer_supplier"  => 1
-        ,"item"               => 1
-        ,"edit_delete_column" => 1
-      ];
+        $html .= "<div class='dash_box'>";
+        $html .= "<a href='$link'>";
+        $html .= "<h3>Hey, don't forget to pay your crazy stuff!</h3>";
+        $html .= "</a>";
 
-      $this->set_grid_view_parameters("default");
-      $link = $this->get_uri_path() . $this->get_qs();
+        $html .= $this->grid('', true);
 
-      $html .= "<div class='dash_box'>";
-      $html .= "<a href='$link'>";
-      $html .= "<h3>Hey, don't forget to pay your crazy stuff!</h3>";
-      $html .= "</a>";
+        // reset variables
+        $this->grid_sql_param = [];
+        unset($_GET['_missing_date_on']);
+        unset($_GET['_missing_date']);
+        unset($_GET['_amount']);
+        $this->config['active_columns'] = $tmp_active_columns;
 
-      $html .= $this->grid('', true);
+        $html .= "</div>";
 
-      // reset variables
-      $this->grid_sql_param = [];
-      unset($_GET['_missing_date_on']);
-      unset($_GET['_missing_date']);
-      unset($_GET['_amount']);
-      $this->config['active_columns'] = $tmp_active_columns;
+        //// sums of last three months
 
-      $html .= "</div>";
+        // set only _from, if _to is not set `generate_grid_sql_monthly()` expects _to = today
+        $_GET['_from'] = (new DateTime())->modify("- 3 months")->modify("first day of this month")->format($this->date_out);
+        $_GET['_view'] = "monthly_sums";
 
-      //// sums of last three months
+        $this->set_grid_view_parameters();
+        $link = $this->get_uri_path() . $this->get_qs();
 
-      // set only _from, if _to is not set `generate_grid_sql_monthly()` expects _to = today
-      $_GET['_from'] = (new DateTime())->modify("- 3 months")->modify("first day of this month")->format($this->date_out);
-      $_GET['_view'] = "monthly_sums";
+        $html .= "<div class='dash_box'>";
+        $html .= "<a href='$link'>";
+        $html .= "<h3>last three months</h3>";
+        $html .= "</a>";
 
-      $this->set_grid_view_parameters();
-      $link = $this->get_uri_path() . $this->get_qs();
+        $html .= $this->grid('', true);
 
-      $html .= "<div class='dash_box'>";
-      $html .= "<a href='$link'>";
-      $html .= "<h3>last three months</h3>";
-      $html .= "</a>";
+        // reset variables
+        $this->grid_sql_param = [];
+        unset($_GET['_from']);
+        unset($_GET['_view']);
 
-      $html .= $this->grid('', true);
+        $html .= "</div>";
 
-      // reset variables
-      $this->grid_sql_param = [];
-      unset($_GET['_from']);
-      unset($_GET['_view']);
+        // graphs
+        $html .= "<div class='dash_box'>";
+        $html .= "<h3>maybe a graph, because it looks cool</h3>";
 
-      $html .= "</div>";
+        $html .= "</div>";
 
-      // graphs
-      $html .= "<div class='dash_box'>";
-      $html .= "<h3>maybe a graph, because it looks cool</h3>";
+        // a wide one
+        $html .= "<div class='dash_box wide'>";
+        $html .= "<h3>another table with a lot of columns</h3>";
 
+        $html .= "</div>";
 
-      $html .= "</div>";
+        $html .= "</div>";// close surrounding div
 
-      // a wide one
-      $html .= "<div class='dash_box wide'>";
-      $html .= "<h3>another table with a lot of columns</h3>";
+        return $html;
 
-      $html .= "</div>";
+    }
 
-      $html .= "</div>";// close surrounding div
+    public function cba() {
+        // purpose: cash basis accounting (German: EÜR)
 
-      return $html;
+        $html = "";
 
-  }// end of dashboard()
+        $html .= "<h3>Einnahmen</h3>";
 
+        $_GET['_amount'] = "pos";
+        $this->grid_sql  = $this->generate_grid_sql_interval("yearly");
 
-  public function cba() {
-      // purpose: cash basis accounting (German: EÜR)
+        $html .= $this->grid('', true);
 
+        $html .= "<h3>Ausgaben</h3>";
 
-      $html = "";
+        $_GET['_amount'] = "neg";
+        $this->grid_sql  = $this->generate_grid_sql_interval("yearly");
 
-      $html .= "<h3>Einnahmen</h3>";
+        $html .= $this->grid('', true);
 
-      $_GET['_amount'] = "pos";
-      $this->grid_sql  = $this->generate_grid_sql_interval("yearly");
+        $html .= "<h3>Gesamt</h3>";
 
-      $html .= $this->grid('', true);
+        $_GET['_amount'] = "";
 
+        $this->grid_sql = $this->generate_grid_sql_interval($interval = "yearly", $date = "", $group = "", $no_group_by = true);
 
-      $html .= "<h3>Ausgaben</h3>";
+        $html .= $this->grid('', true);
 
-      $_GET['_amount'] = "neg";
-      $this->grid_sql  = $this->generate_grid_sql_interval("yearly");
+        return $html;
 
-      $html .= $this->grid('', true);
+    }
 
-      $html .= "<h3>Gesamt</h3>";
+    public function settings() {
 
-      $_GET['_amount'] = "";
+        // purpose: show settings page to user
 
-      $this->grid_sql = $this->generate_grid_sql_interval($interval = "yearly", $date = "", $group = "", $no_group_by = true);
+        $html = "";
 
-      $html .= $this->grid('', true);
+        // form(s) for editing config file(S)
 
-      return $html;
+        $html .= "<div class='lm_error'><p>Settings - coming soon - form doesn't work</p></div>";
+        // $this->error = "Settings - coming soon";
 
-  }// end of cba()
+        $html .= "<div class='center'>";
 
+        // var_dump($this->config);
 
+        foreach($this->config as $group => $arr) {
 
-  public function settings() {
+            // debug is a boolean key
+            if (!is_array($arr)) {
+                continue;
+            }
 
-      // purpose: show settings page to user
+            $html .= "<div style='display:inline-block;vertical-align:top;border:1px solid #ccc;height:300px;margin:5px;padding:5px;overflow:auto;'>";
+            $html .= "<h3>$group</h3>";
+            foreach($arr as $key => $val) {
 
-      $html = "";
+                if(is_array($val)) {
 
-      // form(s) for editing config file(S)
+                    $html .= '<label for="'.htmlspecialchars($key).'">'.$key."</label>";
+                    $html .= "<fieldset id='$key'>";
 
-      $html .= "<div class='lm_error'><p>Settings - coming soon - form doesn't work</p></div>";
-      // $this->error = "Settings - coming soon";
+                    foreach($val as $k => $v) {
 
-      $html .= "<div class='center'>";
+                        if(is_bool($v)) {
+                            $v ? $checked = ' checked="checked"' : $checked = '';
+                            $html .= '<p>'.$k.': <input type="checkbox" name="'.$k.'"'.$checked.'></p>';
+                        }
+                        else {
+                            $html .= '<p>'.$k.': <input type="text" value="'.htmlspecialchars($v).'" name="'.$k.'"></p>';
+                        }
+                    }
 
-      // var_dump($this->config);
+                    $html .= "</fieldset>";
+                }
+                else {
 
-      foreach($this->config as $group => $arr) {
+                    if(is_bool($val)) {
+                        $val ? $checked = ' checked="checked"' : $checked = '';
+                        $html .= '<p>'.$key.': <input type="checkbox" name="'.$key.'"'.$checked.'></p>';
+                    }
+                    else {
+                        $html .= '<p>'.$key.': <input type="text" value="'.htmlspecialchars($val).'" name="'.$key.'"></p>';
+                    }
+                }
 
-          // debug is a boolean key
-          if (!is_array($arr)) {
-              continue;
-          }
+            }
+            $html .= "</div>";
+        }
+        $html .= "</div>";
 
-          $html .= "<div style='display:inline-block;vertical-align:top;border:1px solid #ccc;height:300px;margin:5px;padding:5px;overflow:auto;'>";
-          $html .= "<h3>$group</h3>";
-          foreach($arr as $key => $val) {
+        return $html;
 
-              if(is_array($val)) {
+    }
 
-                  $html .= '<label for="'.htmlspecialchars($key).'">'.$key."</label>";
-                  $html .= "<fieldset id='$key'>";
+    public function list_of_views() {
 
-                  foreach($val as $k => $v) {
+        // purpose: buttons/navigation with different views
 
-                      if(is_bool($v)) {
-                          $v ? $checked = ' checked="checked"' : $checked = '';
-                          $html .= '<p>'.$k.': <input type="checkbox" name="'.$k.'"'.$checked.'></p>';
-                      }
-                      else {
-                          $html .= '<p>'.$k.': <input type="text" value="'.htmlspecialchars($v).'" name="'.$k.'"></p>';
-                      }
-                  }
+        $active_view = $this->get_view();
 
-                  $html .= "</fieldset>";
-              }
-              else {
+        $class = "";
+        if($active_view == "default") {
+            $class = " active";
+        }
 
-                  if(is_bool($val)) {
-                      $val ? $checked = ' checked="checked"' : $checked = '';
-                      $html .= '<p>'.$key.': <input type="checkbox" name="'.$key.'"'.$checked.'></p>';
-                  }
-                  else {
-                      $html .= '<p>'.$key.': <input type="text" value="'.htmlspecialchars($val).'" name="'.$key.'"></p>';
-                  }
-              }
+        $uri = $this->get_uri_path();
 
-          }
-          $html .= "</div>";
-      }
-      $html .= "</div>";
+        // qs without _view
+        // $qs = $this->get_qs('_order_by,_desc,_offset,_search,_pagination_off,_lang');
+        $qs = $this->get_qs('_lang');
 
-      return $html;
+        $html = "";
 
-  }
+        // default
+        $html .= "<a href='{$uri}_view=default&amp;$qs' class='lm_button view_button$class'>".$this->translate("accounting", "pretty")."</a>";
 
+        // other options
+        foreach($this->views as $val) {
+            $class = "";
+            if($val == $active_view) {
+                $class = " active";
+            }
+            $html .= "<a href='".$uri."_view=$val&amp;$qs' class='lm_button view_button$class'>".$this->translate($val, 'pretty')."</a>";
+        }
 
-  public function list_of_views() {
+        return $html;
 
-      // purpose: buttons/navigation with different views
+    }
 
-      $active_view = $this->get_view();
+    public function list_of_editable_tables() {
 
-      $class = "";
-      if($active_view == "default") {
-          $class = " active";
-      }
+        // purpose: list existing tables in database with edit links
 
-      $uri = $this->get_uri_path();
+        $html = "";
+        if(isset($_GET['_view']) && $_GET['_view'] == "edit_tables") {
+            $arr = $this->query("SHOW TABLES");
 
-      // qs without _view
-      // $qs = $this->get_qs('_order_by,_desc,_offset,_search,_pagination_off,_lang');
-      $qs = $this->get_qs('_lang');
+            $html = "<ul class='list_of_tables'>";
+            foreach($arr as $value) {
+                $title = array_values($value)[0];
+                $html .= '<li><a class="lm_button" href="?_view=edit_tables&amp;_edit_table='.$title.'">'. $this->format_title($title, @$this->rename[$title]) .'</a></li>';
+            }
+            $html .= '</ul>';
+        }
 
-      $html = "";
+        return $html;
+    }
 
-      // default
-      $html .= "<a href='{$uri}_view=default&amp;$qs' class='lm_button view_button$class'>".$this->translate("accounting", "pretty")."</a>";
+    public function set_grid_view_parameters($view = "") {
 
-      // other options
-      foreach($this->views as $val) {
-          $class = "";
-          if($val == $active_view) {
-              $class = " active";
-          }
-          $html .= "<a href='".$uri."_view=$val&amp;$qs' class='lm_button view_button$class'>".$this->translate($val, 'pretty')."</a>";
-      }
+        // purpose: show different views with different grids, forms and searchboxes
+        // views must be defined in $this->views or via config file
+        // for a better overview views are in external files in folder `views`
 
-      return $html;
+        if($view == "") {
+            $view = $this->get_view();
+        }
 
-  }
+        if(file_exists("views/{$view}.inc.php")) {
+            include("views/{$view}.inc.php");
+        }
 
+    }
 
-  public function list_of_editable_tables() {
+    public function eks() {
 
-      // purpose: list existing tables in database with edit links
+        // purpose: show form with prefilled data to user (attachment EKS)
 
-      $html = "";
-      if(isset($_GET['_view']) && $_GET['_view'] == "edit_tables") {
-          $arr = $this->query("SHOW TABLES");
+        // parse profile
+        // --> inside `views/eks.inc.php`
 
-          $html = "<ul class='list_of_tables'>";
-          foreach($arr as $value) {
-              $title = array_values($value)[0];
-              $html .= '<li><a class="lm_button" href="?_view=edit_tables&amp;_edit_table='.$title.'">'. $this->format_title($title, @$this->rename[$title]) .'</a></li>';
-          }
-          $html .= '</ul>';
-      }
+        $uri_path = $this->get_uri_path();
+        $qs       = $this->get_qs();
+        $eks      = $this->eks_config;
 
-      return $html;
-  }
+        $estimated = false;
+        if(@$_GET['_eks'] == 'estimated') {
+            $estimated = true;
+        }
 
-  public function set_grid_view_parameters($view = "") {
+        $disabled = $checked = '';
 
-      // purpose: show different views with different grids, forms and searchboxes
-      // views must be defined in $this->views or via config file
-      // for a better overview views are in external files in folder `views`
+        // $this->debug($eks);
 
-      if($view == "") {
-          $view = $this->get_view();
-      }
+        // get current date for signatures
+        $today = $this->date_out(date('Y-m-d'));
 
-      if(file_exists("views/{$view}.inc.php")) {
-          include("views/{$view}.inc.php");
-      }
+        $html = "";
 
-  }
+        $html .= "<div class='lm_error'><p>experimental - no input possible - coming soon</p></div>";
 
-  public function eks() {
+        $html .= "<form action='$uri_path$qs&amp;action=eks' method='post' class='eks_form'>";
 
-      // purpose: show form with prefilled data to user (attachment EKS)
+        // hide selected pages
+        //     CSS checkbox ~ hack
+        // --> pages must
+        //     * follow checkboxes in the DOM
+        //     * have the same parent
 
-      // parse profile
-      // --> inside `views/eks.inc.php`
+        for($i = 1; $i <= 6; $i++) {
+            $checked = "";
+            if(!empty($_GET['_hide_page']) && in_array($i, $_GET['_hide_page'])) {
+                $checked .= " checked=checked";
+            }
+            $html .= "<input type='checkbox' value='$i' name='_hide_page[]' id='_hide_page_$i' class='hide_page'$checked />\r\n";
+            $hide = $this->translate("hide");
+            $show = $this->translate("show");
+            $html .= "<label for='_hide_page_$i' data-hide='$hide' data-show='$show'>$i</label>\r\n";
+        }
 
-      $uri_path = $this->get_uri_path();
-      $qs       = $this->get_qs();
-      $eks      = $this->eks_config;
+        ///////////////// EKS page 1
+        $html .= "<page id='eks_page1' class='eks_page portrait'>";
 
-      $estimated = false;
-      if(@$_GET['_eks'] == 'estimated') {
-          $estimated = true;
-      }
+        // 1.1 personal data of applicant
+        $html .= "<fieldset>";
+        foreach($eks['personal_data'] as $key => $val) {
+            $html .= '<input type="text" value="'.htmlspecialchars($val).'" name="'.htmlspecialchars($key).'">';
+        }
+        $html .= "</fieldset>";
 
-      $disabled = $checked = '';
+        $html .= "<fieldset>";
+        // 1.2 personal data of person to whom the data of this attachment refers to
+        foreach($eks['personal_data_refer'] as $key => $val) {
+            if(mb_strlen($val) > 0) {
+                $html .= '<input type="text" value="'.htmlspecialchars($val).'" name="'.htmlspecialchars($key).'_refer">';
+            }
+            else {
+                $html .= '<input type="text" value="'.htmlspecialchars($eks['personal_data'][$key]).'" name="'.htmlspecialchars($key).'_refer">';
+            }
+        }
+        $html .= "</fieldset>";
 
-      // $this->debug($eks);
+        // 2. estimated or calculated data
+        $html .= "<fieldset>";
+        $checked = (!$estimated) ? "" : " checked='checked'";
+        $html .= "<input type='radio' id='estimated' name='estimated' disabled='disabled'$checked />";
+        $html .= '<label for="estimated"></label>';
+        $checked = ($estimated) ? "" : " checked='checked'";
+        $html .= "<input type='radio' id='calculated' name='calculated' disabled='disabled'$checked />";
+        $html .= '<label for="calculated"></label>';
+        $html .= "</fieldset>";
 
-      // get current date for signatures
-      $today = $this->date_out(date('Y-m-d'));
+        // 3. period for receipt of unemployment benefits
+        $html .= "<fieldset>";
 
-      $html = "";
+        $period = htmlspecialchars($_GET['_from']) . " - " . htmlspecialchars($_GET['_to']);
+        $html .= '<input type="text" value="'.$period.'" name="period" readonly="readonly">';
 
-      $html .= "<div class='lm_error'><p>experimental - no input possible - coming soon</p></div>";
+        $html .= "</fieldset>";
 
-      $html .= "<form action='$uri_path$qs&amp;action=eks' method='post' class='eks_form'>";
+        // 4.1 company data
+        $html .= "<fieldset>";
+        foreach($eks['company_data'] as $key => $val) {
+            $html .= '<input type="text" value="'.htmlspecialchars($val).'" name="'.htmlspecialchars($key).'">';
+        }
 
-      // hide selected pages
-      //     CSS checkbox ~ hack
-      // --> pages must
-      //     * follow checkboxes in the DOM
-      //     * have the same parent
+        $html .= "</fieldset>";
 
-      for($i = 1; $i <= 6; $i++) {
-          $checked = "";
-          if(!empty($_GET['_hide_page']) && in_array($i, $_GET['_hide_page'])) {
-              $checked .= " checked=checked";
-          }
-          $html .= "<input type='checkbox' value='$i' name='_hide_page[]' id='_hide_page_$i' class='hide_page'$checked />\r\n";
-          $hide = $this->translate("hide");
-          $show = $this->translate("show");
-          $html .= "<label for='_hide_page_$i' data-hide='$hide' data-show='$show'>$i</label>\r\n";
-      }
+        // 4.2 employees
+        $html .= "<fieldset>";
 
-      ///////////////// EKS page 1
-      $html .= "<page id='eks_page1' class='eks_page portrait'>";
+        $checked = "";
+        if($eks['employees']['has_employees']) {
+            $checked = " checked='checked'";
+        }
 
-      // 1.1 personal data of applicant
-      $html .= "<fieldset>";
-      foreach($eks['personal_data'] as $key => $val) {
-          $html .= '<input type="text" value="'.htmlspecialchars($val).'" name="'.htmlspecialchars($key).'">';
-      }
-      $html .= "</fieldset>";
+        $html .= '<input type="checkbox" id="has_employees" name="has_employees"'.$checked.' />';
+        $html .= '<label for="has_employees"></label>';
+        $html .= '<input type="text" value="'.htmlspecialchars($eks['employees']['number_of_employees']).'" name="number_of_employees">';
+        $html .= "</fieldset>";
 
-      $html .= "<fieldset>";
-      // 1.2 personal data of person to whom the data of this attachment refers to
-      foreach($eks['personal_data_refer'] as $key => $val) {
-          if(mb_strlen($val) > 0) {
-              $html .= '<input type="text" value="'.htmlspecialchars($val).'" name="'.htmlspecialchars($key).'_refer">';
-          }
-          else {
-              $html .= '<input type="text" value="'.htmlspecialchars($eks['personal_data'][$key]).'" name="'.htmlspecialchars($key).'_refer">';
-          }
-      }
-      $html .= "</fieldset>";
+        $html .= "</page>";
 
-      // 2. estimated or calculated data
-      $html .= "<fieldset>";
-      $checked = (!$estimated) ? "" : " checked='checked'";
-      $html .= "<input type='radio' id='estimated' name='estimated' disabled='disabled'$checked />";
-      $html .= '<label for="estimated"></label>';
-      $checked = ($estimated) ? "" : " checked='checked'";
-      $html .= "<input type='radio' id='calculated' name='calculated' disabled='disabled'$checked />";
-      $html .= '<label for="calculated"></label>';
-      $html .= "</fieldset>";
+        ///////////////// EKS page 2
+        $html .= "<page id='eks_page2' class='eks_page portrait'>";
 
+        // 5. subsidies
+        $html .= "<fieldset>";
+        foreach($eks['subsidies'] as $key => $val) {
+            if(is_bool($val)) {
+                $val ? $checked = ' checked="checked"' : $checked = '';
+                $html .= '<input type="checkbox" id="subsidies_'.$key.'" name="subsidies_'.$key.'"'.$checked.'>';
+                $html .= '<label for="subsidies_'.$key.'"></label>';
+            }
+            else {
+                $html .= '<input type="text" value="'.htmlspecialchars($val).'" name="subsidies_'.$key.'">';
+            }
+        }
 
-      // 3. period for receipt of unemployment benefits
-      $html .= "<fieldset>";
+        $html .= "</fieldset>";
 
-      $period = htmlspecialchars($_GET['_from']) . " - " . htmlspecialchars($_GET['_to']);
-      $html .= '<input type="text" value="'.$period.'" name="period" readonly="readonly">';
+        // 6. loan
+        $html .= "<fieldset>";
+        foreach($eks['loan'] as $key => $val) {
+            if(is_bool($val)) {
+                $val ? $checked = ' checked="checked"' : $checked = '';
+                $html .= '<input type="checkbox" id="loan_'.$key.'" name="loan_'.$key.'"'.$checked.'>';
+                $html .= '<label for="loan_'.$key.'"></label>';
+            }
+            else {
+                $html .= '<input type="text" value="'.htmlspecialchars($val).'" name="loan_'.$key.'">';
+            }
+        }
 
-      $html .= "</fieldset>";
+        $html .= "</fieldset>";
 
-      // 4.1 company data
-      $html .= "<fieldset>";
-      foreach($eks['company_data'] as $key => $val) {
-          $html .= '<input type="text" value="'.htmlspecialchars($val).'" name="'.htmlspecialchars($key).'">';
-      }
+        // 7. home office
+        $html .= "<fieldset>";
+        foreach($eks['home_office'] as $key => $val) {
+            if(is_bool($val)) {
+                $val ? $checked = ' checked="checked"' : $checked = '';
+                $html .= '<input type="checkbox" id="home_office_'.$key.'" name="home_office_'.$key.'"'.$checked.'>';
+                $html .= '<label for="home_office_'.$key.'"></label>';
+            }
+            else {
+                $html .= '<input type="text" value="'.htmlspecialchars($val).'" name="home_office_'.$key.'">';
+            }
+        }
 
-      $html .= "</fieldset>";
+        $html .= "</fieldset>";
 
-      // 4.2 employees
-      $html .= "<fieldset>";
+        // signature
+        $html .= "<fieldset>";
 
-      $checked = "";
-      if($eks['employees']['has_employees']) {
-          $checked = " checked='checked'";
-      }
+        $html .= '<textarea name="location">'.htmlspecialchars($eks['signature']['location']).', '.$today.'</textarea>';
+        $html .= '<textarea name="signature">'.htmlspecialchars($eks['signature']['signature']).'</textarea>';
 
-      $html .= '<input type="checkbox" id="has_employees" name="has_employees"'.$checked.' />';
-      $html .= '<label for="has_employees"></label>';
-      $html .= '<input type="text" value="'.htmlspecialchars($eks['employees']['number_of_employees']).'" name="number_of_employees">';
-      $html .= "</fieldset>";
+        $html .= "</fieldset>";
 
+        $html .= "</page>";
 
-      $html .= "</page>";
+        ///////////////// EKS page 3
+        $html .= "<page id='eks_page3' class='eks_page landscape'>";
 
-      ///////////////// EKS page 2
-      $html .= "<page id='eks_page2' class='eks_page portrait'>";
+        $html .= "<fieldset>";
 
+        // get name
+        $name = "";
+        if(mb_strlen($eks['personal_data_refer']['last_name']) > 0) {
+            $name .= htmlspecialchars($eks['personal_data_refer']['last_name']);
+        }
+        else {
+            $name .= htmlspecialchars($eks['personal_data']['last_name']);
+        }
+        $name .= ", ";
+        if(mb_strlen($eks['personal_data_refer']['first_name']) > 0) {
+            $name .= htmlspecialchars($eks['personal_data_refer']['first_name']);
+        }
+        else {
+            $name .= htmlspecialchars($eks['personal_data']['first_name']);
+        }
 
-      // 5. subsidies
-      $html .= "<fieldset>";
-      foreach($eks['subsidies'] as $key => $val) {
-          if(is_bool($val)) {
-              $val ? $checked = ' checked="checked"' : $checked = '';
-              $html .= '<input type="checkbox" id="subsidies_'.$key.'" name="subsidies_'.$key.'"'.$checked.'>';
-              $html .= '<label for="subsidies_'.$key.'"></label>';
-          }
-          else {
-              $html .= '<input type="text" value="'.htmlspecialchars($val).'" name="subsidies_'.$key.'">';
-          }
-      }
+        $html .= '<input type="text" value="'.$name.'" name="last_first_name">';
+        $html .= '<input type="text" value="'.htmlspecialchars($eks['personal_data']['bg_number']).'" name="page3_bg_number">';
 
-      $html .= "</fieldset>";
+        $html .= "</fieldset>";
 
-      // 6. loan
-      $html .= "<fieldset>";
-      foreach($eks['loan'] as $key => $val) {
-          if(is_bool($val)) {
-              $val ? $checked = ' checked="checked"' : $checked = '';
-              $html .= '<input type="checkbox" id="loan_'.$key.'" name="loan_'.$key.'"'.$checked.'>';
-              $html .= '<label for="loan_'.$key.'"></label>';
-          }
-          else {
-              $html .= '<input type="text" value="'.htmlspecialchars($val).'" name="loan_'.$key.'">';
-          }
-      }
+        // estimated or calculated data
+        $html .= "<fieldset>";
+        $checked = (!$estimated) ? "" : " checked='checked'";
+        $html .= "<input type='radio' id='page3_estimated' name='page3_estimated' disabled='disabled'$checked />";
+        $html .= '<label for="page3_estimated"></label>';
+        $checked = ($estimated) ? "" : " checked='checked'";
+        $html .= "<input type='radio' id='page3_calculated' name='page3_calculated' disabled='disabled'$checked />";
+        $html .= '<label for="page3_calculated"></label>';
+        $html .= "</fieldset>";
 
-      $html .= "</fieldset>";
+        // small business / Kleinunternehmer/in (§19 UStG)
+        $html .= "<fieldset>";
+        $eks['eks']['small_business'] ? $checked = " checked='checked'" : $checked = "";
+        $html .= '<input type="checkbox" id="small_business" name="small_business"'.$checked.' />';
+        $html .= '<label for="small_business"></label>';
+        $html .= "</fieldset>";
 
-      // 7. home office
-      $html .= "<fieldset>";
-      foreach($eks['home_office'] as $key => $val) {
-          if(is_bool($val)) {
-              $val ? $checked = ' checked="checked"' : $checked = '';
-              $html .= '<input type="checkbox" id="home_office_'.$key.'" name="home_office_'.$key.'"'.$checked.'>';
-              $html .= '<label for="home_office_'.$key.'"></label>';
-          }
-          else {
-              $html .= '<input type="text" value="'.htmlspecialchars($val).'" name="home_office_'.$key.'">';
-          }
-      }
+        $this->grid_sql = $this->generate_grid_sql_eks(3);
 
-      $html .= "</fieldset>";
+        // inject rows with sums/carryover
+        $sum_page_3 = $this->sum_result($this->query($this->grid_sql, $this->grid_sql_param)); // sum of page 3
 
+        $this->inject_rows['last']                     = $sum_page_3;
+        $this->inject_rows['last'][0]['ID']            = "";
+        $this->inject_rows['last'][0]['type_of_costs'] = "Summe A1-A7";
 
-      // signature
-      $html .= "<fieldset>";
+        // grid
+        $html .= $this->grid('', true);
 
-      $html .= '<textarea name="location">'.htmlspecialchars($eks['signature']['location']).', '.$today.'</textarea>';
-      $html .= '<textarea name="signature">'.htmlspecialchars($eks['signature']['signature']).'</textarea>';
+        // reset row injection
+        $this->inject_rows = [];
 
-      $html .= "</fieldset>";
+        $html .= "</page>";
 
+        ///////////////// EKS page 4
+        $html .= "<page id='eks_page4' class='eks_page landscape'>";
 
-      $html .= "</page>";
+        $this->grid_sql = $this->generate_grid_sql_eks(4);
 
+        // inject rows with sums/carryover
+        $sum_page_4 = $this->sum_result($this->query($this->grid_sql, $this->grid_sql_param)); // sum of page 4
 
-      ///////////////// EKS page 3
-      $html .= "<page id='eks_page3' class='eks_page landscape'>";
+        $this->inject_rows["last"]                     = $sum_page_4;
+        $this->inject_rows['last'][0]['ID']            = "";
+        $this->inject_rows['last'][0]['type_of_costs'] = "Zwischensumme B1-B7";
 
-      $html .= "<fieldset>";
+        // grid
+        $html .= $this->grid('', true);
 
-      // get name
-      $name = "";
-      if(mb_strlen($eks['personal_data_refer']['last_name']) > 0) {
-          $name .= htmlspecialchars($eks['personal_data_refer']['last_name']);
-      }
-      else {
-          $name .= htmlspecialchars($eks['personal_data']['last_name']);
-      }
-      $name .= ", ";
-      if(mb_strlen($eks['personal_data_refer']['first_name']) > 0) {
-          $name .= htmlspecialchars($eks['personal_data_refer']['first_name']);
-      }
-      else {
-          $name .= htmlspecialchars($eks['personal_data']['first_name']);
-      }
+        // reset row injection
+        $this->inject_rows = [];
 
-      $html .= '<input type="text" value="'.$name.'" name="last_first_name">';
-      $html .= '<input type="text" value="'.htmlspecialchars($eks['personal_data']['bg_number']).'" name="page3_bg_number">';
+        $html .= "</page>";
 
-      $html .= "</fieldset>";
+        ///////////////// EKS page 5
+        $html .= "<page id='eks_page5' class='eks_page landscape'>";
 
-      // estimated or calculated data
-      $html .= "<fieldset>";
-      $checked = (!$estimated) ? "" : " checked='checked'";
-      $html .= "<input type='radio' id='page3_estimated' name='page3_estimated' disabled='disabled'$checked />";
-      $html .= '<label for="page3_estimated"></label>';
-      $checked = ($estimated) ? "" : " checked='checked'";
-      $html .= "<input type='radio' id='page3_calculated' name='page3_calculated' disabled='disabled'$checked />";
-      $html .= '<label for="page3_calculated"></label>';
-      $html .= "</fieldset>";
+        // inject rows with sums/carryover
+        $this->inject_rows[1]                     = $sum_page_4; // carryover from page 4
+        $this->inject_rows[1][0]['ID']            = "";
+        $this->inject_rows[1][0]['type_of_costs'] = "Übertrag B1-B7";
 
-      // small business / Kleinunternehmer/in (§19 UStG)
-      $html .= "<fieldset>";
-      $eks['eks']['small_business'] ? $checked = " checked='checked'" : $checked = "";
-      $html .= '<input type="checkbox" id="small_business" name="small_business"'.$checked.' />';
-      $html .= '<label for="small_business"></label>';
-      $html .= "</fieldset>";
+        $this->grid_sql = $this->generate_grid_sql_eks(5);
 
-      $this->grid_sql = $this->generate_grid_sql_eks(3);
+        $sum_page_5 = $this->sum_result($this->query($this->grid_sql, $this->grid_sql_param)); // sum of page 5
 
-      // inject rows with sums/carryover
-      $sum_page_3 = $this->sum_result($this->query($this->grid_sql, $this->grid_sql_param)); // sum of page 3
+        foreach($sum_page_4[0] as $key => $val) {
+            $sum_costs[0][$key] = $val + $sum_page_5[0][$key];
+        }
+        foreach($sum_page_3[0] as $key => $val) {
+            $sum_all[0][$key] = $val + $sum_costs[0][$key];
+        }
 
-      $this->inject_rows['last']                     = $sum_page_3;
-      $this->inject_rows['last'][0]['ID']            = "";
-      $this->inject_rows['last'][0]['type_of_costs'] = "Summe A1-A7";
+        $this->inject_rows[22]                     = $sum_costs;
+        $this->inject_rows[22][0]['ID']            = "";
+        $this->inject_rows[22][0]['type_of_costs'] = "Summe B1-B18";
 
-      // grid
-      $html .= $this->grid('', true);
+        $this->inject_rows[23]                     = $sum_all;
+        $this->inject_rows[23][0]['ID']            = "";
+        $this->inject_rows[23][0]['type_of_costs'] = "Gewinn";
 
-      // reset row injection
-      $this->inject_rows = [];
+        // grid
+        $html .= $this->grid('', true);
 
-      $html .= "</page>";
+        // reset row injection
+        $this->inject_rows = [];
 
+        $html .= "</page>";
 
-      ///////////////// EKS page 4
-      $html .= "<page id='eks_page4' class='eks_page landscape'>";
+        ///////////////// EKS page 6
+        $html .= "<page id='eks_page6' class='eks_page landscape'>";
 
-      $this->grid_sql = $this->generate_grid_sql_eks(4);
+        // this section doesn't exist in the database or in any other place.
+        // It's coming in the future...
 
-      // inject rows with sums/carryover
-      $sum_page_4 = $this->sum_result($this->query($this->grid_sql, $this->grid_sql_param)); // sum of page 4
+        // grid
+        // $this->grid_sql = $this->generate_grid_sql_eks(6);
+        // $html .= $this->grid('', true);
 
-      $this->inject_rows["last"]                     = $sum_page_4;
-      $this->inject_rows['last'][0]['ID']            = "";
-      $this->inject_rows['last'][0]['type_of_costs'] = "Zwischensumme B1-B7";
+        // signature
+        $html .= "<fieldset>";
 
-      // grid
-      $html .= $this->grid('', true);
+        $html .= '<textarea name="location">'.htmlspecialchars($eks['signature']['location']).', '.$today.'</textarea>';
+        $html .= '<textarea name="signature">'.htmlspecialchars($eks['signature']['signature']).'</textarea>';
 
-      // reset row injection
-      $this->inject_rows = [];
+        $html .= "</fieldset>";
 
-      $html .= "</page>";
+        $html .= "</page>";
 
+        $html .= "</form>";
 
-      ///////////////// EKS page 5
-      $html .= "<page id='eks_page5' class='eks_page landscape'>";
+        return $html;
 
-      // inject rows with sums/carryover
-      $this->inject_rows[1]                     = $sum_page_4; // carryover from page 4
-      $this->inject_rows[1][0]['ID']            = "";
-      $this->inject_rows[1][0]['type_of_costs'] = "Übertrag B1-B7";
+    }// end of eks()
 
-      $this->grid_sql = $this->generate_grid_sql_eks(5);
+    public function back_button($identity_id = 0) {
 
-      $sum_page_5 = $this->sum_result($this->query($this->grid_sql, $this->grid_sql_param)); // sum of page 5
+        $uri_path  = $this->get_uri_path();
+        $qs        = $this->get_qs();
+        $back_link = $uri_path . $qs;
 
-      foreach($sum_page_4[0] as $key => $val) {
-          $sum_costs[0][$key] = $val + $sum_page_5[0][$key];
-      }
-      foreach($sum_page_3[0] as $key => $val) {
-          $sum_all[0][$key] = $val + $sum_costs[0][$key];
-      }
+        // append id for row highlighting
+        if($identity_id > 0) {
+            $back_link .= "&amp;$this->identity_name=$identity_id";
+        }
 
-      $this->inject_rows[22]                     = $sum_costs;
-      $this->inject_rows[22][0]['ID']            = "";
-      $this->inject_rows[22][0]['type_of_costs'] = "Summe B1-B18";
+        return "<a href='$back_link' class='lm_button'>$this->form_back_button_text</a>";
 
-      $this->inject_rows[23]                     = $sum_all;
-      $this->inject_rows[23][0]['ID']            = "";
-      $this->inject_rows[23][0]['type_of_costs'] = "Gewinn";
+    }
 
-      // grid
-      $html .= $this->grid('', true);
+    public function add_button() {
+        $qs            = $this->get_qs();
+        $uri_path      = $this->get_uri_path();
+        $grid_add_link = $this->grid_add_link;
+        $grid_add_link = str_replace('[script_name]', $uri_path, $grid_add_link);
+        $grid_add_link = str_replace('[qs]', $qs, $grid_add_link);
+        $grid_add_link = str_replace('[grid_add_link_text]', $this->grid_add_link_text, $grid_add_link);
+        return $grid_add_link;
+    }
 
-      // reset row injection
-      $this->inject_rows = [];
+    public function export_button() {
+        $qs               = $this->get_qs();
+        $uri_path         = $this->get_uri_path();
+        $grid_export_link = $this->grid_export_link;
+        $grid_export_link = str_replace('[script_name]', $uri_path, $grid_export_link);
+        $grid_export_link = str_replace('[qs]', $qs, $grid_export_link);
+        $grid_export_link = str_replace('[grid_export_link_text]', $this->grid_export_link_text, $grid_export_link);
+        return $grid_export_link;
+    }
 
+    public function template($content) {
 
-      $html .= "</page>";
+        // purpose: use template file for HTML output
 
+        // wkhtmltopdf has a bug and doesnt't load background images inside @media rules
+        // issue: https://github.com/wkhtmltopdf/wkhtmltopdf/issues/3126
+        // Therefore we have to insert some CSS to overwrite the screen images with
+        // high-resulution images for printing
+        // $_wkhtmltopdf_img_fix = intval(@$_REQUEST['_wkhtmltopdf_img_fix']);
+        // $_pdf = intval(@$_REQUEST['_pdf']);
 
-      ///////////////// EKS page 6
-      $html .= "<page id='eks_page6' class='eks_page landscape'>";
+        // export page to PDF and quit
+        // if($_pdf == 1){
+        //   $url = $this->get_uri_path() . $this->get_qs();
+        //   // replace escaped ampersands from get_qs() with unescaped ampersands
+        //   $url = str_replace('&amp;', '&', $url);
+        //   $url .= "&_wkhtmltopdf_img_fix=1"; // add parameter to qs of current page for CSS insert
+        //   $this->generate_pdf($url);
+        //   return;
+        // }
 
-      // this section doesn't exist in the database or in any other place.
-      // It's coming in the future...
+        $css = "";
+        // if($_wkhtmltopdf_img_fix == 1) // insert CSS to overwrite background images
+        //   $css .= "body.eks form.eks_form #eks_page1.eks_page{background-image:url('img/eks_1-6_print.png');}body.eks form.eks_form #eks_page2.eks_page{background-image:url('img/eks_2-6_print.png');}body.eks form.eks_form #eks_page3.eks_page{background-image:url('img/eks_3-6_print.png');}body.eks form.eks_form #eks_page4.eks_page{background-image:url('img/eks_4-6_print.png');}body.eks form.eks_form #eks_page5.eks_page{background-image:url('img/eks_5-6_print.png');}body.eks form.eks_form #eks_page6.eks_page{background-image:url('img/eks_6-6_print.png');}";
 
-      // grid
-      // $this->grid_sql = $this->generate_grid_sql_eks(6);
-      // $html .= $this->grid('', true);
+        //// variables for templating
 
-      // signature
-      $html .= "<fieldset>";
+        // class name generated by page name/type for easier styling
+        $body_class = $this->get_action();
 
-      $html .= '<textarea name="location">'.htmlspecialchars($eks['signature']['location']).', '.$today.'</textarea>';
-      $html .= '<textarea name="signature">'.htmlspecialchars($eks['signature']['signature']).'</textarea>';
+        $uri             = $this->get_uri_path();
+        $qs              = $this->get_qs();
+        $qs_without_lang = $this->get_qs('_order_by,_desc,_offset,_search,_pagination_off,_view,action');// + action
 
-      $html .= "</fieldset>";
+        // optional background image
+        if (mb_strlen($this->background_image) > 0) {
+            $css .= "main{background-image:url($this->background_image);}";
+            $css .= "@media print{main{background-image:none;}}";
+        }
 
-      $html .= "</page>";
+        $html_lang     = substr($this->i18n, 0, 2);
+        $title         = $this->get_page_name();
+        $software_name = htmlspecialchars($this->software_name);
+        $slogan        = htmlspecialchars($this->slogan);
+        // $version = $this->version();
+        $version = $this->version;
+        $debug   = $this->debug;
 
+        $page_name = $this->get_page_name("", false);
+        $date_now  = date($this->datetime_out);
 
-      $html .= "</form>";
+        // user CSS
+        $user_css = "";
+        if(mb_strlen($css) > 0) {
+            $user_css .= "<style>$css</style>";
+        }
 
-      return $html;
+        // buttons
+        $settings_button   = "<a href='{$uri}action=settings' class='lm_button'>".$this->translate("settings", "pretty")."</a>";
+        $dashboard_button  = "<a href='{$uri}action=dashboard' class='lm_button'>Dashboard</a>";
+        $add_button        = $this->add_button();
+        $export_button_csv = $this->export_button();
+        // $export_button_pdf = "<a target='_blank' href='{$uri}_pdf=1&amp;{$qs}' class='lm_button' title='PDF Export'>PDF</a>";
+        // language buttons
+        $langs           = ["de-de", "en-us"];
+        $language_button = "";
+        foreach($langs as $lang) {
+            if($lang != $this->i18n) {
+                $language_button .= "<a href='{$uri}_lang=$lang&amp;$qs_without_lang' class='lang_button'>".substr($lang, 0, 2)."</a>";
+            }
+        }
 
-  }// end of eks()
+        $list_of_views           = $this->list_of_views();
+        $searchbox               = $this->search_box();
+        $list_of_editable_tables = $this->list_of_editable_tables(); // empty if _view != "edit_tables"
 
+        // javascript
+        $js = "";
+        if($this->allow_javascript) {
+            $js = "<script src='assets/js/pikaday.js'></script>";
+            $js .= "<script>var lang = '$this->i18n', date_out = '$this->date_out'</script>";
+            $js .= "<script src='assets/js/eEKS.js?v=".($debug ? time() : $version)."'></script>";
+        }
 
-  public function back_button($identity_id = 0) {
+        $error = $this->error;
 
-      $uri_path  = $this->get_uri_path();
-      $qs        = $this->get_qs();
-      $back_link = $uri_path . $qs;
+        // include template file
+        if(file_exists('themes/'.$this->config['eeks']['theme'].'/index.php')) {
+            include('themes/'.$this->config['eeks']['theme'].'/index.php');
+        }
+        else {
+            include('themes/default/index.php');
+        }
+    }
 
-      // append id for row highlighting
-      if($identity_id > 0) {
-          $back_link .= "&amp;$this->identity_name=$identity_id";
-      }
+    public function edit($error = '') {
 
-      return "<a href='$back_link' class='lm_button'>$this->form_back_button_text</a>";
+        // purpose: called from contoller to display form() and add or edit a record
 
-  }
+        return $this->form($error);
 
+    }
 
-  public function add_button() {
-      $qs            = $this->get_qs();
-      $uri_path      = $this->get_uri_path();
-      $grid_add_link = $this->grid_add_link;
-      $grid_add_link = str_replace('[script_name]', $uri_path, $grid_add_link);
-      $grid_add_link = str_replace('[qs]', $qs, $grid_add_link);
-      $grid_add_link = str_replace('[grid_add_link_text]', $this->grid_add_link_text, $grid_add_link);
-      return $grid_add_link;
-  }
+    public function index($error = '') {
 
+        // purpose: called from contoller to display update() data
 
-  public function export_button() {
-      $qs               = $this->get_qs();
-      $uri_path         = $this->get_uri_path();
-      $grid_export_link = $this->grid_export_link;
-      $grid_export_link = str_replace('[script_name]', $uri_path, $grid_export_link);
-      $grid_export_link = str_replace('[qs]', $qs, $grid_export_link);
-      $grid_export_link = str_replace('[grid_export_link_text]', $this->grid_export_link_text, $grid_export_link);
-      return $grid_export_link;
-  }
+        return $this->grid($error);
 
+    }
 
-  public function template($content) {
+    public function html_image_input($field_name, $file_name) {
 
-      // purpose: use template file for HTML output
+        // purpose: if image exists, display image and delete checkbox. also display file input
+        // returns: html
 
-      // wkhtmltopdf has a bug and doesnt't load background images inside @media rules
-      // issue: https://github.com/wkhtmltopdf/wkhtmltopdf/issues/3126
-      // Therefore we have to insert some CSS to overwrite the screen images with
-      // high-resulution images for printing
-      // $_wkhtmltopdf_img_fix = intval(@$_REQUEST['_wkhtmltopdf_img_fix']);
-      // $_pdf = intval(@$_REQUEST['_pdf']);
+        $html  = '';
+        $class = $this->get_class_name($field_name);
 
-      // export page to PDF and quit
-      // if($_pdf == 1){
-      //   $url = $this->get_uri_path() . $this->get_qs();
-      //   // replace escaped ampersands from get_qs() with unescaped ampersands
-      //   $url = str_replace('&amp;', '&', $url);
-      //   $url .= "&_wkhtmltopdf_img_fix=1"; // add parameter to qs of current page for CSS insert
-      //   $this->generate_pdf($url);
-      //   return;
-      // }
+        if(mb_strlen($file_name) > 0) {
 
-      $css = "";
-      // if($_wkhtmltopdf_img_fix == 1) // insert CSS to overwrite background images
-      //   $css .= "body.eks form.eks_form #eks_page1.eks_page{background-image:url('img/eks_1-6_print.png');}body.eks form.eks_form #eks_page2.eks_page{background-image:url('img/eks_2-6_print.png');}body.eks form.eks_form #eks_page3.eks_page{background-image:url('img/eks_3-6_print.png');}body.eks form.eks_form #eks_page4.eks_page{background-image:url('img/eks_4-6_print.png');}body.eks form.eks_form #eks_page5.eks_page{background-image:url('img/eks_5-6_print.png');}body.eks form.eks_form #eks_page6.eks_page{background-image:url('img/eks_6-6_print.png');}";
+            if(mb_strlen($this->thumb_path)) {
+                $html .= "<a href='$this->upload_path/$file_name' target='_blank'><img src='$this->thumb_path/$file_name' alt='image' /></a>";
+            }
+            else {
+                $html .= "<a href='$this->upload_path/$file_name' target='_blank'><img src='$this->upload_path/$file_name' alt='image' /></a>";
+            }
 
-      //// variables for templating
+            $html .= " <label><input type='checkbox' name='{$field_name}-delete' value='1' >$this->text_delete_image</label><br>";
+        }
 
-      // class name generated by page name/type for easier styling
-      $body_class = $this->get_action();
+        $html .= "<input type='file' name='$field_name' class='$class' size='$this->form_text_input_size'>";
 
-      $uri             = $this->get_uri_path();
-      $qs              = $this->get_qs();
-      $qs_without_lang = $this->get_qs('_order_by,_desc,_offset,_search,_pagination_off,_view,action');// + action
+        return $html;
 
-      // optional background image
-      if (mb_strlen($this->background_image) > 0) {
-          $css .= "main{background-image:url($this->background_image);}";
-          $css .= "@media print{main{background-image:none;}}";
-      }
+    }
 
-      $html_lang     = substr($this->i18n, 0, 2);
-      $title         = $this->get_page_name();
-      $software_name = htmlspecialchars($this->software_name);
-      $slogan        = htmlspecialchars($this->slogan);
-      // $version = $this->version();
-      $version = $this->version;
-      $debug   = $this->debug;
+    public function html_image_output($file_name) {
 
-      $page_name = $this->get_page_name("", false);
-      $date_now  = date($this->datetime_out);
+        // purpose: if image exists, display image depending on settings and if thumbnail exists
+        // returns: html
 
-      // user CSS
-      $user_css = "";
-      if(mb_strlen($css) > 0) {
-          $user_css .= "<style>$css</style>";
-      }
+        if(mb_strlen($file_name) == 0) {
+            return;
+        }
 
-      // buttons
-      $settings_button   = "<a href='{$uri}action=settings' class='lm_button'>".$this->translate("settings", "pretty")."</a>";
-      $dashboard_button  = "<a href='{$uri}action=dashboard' class='lm_button'>Dashboard</a>";
-      $add_button        = $this->add_button();
-      $export_button_csv = $this->export_button();
-      // $export_button_pdf = "<a target='_blank' href='{$uri}_pdf=1&amp;{$qs}' class='lm_button' title='PDF Export'>PDF</a>";
-      // language buttons
-      $langs           = ["de-de", "en-us"];
-      $language_button = "";
-      foreach($langs as $lang) {
-          if($lang != $this->i18n) {
-              $language_button .= "<a href='{$uri}_lang=$lang&amp;$qs_without_lang' class='lang_button'>".substr($lang, 0, 2)."</a>";
-          }
-      }
+        $ext = strtolower(pathinfo($this->upload_path . '/' . $file_name, PATHINFO_EXTENSION));
 
-      $list_of_views           = $this->list_of_views();
-      $searchbox               = $this->search_box();
-      $list_of_editable_tables = $this->list_of_editable_tables(); // empty if _view != "edit_tables"
+        if ($ext == 'pdf') {
+            return "<a href='$this->upload_path/$file_name' target='_blank' title='" . $this->clean_out($file_name) . "'>" . $ext . "</a>";
+        }
 
-      // javascript
-      $js = "";
-      if($this->allow_javascript) {
-          $js = "<script src='assets/js/pikaday.js'></script>";
-          $js .= "<script>var lang = '$this->i18n', date_out = '$this->date_out'</script>";
-          $js .= "<script src='assets/js/eEKS.js?v=".($debug ? time() : $version)."'></script>";
-      }
+        if($this->grid_show_images == false) {
+            return "<a href='$this->upload_path/$file_name' target='_blank'>" . $this->clean_out($file_name, $this->grid_ellipse_at) . "</a>";
+        }
+        elseif(mb_strlen($this->thumb_path) && file_exists($this->thumb_path.'/'.$file_name)) {
+            return "<a href='$this->upload_path/$file_name' target='_blank'><img src='$this->thumb_path/$file_name' alt='image' /></a>";
+        }
+        else {
+            return "<a href='$this->upload_path/$file_name' target='_blank'><img src='$this->upload_path/$file_name' alt='image' /></a>";
+        }
 
-      $error = $this->error;
+    }
 
-      // include template file
-      if(file_exists('themes/'.$this->config['eeks']['theme'].'/index.php')) {
-          include('themes/'.$this->config['eeks']['theme'].'/index.php');
-      }
-      else {
-          include('themes/default/index.php');
-      }
-  }
+    public function html_document_output($file_name) {
 
+        // purpose: if exists, display document link
+        // returns: html
 
-  public function edit($error = '') {
+        if (!file_exists($this->upload_path . '/' . $file_name)) {
+            return '';
+        }
 
-      // purpose: called from contoller to display form() and add or edit a record
+        $ext = strtolower(pathinfo($this->upload_path . '/' . $file_name, PATHINFO_EXTENSION));
 
-      return $this->form($error);
+        if ($this->grid_show_images && in_array($ext, ['jpg','jpeg','gif','png'])) {
+            return $this->html_image_output($file_name);
+        }
 
-  }
+        return "<a href='$this->upload_path/$file_name' target='_blank' title='" . $this->clean_out($file_name) . "'>" . $ext . "</a>";
 
+    }
 
-  public function index($error = '') {
+    public function number_out($str = "", $type = "float") {
 
-      // purpose: called from contoller to display update() data
+        // purpose: convert database format to local format
 
-      return $this->grid($error);
+        if ($str === null) {
+            return '';
+        }
 
-  }
+        if(mb_strlen($str) == 0) {
+            return;
+        }
 
+        $str = $this->clean_out($str);
 
-  public function html_image_input($field_name, $file_name) {
+        // delete thousands separator if it exists
+        $str = str_replace(',', '', $str);
 
-      // purpose: if image exists, display image and delete checkbox. also display file input
-      // returns: html
+        // format number with local separators
+        if($type == "float") {
+            $str = number_format((float)$str, $this->decimals, $this->dec_point, $this->thousands_sep);
+        }
+        else {
+            $str = number_format((float)$str, 0, $this->dec_point, $this->thousands_sep);
+        }
 
-      $html  = '';
-      $class = $this->get_class_name($field_name);
+        return $str;
 
-      if(mb_strlen($file_name) > 0) {
+    }
 
-          if(mb_strlen($this->thumb_path)) {
-              $html .= "<a href='$this->upload_path/$file_name' target='_blank'><img src='$this->thumb_path/$file_name' alt='image' /></a>";
-          }
-          else {
-              $html .= "<a href='$this->upload_path/$file_name' target='_blank'><img src='$this->upload_path/$file_name' alt='image' /></a>";
-          }
+    public function html_number_output($str = "", $type = "float") {
 
-          $html .= " <label><input type='checkbox' name='{$field_name}-delete' value='1' >$this->text_delete_image</label><br>";
-      }
+        // purpose: set class names for different numbers
 
-      $html .= "<input type='file' name='$field_name' class='$class' size='$this->form_text_input_size'>";
+        $class = "number";
+        if ($str == 0) {
+            $class .= " zero";
+        }
+        if ($str < 0) {
+            $class .= " minus";
+        }
+        if ($str > 0) {
+            $class .= " plus";
+        }
 
-      return $html;
+        $str = $this->number_out($str, $type);
 
-  }
+        return "<span class='$class'>$str</span>";
 
+    }
 
-  public function html_image_output($file_name) {
+    public function html_date_output($str = "", $use_time = false) {
 
-      // purpose: if image exists, display image depending on settings and if thumbnail exists
-      // returns: html
+        // purpose: set class names for different numbers
 
-      if(mb_strlen($file_name) == 0) {
-          return;
-      }
+        $str = $this->date_out($str, $use_time);
 
-      $ext = strtolower(pathinfo($this->upload_path . '/' . $file_name, PATHINFO_EXTENSION));
+        if($use_time) {
+            $class = "datetime";
+        }
+        else {
+            $class = "date";
+        }
 
-      if ($ext == 'pdf') {
-          return "<a href='$this->upload_path/$file_name' target='_blank' title='" . $this->clean_out($file_name) . "'>" . $ext . "</a>";
-      }
+        return "<span class='$class'>$str</span>";
 
-      if($this->grid_show_images == false) {
-          return "<a href='$this->upload_path/$file_name' target='_blank'>" . $this->clean_out($file_name, $this->grid_ellipse_at) . "</a>";
-      }
-      elseif(mb_strlen($this->thumb_path) && file_exists($this->thumb_path.'/'.$file_name)) {
-          return "<a href='$this->upload_path/$file_name' target='_blank'><img src='$this->thumb_path/$file_name' alt='image' /></a>";
-      }
-      else {
-          return "<a href='$this->upload_path/$file_name' target='_blank'><img src='$this->upload_path/$file_name' alt='image' /></a>";
-      }
+    }
 
-  }
+    public function grid($error = '', $no_form = false) {
 
-  public function html_document_output($file_name) {
+        // purpose: function to list a table of records. aka data grid
+        // returns: html
+        // populate_from_post tells inputs to populate from $_POST instead of the database. useful to preserve data when displaying validation errors.
+        // in grid_sql, select the identity_id as the last column to display the edit and delete links
+        // example: $lm->grid_sql = 'select title, create_date, foo_id from foo';
 
-      // purpose: if exists, display document link
-      // returns: html
+        if(mb_strlen($this->identity_name) == 0 || (mb_strlen($this->grid_sql) && mb_strlen($this->table) == 0)) {
+            $this->display_error("missing grid_sql and table (one is required), or missing identity_name", 'form()');
+            return;
+        }
 
-      if (!file_exists($this->upload_path . '/' . $file_name)) {
-          return '';
-      }
+        // local copies
+        $sql              = trim($this->grid_sql);
+        $sql_param        = $this->grid_sql_param;
+        $grid_limit       = intval($this->grid_limit);
+        $uri_path         = $this->get_uri_path();
+        $default_order_by = $this->grid_default_order_by;
 
-      $ext = strtolower(pathinfo($this->upload_path . '/' . $file_name, PATHINFO_EXTENSION));
+        if($default_order_by == '') {
+            $default_order_by = "`$this->identity_name`";
+        }
 
-      if ($this->grid_show_images && in_array($ext, ['jpg','jpeg','gif','png'])) {
-          return $this->html_image_output($file_name);
-      }
+        // remove line feeds which can cause problems with parsing
+        $sql = preg_replace('/[\n\r]/', ' ', $sql);
 
-      return "<a href='$this->upload_path/$file_name' target='_blank' title='" . $this->clean_out($file_name) . "'>" . $ext . "</a>";
+        // default queries if only table and id names were provided
+        if(mb_strlen($sql) == 0) {
+            $sql = "select *, `$this->identity_name` from `$this->table` order by $default_order_by";
+        }
 
-  }
+        // inject function for counting
+        $sql = preg_replace('/^select/i', 'select sql_calc_found_rows', $sql);
 
-  public function number_out($str = "", $type = "float") {
+        // get input
+        $_posted         = intval(@$_REQUEST['_posted']);
+        $_search         = $this->clean_out(@$_REQUEST['_search']);
+        $_pagination_off = intval(@$_REQUEST['_pagination_off']);
+        $_order_by       = abs(intval(@$_REQUEST['_order_by'])); // order by is numeric index to column
+        $_desc           = abs(intval(@$_REQUEST['_desc']));         // descending order flag
+        $_offset         = abs(intval(@$_REQUEST['_offset']));     // pagination offset
+        $_export         = intval(@$_REQUEST['_export']);
 
-      // purpose: convert database format to local format
+        $qs = $this->get_qs();
 
-      if ($str === null) {
-          return '';
-      }
+        // header links - invert current sort
+        $_desc_invert = 1;
+        if($_desc == 1) {
+            $_desc_invert = 0;
+        }
 
-      if(mb_strlen($str) == 0) {
-          return;
-      }
+        // success messages
+        $success = intval(@$_GET['_success']);
+        if($success == 1) {
+            $success = $this->grid_text_record_added;
+        }
+        elseif($success == 2) {
+            $success = $this->grid_text_changes_saved;
+        }
+        elseif($success == 3) {
+            $success = $this->grid_text_record_deleted;
+        }
+        else {
+            $success = '';
+        }
 
-      $str = $this->clean_out($str);
+        // column array and column count
+        $columns      = $this->get_columns('grid');
+        $column_count = count($columns);
+        if($column_count == 0) {
+            return;
+        }
 
-      // delete thousands separator if it exists
-      $str = str_replace(',', '', $str);
+        // alter order
+        $desc_str = '';
+        if($_order_by > 0) {
 
-      // format number with local separators
-      if($type == "float") {
-          $str = number_format((float)$str, $this->decimals, $this->dec_point, $this->thousands_sep);
-      }
-      else {
-          $str = number_format((float)$str, 0, $this->dec_point, $this->thousands_sep);
-      }
+            if($_desc == 1) {
+                $desc_str = 'desc';
+            }
 
-      return $str;
+            $sql = rtrim($sql, '; '); // remove last semicolon
 
-  }
+            // try to remove last 'order by'. we need to allow functions in order by and order by in subqueries
+            $this->mb_preg_match_all('/order\s+by\s/im', $sql, $matches, PREG_OFFSET_CAPTURE);
+            if(count($matches) > 0) {
+                $match = end($matches[0]);
+                $sql   = mb_substr($sql, 0, $match[1]);
+            }
 
+            $sql .= " order by $_order_by $desc_str"; // add requested sort order
+        }
 
-  public function html_number_output($str = "", $type = "float") {
+        // remove existing limit
+        $sql = preg_replace('/\s+limit\s+[0-9,\s]+$/i', '', $sql);
 
-      // purpose: set class names for different numbers
+        // add limit and offset for pagination
+        if($_pagination_off == 0 && $_export == 0) {
+            $sql .= " limit $_offset, $grid_limit";
+        }
 
-      $class = "number";
-      if ($str == 0) {
-          $class .= " zero";
-      }
-      if ($str < 0) {
-          $class .= " minus";
-      }
-      if ($str > 0) {
-          $class .= " plus";
-      }
+        // run query
+        $result = $this->query($sql, $sql_param, 'grid() run query');
+        if(!is_array($result)) {
+            $result = [];
+        }
 
-      $str = $this->number_out($str, $type);
+        // get count
+        $count        = 0;
+        $sql          = 'select found_rows() as cnt';
+        $result_count = $this->query($sql);
+        foreach($result_count as $row) {
+            $count = $row['cnt'];
+        }
 
-      return "<span class='$class'>$str</span>";
+        // export data to CSV and quit
+        if($_export == 1 && $count > 0) {
+            $this->export($result, $columns);
+            return;
+        }
 
-  }
+        // populate link placeholders
+        $grid_edit_link   = $this->grid_edit_link;
+        $grid_delete_link = $this->grid_delete_link;
+        $grid_edit_link   = str_replace('[script_name]', $uri_path, $grid_edit_link);
+        $grid_edit_link   = str_replace('[qs]', $qs, $grid_edit_link);
+        $grid_edit_link   = str_replace('[grid_edit_link_text]', $this->grid_edit_link_text, $grid_edit_link);
+        $grid_edit_link   = str_replace('[identity_name]', $this->identity_name, $grid_edit_link);
+        $grid_delete_link = str_replace('[script_name]', $uri_path, $grid_delete_link);
+        $grid_delete_link = str_replace('[qs]', $qs, $grid_delete_link);
+        $grid_delete_link = str_replace('[identity_name]', $this->identity_name, $grid_delete_link);
+        $grid_delete_link = str_replace('[delete_confirm]', $this->delete_confirm, $grid_delete_link);
+        $grid_delete_link = str_replace('[grid_text_delete]', $this->grid_text_delete, $grid_delete_link);
+        $links            = $grid_edit_link . ' ' . $grid_delete_link;
 
+        // pagination and save changes link bar
+        $pagination = $this->get_pagination($count, $grid_limit, $_offset, $_pagination_off);
+        $button     = '';
+        if(count($this->grid_input_control) > 0 || $this->grid_multi_delete == true) {
+            $button = "<input type='submit' name='__update_grid' value='$this->grid_text_save_changes' class='lm_button lm_save_changes_button'>";
+        }
+        $pagination_button_bar = "<div class='lm_pagination'>$pagination</div>\n";
 
-  public function html_date_output($str = "", $use_time = false) {
-
-      // purpose: set class names for different numbers
-
-      $str = $this->date_out($str, $use_time);
-
-      if($use_time) {
-          $class = "datetime";
-      }
-      else {
-          $class = "date";
-      }
-
-      return "<span class='$class'>$str</span>";
-
-  }
-
-
-  public function grid($error = '', $no_form = false) {
-
-      // purpose: function to list a table of records. aka data grid
-      // returns: html
-      // populate_from_post tells inputs to populate from $_POST instead of the database. useful to preserve data when displaying validation errors.
-      // in grid_sql, select the identity_id as the last column to display the edit and delete links
-      // example: $lm->grid_sql = 'select title, create_date, foo_id from foo';
-
-      if(mb_strlen($this->identity_name) == 0 || (mb_strlen($this->grid_sql) && mb_strlen($this->table) == 0)) {
-          $this->display_error("missing grid_sql and table (one is required), or missing identity_name", 'form()');
-          return;
-      }
-
-      // local copies
-      $sql              = trim($this->grid_sql);
-      $sql_param        = $this->grid_sql_param;
-      $grid_limit       = intval($this->grid_limit);
-      $uri_path         = $this->get_uri_path();
-      $default_order_by = $this->grid_default_order_by;
-
-      if($default_order_by == '') {
-          $default_order_by = "`$this->identity_name`";
-      }
-
-      // remove line feeds which can cause problems with parsing
-      $sql = preg_replace('/[\n\r]/', ' ', $sql);
-
-      // default queries if only table and id names were provided
-      if(mb_strlen($sql) == 0) {
-          $sql = "select *, `$this->identity_name` from `$this->table` order by $default_order_by";
-      }
-
-      // inject function for counting
-      $sql = preg_replace('/^select/i', 'select sql_calc_found_rows', $sql);
-
-      // get input
-      $_posted         = intval(@$_REQUEST['_posted']);
-      $_search         = $this->clean_out(@$_REQUEST['_search']);
-      $_pagination_off = intval(@$_REQUEST['_pagination_off']);
-      $_order_by       = abs(intval(@$_REQUEST['_order_by'])); // order by is numeric index to column
-      $_desc           = abs(intval(@$_REQUEST['_desc']));         // descending order flag
-      $_offset         = abs(intval(@$_REQUEST['_offset']));     // pagination offset
-      $_export         = intval(@$_REQUEST['_export']);
-
-      $qs = $this->get_qs();
-
-      // header links - invert current sort
-      $_desc_invert = 1;
-      if($_desc == 1) {
-          $_desc_invert = 0;
-      }
-
-      // success messages
-      $success = intval(@$_GET['_success']);
-      if($success == 1) {
-          $success = $this->grid_text_record_added;
-      }
-      elseif($success == 2) {
-          $success = $this->grid_text_changes_saved;
-      }
-      elseif($success == 3) {
-          $success = $this->grid_text_record_deleted;
-      }
-      else {
-          $success = '';
-      }
-
-      // column array and column count
-      $columns      = $this->get_columns('grid');
-      $column_count = count($columns);
-      if($column_count == 0) {
-          return;
-      }
-
-      // alter order
-      $desc_str = '';
-      if($_order_by > 0) {
-
-          if($_desc == 1) {
-              $desc_str = 'desc';
-          }
-
-          $sql = rtrim($sql, '; '); // remove last semicolon
-
-          // try to remove last 'order by'. we need to allow functions in order by and order by in subqueries
-          $this->mb_preg_match_all('/order\s+by\s/im', $sql, $matches, PREG_OFFSET_CAPTURE);
-          if(count($matches) > 0) {
-              $match = end($matches[0]);
-              $sql   = mb_substr($sql, 0, $match[1]);
-          }
-
-          $sql .= " order by $_order_by $desc_str"; // add requested sort order
-      }
-
-      // remove existing limit
-      $sql = preg_replace('/\s+limit\s+[0-9,\s]+$/i', '', $sql);
-
-      // add limit and offset for pagination
-      if($_pagination_off == 0 && $_export == 0) {
-          $sql .= " limit $_offset, $grid_limit";
-      }
-
-      // run query
-      $result = $this->query($sql, $sql_param, 'grid() run query');
-      if(!is_array($result)) {
-          $result = [];
-      }
-
-      // get count
-      $count        = 0;
-      $sql          = 'select found_rows() as cnt';
-      $result_count = $this->query($sql);
-      foreach($result_count as $row) {
-          $count = $row['cnt'];
-      }
-
-      // export data to CSV and quit
-      if($_export == 1 && $count > 0) {
-          $this->export($result, $columns);
-          return;
-      }
-
-      // populate link placeholders
-      $grid_edit_link   = $this->grid_edit_link;
-      $grid_delete_link = $this->grid_delete_link;
-      $grid_edit_link   = str_replace('[script_name]', $uri_path, $grid_edit_link);
-      $grid_edit_link   = str_replace('[qs]', $qs, $grid_edit_link);
-      $grid_edit_link   = str_replace('[grid_edit_link_text]', $this->grid_edit_link_text, $grid_edit_link);
-      $grid_edit_link   = str_replace('[identity_name]', $this->identity_name, $grid_edit_link);
-      $grid_delete_link = str_replace('[script_name]', $uri_path, $grid_delete_link);
-      $grid_delete_link = str_replace('[qs]', $qs, $grid_delete_link);
-      $grid_delete_link = str_replace('[identity_name]', $this->identity_name, $grid_delete_link);
-      $grid_delete_link = str_replace('[delete_confirm]', $this->delete_confirm, $grid_delete_link);
-      $grid_delete_link = str_replace('[grid_text_delete]', $this->grid_text_delete, $grid_delete_link);
-      $links            = $grid_edit_link . ' ' . $grid_delete_link;
-
-      // pagination and save changes link bar
-      $pagination = $this->get_pagination($count, $grid_limit, $_offset, $_pagination_off);
-      $button     = '';
-      if(count($this->grid_input_control) > 0 || $this->grid_multi_delete == true) {
-          $button = "<input type='submit' name='__update_grid' value='$this->grid_text_save_changes' class='lm_button lm_save_changes_button'>";
-      }
-      $pagination_button_bar = "<div class='lm_pagination'>$pagination</div>\n";
-
-      // generate table header
-      $head = "<tr>\n";
-      if($this->grid_multi_delete) {
-          $head .= "<th><a href='#' onclick='return _toggle();' title='toggle checkboxes'>$this->grid_text_delete</a></th>\n";
-      }
-
-
-      $edit_delete = "";
-      $i           = 0;
-      foreach($columns as $column_name) {
-
-          $title = $this->format_title($column_name, @$this->rename[$column_name]);
-
-          if($this->reorder_link_on_header) {
-              $order_link = "<a href='{$uri_path}_order_by=" . ($i + 1) . "&amp;_desc=$_desc_invert&amp;" . $this->get_qs('_search,_view,_lang') . "' class='lm_$column_name'>$title</a>";
-          }
-          else {
-              $order_link = $title;
-          }
-
-          if($column_name == $this->identity_name && $i == ($column_count - 1)) {
-              $edit_delete = "    <th class='col_edit'></th>\n";
-          } // if identity is last column then this is the column with the edit and delete links
-          elseif($this->multi_column_on) { // experimental multi-value column active
-              if(!in_array($column_name, $this->multi_column)) {
-                  $head .= "    <th>$order_link</th>\n";
-              }
-          }
-          else {
-              $head .= "    <th>$order_link</th>\n";
-          }
-
-          $i++;
-
-      }
-      if($this->multi_column_on) {
-          $head .= "<th>$this->multi_value_column_title</th>";
-      }
-      $head .= "$edit_delete";
-      $head .= "</tr>\n";
-
-      // start generating output //
-      $html = "";
-      // $html .= "<div class='lm'>\n";
-
-      if(mb_strlen($success) > 0) {
-          $html .= "<div class='lm_success'><p>$success</p></div>\n";
-      }
-      if(mb_strlen($error) > 0) {
-          $html .= "<div class='lm_error'><p>$error</p></div>\n";
-      }
-
-      if(!$no_form) {
-          $html .= "<form action='$uri_path$qs&amp;action=update_grid' method='post' enctype='multipart/form-data'>\n";
-          $html .= "<input type='hidden' name='_posted' value='1'>\n";
-          $html .= "<input type='hidden' name='_csrf' value='$_SESSION[_csrf]'>\n";
-      }
-
-
-      // save changes button on top to avoid wrong submit button on pressing `Enter`
-      $html .= $button;
-
-      // quit if there's no data
-      if($count <= 0) {
-          if(!$no_form) {
-              $html .= "<div class='lm_notice'><p>$this->grid_text_no_records_found</p></div></form>\n";
-          }
-          else {
-              $html .= "<div class='lm_notice'><p>$this->grid_text_no_records_found</p></div>\n";
-          }
-
-          return $html;
-      }
-
-      // buttons & pagination on top. only show if we have a lot of records
-      if($count > 30) {
-          $html .= $pagination_button_bar;
-      }
-
-      $html .= "<table class='lm_grid'>\r\n";
-      $html .= $head;
-
-      // optional: sums of results
-      $sum = [];
-      if($this->grid_show_column_sums) {
-          foreach($columns as $col) {
-              // no settings: sum everything except identity_name
-              if(!$this->sum_these_columns && $col != $this->identity_name) {
-                  $sum[$col] = array_sum(array_column($result, $col));
-              }
-              // with settings: sum defined column(s)
-              elseif(in_array($col, $this->sum_these_columns)) {
-                  if(is_numeric($col)) {
-                      $sum[$col] = array_sum(array_column($result, intval($col)));
-                  }
-                  else {
-                      $sum[$col] = array_sum(array_column($result, $col));
-                  }
-              }
-              else {
-                  $sum[$col] = "";
-              }
-          }
-          // inject row with sums into result
-          $this->inject_rows['last'][0]       = $sum;
-          $this->inject_rows['last'][0]["ID"] = $this->translate("sum");
-      }
-
-      // optional: inject rows at specified positions into $result
-      $count_inject_rows = count($this->inject_rows);
-      if($count_inject_rows > 0) {
-          $result = $this->inject_rows_into_result($result);
-      }
-
-      $count_result = count($result);
-
-      // print rows
-      $j = 0;
-      foreach($result as $row) {
-
-          // add extra classes to rows
-          $class = [];
-
-          $c = $this->grid_add_css_classes($row);
-          if($c != "") {
-              $class[] = $c;
-          }
-
-          // highlight last updated or inserted row
-          $shaded = '';
-          if(@$_GET[$this->identity_name] == @$row[$this->identity_name] && mb_strlen($_GET[$this->identity_name] ?? '') > 0) {
-              $class[] = "lm_active";
-          }
-
-
-          // add class to column sums
-          if($this->grid_show_column_sums && $j == $count_result - 1) {
-              $class[] = "column_sums";
-          }
-
-          if(!empty($class)) {
-              $shaded = " class='".trim(implode(" ", $class))."'";
-          }
-
-          $html .= "<tr$shaded>\r\n";// print a row
-
-
-          // delete selection checkbox
-          if($this->grid_multi_delete) {
-              $html .= "<td><label><input type='checkbox' name='_delete[]' value='{$row[$this->identity_name]}'></label></td>\r\n";
-          }
-
-
-          // set empty variables for test with multi-value column
-          $multi_column_content = "";
-          $edit_delete          = "";
-
-          // print columns
-          $i = 0;
-          foreach($columns as $column_name) {
-
-              $title = $this->format_title($column_name, @$this->rename[$column_name]);
-
-              $value = $row[$column_name];
-              if ($value === null) {
-                  $value = '';
-              }
-
-              // edit & delete links
-              if($column_name == $this->identity_name && $i == ($column_count - 1)) {
-                  if($this->grid_show_column_sums && $j == $count_result - 1) {
-                      $edit_delete .= "<td class='col_edit'></td>";
-                  }
-                  else {
-                      $edit_delete .= "    <td class='col_edit'>" . str_replace('[identity_id]', $value, $links) . "</td>\n";
-                  }
-              }
-
-              // experimental multi-value column
-              elseif(in_array($column_name, $this->multi_column) && $this->multi_column_on) {
-                  $multi_column_content .= "<div>";
-                  if(mb_strlen($value) > 0) {
-                      $multi_column_content .= "<strong>$title:</strong> ";
-                  }
-                  $multi_column_content .= $this->get_output_control($column_name . '-' . $row[$this->identity_name], $value, '--text', 'grid') . "</div>";
-
-              }
-
-              // input fields
-              elseif(array_key_exists($column_name, $this->grid_input_control)) {
-                  if(mb_strlen($error) > 0 && $_posted == 1) { // repopulate from previous post when validation error is displayed
-                      $value = $_POST[$column_name . '-' . $row[$this->identity_name]];
-                  }
-                  $html .= '    <td data-coltitle="'.htmlspecialchars($title).'" data-col="'.htmlspecialchars($column_name).'">' . $this->get_input_control($column_name . '-' . $row[$this->identity_name], $value, $this->grid_input_control[$column_name], 'grid') . "</td>\n";
-              }
-
-              // output
-              elseif(array_key_exists($column_name, $this->grid_output_control)) {
-                  $html .= '    <td data-coltitle="'.htmlspecialchars($title).'" data-col="'.htmlspecialchars($column_name).'">' . $this->get_output_control($column_name . '-' . $row[$this->identity_name], $value, $this->grid_output_control[$column_name], 'grid') . "</td>\n";
-              }
-
-              // anything else
-              else {
-                  $html .= '    <td data-coltitle="'.htmlspecialchars($title).'" data-col="'.htmlspecialchars($column_name).'">' . $this->get_output_control($column_name . '-' . $row[$this->identity_name], $value, '--text', 'grid') . "</td>\n";
-              }
-
-              $i++; // column index
-          }
-
-          if($this->multi_column_on) {
-              $html .= "<td class='col_multi_value'>$multi_column_content</td>";
-          }
-
-          $multi_column_content = ""; // reset
-          $html .= $edit_delete;
-          $edit_delete = ""; // reset
-          $html .= "</tr>\n";
-
-          // repeat header
-          if($this->grid_repeat_header_at > 0) {
-              if($j % $this->grid_repeat_header_at == 0 && $j < $count && $j > 0) {
-                  $html .= str_replace('<tr', '<tr class="grid_repeat_header"', $head);
-              }
-          }
-
-          // row counter
-          $j++;
-      }
-
-      $html .= "</table>\n";
-
-      // buttons & pagination, close form
-      $html .= $pagination_button_bar;
-      $html .= $button;
-      if(!$no_form) {
-          $html .= "</form>\n";
-      }
-      // $html .= "</div>\n";
-
-      return $html;
-
-  }//end of grid()
-
-
-  public function generate_grid_sql() {
-
-      // purpose: generate sql query ($this->grid_sql) with defined filter options
-
-      // $this->grid_sql_param = [];
-
-      $search_in_columns = $this->search_in_columns;
-      $date_filters      = $this->date_filters;
-
-      $query = "";
-      $query .= "SELECT\r\n";
-
-      $missing_identity_name = true;
-      $where                 = [];
-      $date_filter           = [];
-
-      // get active columns
-      $active_columns = [];
-      foreach($this->config['active_columns'] as $key => $val) {
-          if($val && $key != "edit_delete_column") {
-              $active_columns[] = $key;
-          }
-          elseif($val && $key == "edit_delete_column") {
-              $active_columns[] = $this->identity_name;
-          }
-      }
-
-      // list active columns (defined in config file)
-      $i = 0;
-      foreach($active_columns as $val) {
-
-          if($i != 0) {
-              $query .= ", ";
-          }
-
-          // set different aliases if sql joins are defined and
-          // if no grid_input_control for this column defined
-          $cmd = false;
-          if(isset($this->grid_input_control[$val])) {
-              $cmd = $this->grid_input_control[$val];
-              if(mb_strstr($cmd, '--select')) {
-                  $cmd = 'select';
-              }
-          }
-
-          if(array_key_exists($val, $this->config['sql_joins']) && $cmd != 'select') {
-              $query .= $this->config['sql_joins'][$val]['alias'] . "." .$this->config['sql_joins'][$val]['column'] . "\r\n";
-          }
-          else {
-              $query .= "a.$val\r\n";
-          }
-          // $query .= $this->table . ".$val\r\n";
-
-          if($val == $this->identity_name) {
-              $missing_identity_name = false;
-          }
-
-          // set variable for where filters
-          if(in_array($val, $search_in_columns)) {
-              $where[] = $val;
-          }
-
-          // set variable for date filters
-          if(in_array($val, $date_filters) && $val == @$_REQUEST['_date_between'] && (mb_strlen(trim($_REQUEST['_from'] ?? '')) > 0 || mb_strlen(trim($_REQUEST['_to'] ?? '')) > 0)) {
-              $date_filter[] = $val;
-          }
-
-          $i++;
-      }
-
-      // prevent missing ID
-      if($missing_identity_name) {
-          $query .= ", a.$this->identity_name\r\n";
-      }
-
-      // add FROM table with alias `a`
-      $query .= "FROM $this->table a\r\n";
-
-      // add LEFT JOIN
-      // if no grid_input_control for this column defined
-      foreach($this->config['sql_joins'] as $key => $val) {
-
-          $cmd = false;
-          if(isset($this->grid_input_control[$key])) {
-              $cmd = $this->grid_input_control[$key];
-              if(mb_strstr($cmd, '--select')) {
-                  $cmd = 'select';
-              }
-          }
-
-          if(array_key_exists($key, $this->config['sql_joins']) && $cmd != 'select') {
-
-              $query .= "LEFT JOIN ".$val['table']." ".$val['alias']."\r\n";
-              $query .= "ON a.$key = ".$val['alias'].".".$val['ID']."\r\n";
-
-          }
-      }
-
-
-      // add WHERE clause for full text search
-      if(!empty($where)) {
-
-          $query .= "WHERE (\r\n";
-
-          $i = 0;
-          foreach($where as $val) {
-              if($i != 0) {
-                  $query .= "  OR\r\n";
-              }
-              $query .= "  COALESCE(a.$val, '') LIKE :_search\r\n";
-              $i++;
-          }
-
-          // add grid_sql_param
-          $this->grid_sql_param[':_search'] = '%' . trim($_REQUEST['_search'] ?? '') . '%';
-
-      }
-
-      $query .= ")\r\n";
-
-      // add AND clause for filter by category
-      foreach($this->category_filters as $val) {
-          if(!empty($_REQUEST["_$val"])) {
-              // echo $val . PHP_EOL;
-              $query .= "AND a.$val LIKE :_$val\r\n";
-              $this->grid_sql_param[":_$val"] = $this->clean_out(@$_REQUEST["_$val"]);
-          }
-      }
-
-      // add AND clause for negative/positive amounts
-      if(mb_strlen($this->amount_filter) > 0) {
-          $column = $this->amount_filter;
-          $amount = "";
-          if(!empty($_GET["_amount"])) {
-              $amount = $this->clean_out($_GET["_amount"]);
-          }
-          if($amount == "pos") {
-              $query .= "AND ( a.$column >= 0 AND COALESCE(a.is_reimbursement, 0) = 0 OR ( a.$column < 0 AND a.is_reimbursement = 1 ) )\r\n";
-          }
-          if($amount == "neg") {
-              $query .= "AND ( a.$column < 0 AND COALESCE(a.is_reimbursement, 0) = 0 OR ( a.$column >= 0 AND a.is_reimbursement = 1 ) )\r\n";
-          }
-      }
-
-
-      // add AND clause for date filters
-      // if no dates are given, show all records
-      // and yes, I'm aware of the y10k bug but I don't care
-      if(!empty($date_filter)) {
-          foreach($date_filter as $val) {
-              $query .= "AND a.$val BETWEEN COALESCE(NULLIF(:_from, ''), 0) AND COALESCE(NULLIF(:_to, ''), '9999-12-31')\r\n";
-          }
-
-          // add grid_sql_param
-          $this->grid_sql_param[':_from'] = $this->date_in(@$_REQUEST['_from']);
-          $this->grid_sql_param[':_to']   = $this->date_in(@$_REQUEST['_to']);
-      }
-
-      // add AND clause for no-date filter
-      if(!empty($_GET['_missing_date_on']) && !empty($_GET['_missing_date']) == 1 && !empty($_GET['_missing_date'])) {
-          $query .= "AND (";
-
-          foreach($_GET['_missing_date'] as $key => $val) {
-              if($key == 0) {
-                  $query .= "a.$val IS NULL";
-              }
-              else {
-                  $query .= " OR a.$val IS NULL";
-              }
-          }
-
-          $query .= ")\r\n";
-      }
-
-
-      // add ORDER BY
-      $sort_order = $this->config['sort_order'];
-      $count      = count($sort_order);
-      if($count > 0) {
-          $query .= "ORDER BY ";
-
-          $i = 0;
-          foreach($this->config['sort_order'] as $val) {
-              if($i >= 1) {
-                  $query .= ", ";
-              }
-              $query .= "a.$val";
-              $i++;
-          }
-      }
-
-      return $query;
-
-  }//end of generate_grid_sql
-
-
-  public function expect_sloppy_date_filter_inputs($case = "default") {
-
-      // purpose: correct sloppy user input for date ranges filter and provide default ranges
-
-      if($case == "monthly") {
-
-          // take care of user input for _from and _to
-          if(!empty($_GET['_from']) && !empty($_GET['_to'])) {
-              // case: _from and _to given
-              // --> set first day of _from and last day of _to
-              $from = (new DateTime($this->date_in($_GET['_from'])))->modify('first day of this month')->format('Y-m-d');
-              $to   = (new DateTime($this->date_in($_GET['_to'])))->modify('last day of this month')->format('Y-m-d');
-          }
-          elseif(!empty($_GET['_from'])) {
-              // case: _from given, _to = ""
-              // --> from = first day of _from-month and to = today
-              $from = (new DateTime($this->date_in($_GET['_from'])))->modify('first day of this month')->format('Y-m-d');
-              $to   = (new DateTime())->format('Y-m-d');//today
-          }
-          elseif(!empty($_GET['_to'])) {
-              // case: _to given, _from = ""
-              // --> from = first day of _to-year, to = last day of _to-month
-              $to   = (new DateTime($this->date_in($_GET['_to'])))->modify('last day of this month')->format('Y-m-d');
-              $from = (new DateTime($to))->modify('first day of Jan this year')->format("Y-m-d");// first day of to-year
-          }
-          else {// no input, expect this year
-              $now  = new DateTime();
-              $from = $now->modify('first day of Jan this year')->format('Y-m-d');
-              $to   = $now->modify('last day of Dec this year')->format('Y-m-d');
-          }
-
-      }
-      elseif($case == "yearly") {
-          if(!empty($_GET['_from']) && !empty($_GET['_to'])) {
-              // case: _from and _to given
-              // --> from = first day of _from-year, to = last day of _to-year
-              $from = (new DateTime($this->date_in($_GET['_from'])))->modify('first day of Jan this year')->format('Y-m-d');
-              $to   = (new DateTime($this->date_in($_GET['_to'])))->modify('last day of Dec this year')->format('Y-m-d');
-          }
-          elseif(!empty($_GET['_from'])) {
-              // case: _from given, _to = ""
-              // --> from = first day of _from-year, to = today
-              $from = (new DateTime($this->date_in($_GET['_from'])))->modify('first day of Jan this year')->format('Y-m-d');
-              $to   = (new DateTime())->modify('last day of Dec this year')->format('Y-m-d');//Dec this year
-          }
-          elseif(!empty($_GET['_to'])) {
-              // case: _to given, _from = ""
-              // --> from = first day of _to-year, to = last day of _to-year
-              $to   = (new DateTime($this->date_in($_GET['_to'])))->modify('last day of Dec this year')->format('Y-m-d');
-              $from = (new DateTime($to))->modify('first day of Jan this year')->modify('- 2 years')->format("Y-m-d");// first day of to-year
-          }
-          else {// no input, expect this year and last two years
-              // $now = new DateTime();
-              $from = (new DateTime())->modify('first day of Jan this year')->modify('- 2 years')->format('Y-m-d');
-              $to   = (new DateTime())->modify('last day of Dec this year')->format('Y-m-d');
-          }
-      }
-      else {
-          $from = @$_GET['_from'];
-          $to   = @$_GET['_to'];
-      }
-
-      // set GET parameters to calculated params
-      // --> pro: params are visible
-      // --> contra: overwriting existing params
-      // $_GET['_from'] = $from;
-      // $_GET['_to'] = $to;
-
-      return [$from, $to];
-  }
-
-
-  public function select_interval($from, $to, $date, $interval = "monthly") {
-
-      if($interval == "monthly") {
-          // add montly summed columns in sql query in date range
-          $start = (new DateTime($from))->modify('first day of this month');
-          $end   = (new DateTime($to))->modify('first day of next month');
-          $inter = DateInterval::createFromDateString('1 month');
-      }
-      if($interval == "yearly") {
-          // add montly summed columns in sql query in date range
-          $start = (new DateTime($from))->modify('first day of this year');
-          $end   = (new DateTime($to))->modify('last day of this year');
-          $inter = DateInterval::createFromDateString('1 year');
-      }
-
-      $period = new DatePeriod($start, $inter, $end);
-
-      $query      = "";
-      $count_cols = 0;
-      foreach ($period as $dt) {
-          $month = $dt->format('m');
-          $year  = $dt->format('Y');
-
-          if($interval == "monthly") {
-              $col = $this->translate($dt->format('M')) . $dt->format(' (y)');
-              $query .= ", SUM( CASE WHEN EXTRACT(MONTH FROM a.$date) = $month AND EXTRACT(YEAR FROM a.$date) = $year THEN a.gross_amount ELSE 0 END ) AS '$col'\r\n";
-          }
-          elseif($interval == "yearly") {
-              $col = $dt->format('Y');
-              $query .= ", SUM( CASE WHEN EXTRACT(YEAR FROM a.$date) = $year THEN a.gross_amount ELSE 0 END ) AS '$col'\r\n";
-          }
-
-          // set grid output control
-          $this->grid_output_control[$col] = ['type' => 'number'];
-
-          // set column sums
-          $this->sum_these_columns[] = $col;
-
-          $count_cols++;
-      }
-
-      // set grid output control
-      $this->grid_output_control['sum']     = ['type' => 'number'];
-      $this->grid_output_control['average'] = ['type' => 'number'];
-
-      // set column sums
-      $this->sum_these_columns[] = "sum";
-      $this->sum_these_columns[] = "average";
-
-      // sum
-      if($interval == "monthly") {
-          $query .= ", SUM(COALESCE(NULLIF(a.gross_amount, ''), 0)) as sum\r\n";
-      }
-
-      // average
-      if($count_cols > 1) {
-          $query .= ", ROUND( COALESCE(SUM( a.gross_amount / $count_cols ), 0), ".($this->decimals)." ) AS average\r\n";
-      }
-
-      return $query;
-
-  }// end of select_interval()
-
-
-  public function generate_grid_sql_interval($interval = "monthly", $date = "", $group = "", $no_group_by = false) {
-
-      // purpose: sql query for monthly sums of amounts with $date, grouped by $group
-
-      // needs some more work to make it portable without joins or tables with different identity_names
-
-      // expected default dates need some adjusting and/or user definable variables
-      if($date == "") {
-          if(isset($this->date_filters[0])) {
-              $date = $this->date_filters[0];
-          }
-          else {
-              $this->display_error("specify a column in your date filter", "generate_grid_sql_interval()");
-          }
-      }
-
-      if($group == "") {
-          if(isset($this->category_filters[0])) {
-              $group = $this->category_filters[0];
-          }
-          else {
-              $this->display_error("specify a column in your category filter", "generate_grid_sql_interval()");
-          }
-      }
-
-      // start query
-      $query = "";
-
-      $query .= "SELECT\r\n";
-      if ($no_group_by) {
-          $query .= "  (CASE WHEN t.ID != 'sku2lkajsnclj43' THEN '".$this->translate("all")."' END) AS ID\r\n";
-      }
-      else {
-          $query .= "  t.ID\r\n";
-      }
-
-      // add column with type income/cost in interval view
-      // $query .= ", CASE WHEN t.is_income = true THEN '".$this->translate("income")."' ELSE '".$this->translate("costs")."' END AS income_costs\r\n";
-
-      if ($no_group_by) {
-          $query .= ", (CASE WHEN t.$group != 'sku2lkajsnclj43' THEN '".$this->translate("all")."' END) AS $group\r\n";
-      }
-      else {
-          $query .= ", t.$group\r\n";
-      }
-
-      $from_to = $this->expect_sloppy_date_filter_inputs($interval);
-      $from    = $from_to[0];
-      $to      = $from_to[1];
-
-      // add select summed columns in month/year interval
-      $query .= $this->select_interval($from, $to, $date, $interval);
-
-      $query .= "FROM $this->table a\r\n";
-      $query .= "RIGHT OUTER JOIN $group t\r\n";
-      $query .= "ON a.$group = t.ID\r\n";
-
-      // add WHERE clause(s) for negative/positive amounts
-      if(mb_strlen($this->amount_filter) > 0) {
-          $column = $this->amount_filter;
-          $amount = "";
-          if(!empty($_GET["_amount"])) {
-              $amount = $this->clean_out($_GET["_amount"]);
-          }
-          if($amount == "pos") {
-              $query .= "WHERE ( a.$column >= 0 AND COALESCE(a.is_reimbursement, 0) = 0 OR ( a.$column < 0 AND a.is_reimbursement = 1 ) )\r\n";
-          }
-          if($amount == "neg") {
-              $query .= "WHERE ( a.$column < 0 AND COALESCE(a.is_reimbursement, 0) = 0 OR ( a.$column >= 0 AND a.is_reimbursement = 1 ) )\r\n";
-          }
-      }
-
-      // add AND clause for filter by category
-      foreach($this->category_filters as $val) {
-          if(!empty($_GET["_$val"])) {
-              $query .= "AND a.$val LIKE :_$val\r\n";
-              $this->grid_sql_param[":_$val"] = $this->clean_out(@$_GET["_$val"]);
-          }
-      }
-
-      $query .= "AND a.$date BETWEEN '$from' AND '$to'\r\n";
-      if(!$no_group_by) {
-          $query .= "GROUP BY t.$group\r\n";
-      }
-
-      $query .= "ORDER BY t.is_income DESC, t.sort_order ASC, t.$group ASC\r\n";
-
-      return $query;
-
-  }// end of generate_grid_sql_interval()
-
-
-  public function generate_grid_sql_eks($pages = "1,2,3,4,5,6", $no_group_by = false) {
-
-      $date = "value_date";
-
-      $estimated = false;
-      if(@$_GET['_eks'] == 'estimated') {
-          $estimated = true;
-      }
-
-      $query = "";
-
-      $from = (new DateTime($this->date_in($_GET['_from'])))->modify('first day of this month')->format('Y-m-d');
-      $to   = (new DateTime($from))->modify('+ 5 months')->modify('last day of this month')->format('Y-m-d');
-
-      // use data in different date range to estimate future income
-      $range = 6;
-      if($estimated) {
-          // set range
-          if(empty($_GET['_eks_est_range'])) {
-              $range = 6;
-          }
-          else {
-              $range = $this->clean_out($_GET['_eks_est_range']);
-          }
-
-          // set dates
-          if(empty($_GET['_eks_est_from'])) {
-              // if nothing specified, use six months before estimation date
-              $eks_est_from = (new DateTime($from))->modify('- '.$range.' months')->format('Y-m-d');
-              $eks_est_to   = (new DateTime($from))->modify('+ ' . ($range - 1) . ' months')->modify('last day of this month')->format('Y-m-d');
-          }
-          else {
-              $eks_est_from = (new DateTime($this->date_in($_GET['_eks_est_from'])))->modify('first day of this month')->format('Y-m-d');
-              $eks_est_to   = (new DateTime($eks_est_from))->modify('+ ' . ($range - 1) . ' months')->modify('last day of this month')->format('Y-m-d');
-          }
-      }
-
-
-      // add montly summed columns in sql query in date range
-      $start    = (new DateTime($from));
-      $end      = (new DateTime($to))->modify('first day of next month');
-      $interval = DateInterval::createFromDateString('1 month');
-      $period   = new DatePeriod($start, $interval, $end);
-
-      $select_months = "";// contains query for summed months
-      $i             = "a";// temporary column name for estimated months
-      $cols          = [];// contains temporary month names and
-      foreach ($period as $dt) {
-
-          $month = $dt->format('m');
-          $year  = $dt->format('Y');
-
-          $col = $this->translate($dt->format('M')) . $dt->format(' (y)');
-
-          if(!$estimated) {// concluded EKS, don't change data
-              $select_months .= ",SUM( CASE WHEN EXTRACT(MONTH FROM a.$date) = $month AND EXTRACT(YEAR FROM a.$date) = $year THEN a.gross_amount ELSE 0 END ) AS '$col'\r\n";
-          }
-          else {
-              // estimated EKS, use averages and defined multipliers
-              if(!empty($_GET['_intended_growth'])) {
-                  $multiplier = $this->clean_out($_GET['_intended_growth']) / 100;
-              }
-              else {
-                  $multiplier = $this->eks_config['eks']['intended_growth'] / 100;
-              }
-
-              // $multiplier = $this->eks_config['eks']['intended_growth'] / 100;
-              $multiplier_income = $multiplier * 2 + 1;
-              $multiplier_cost   = $multiplier + 1;
-
-              $exclude_growing = false;
-              if(isset($this->eks_config['eks']['exclude_growth'])) {
-                  $exclude_growing = true;
-                  $exclude_growth  = implode(",", $this->eks_config['eks']['exclude_growth']);
-              }
-
-              $select_months .= ", ROUND( COALESCE( SUM(\r\n";
-
-              if($exclude_growing) { // add extra CASE for exclude_growth
-                  $select_months .= "    CASE
-      WHEN a.type_of_costs in ($exclude_growth)
-      THEN a.gross_amount / $range
-      ELSE\r\n";
-              }
-
-              // multiplier
-              $select_months .= "        CASE
-          WHEN c.page = 3
-          THEN a.gross_amount / $range * $multiplier_income
-          ELSE a.gross_amount / $range * $multiplier_cost
-        END\r\n";
-
-              if($exclude_growing) { // close extra CASE for exclude_growth
-                  $select_months .= "    END\r\n";
-              }
-
-              $select_months .= "  ), 0), ".($this->decimals)." ) AS '$i'\r\n";
-          }
-
-          // grid output control
-          $this->grid_output_control[$col]  = ['type' => 'number'];
-          $this->grid_output_control['sum'] = ['type' => 'number'];
-
-          $cols[$i] = $col;
-          $i++;
-      }
-
-      // add sub-query for estimated EKS to avoid rounding issues in calculated sums
-      if($estimated) {
-          $query .= "SELECT ID, type_of_costs\r\n";
-          foreach($cols as $key => $val) {
-              $query .= ", $key AS '$val'\r\n";
-          }
-          $query .= ", ". implode('+', array_keys($cols)) ." AS sum\r\n";
-          $query .= ", average AS old_average\r\n";
-          $query .= "FROM (\r\n";
-
-          $this->grid_output_control['old_average'] = ['type' => 'number'];// grid output control
-      }
-
-      $query .= "SELECT\r\n";
-      $query .= "c.ID, c.type_of_costs\r\n";
-
-      $query .= $select_months;
-
-      // sum
-      if(!$estimated) {
-          $query .= ", SUM(COALESCE(NULLIF(a.gross_amount, ''), 0)) as sum\r\n";
-      }
-
-      // average
-      $query .= ", ROUND( COALESCE(SUM( a.gross_amount / $range ), 0), ".($this->decimals)." ) AS average\r\n";
-
-      $this->grid_output_control['average'] = ['type' => 'number'];
-
-      $query .= "FROM type_of_costs t\r\n";
-      $query .= "RIGHT JOIN coa_jobcenter_eks_01_2017 c\r\n";
-      $query .= "  ON t.coa_jobcenter_eks_01_2017 = c.ID\r\n";
-      $query .= "LEFT JOIN accounting a\r\n";
-      $query .= "  ON a.type_of_costs = t.ID\r\n";
-      $query .= "AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
-      if(!$estimated) {
-          $query .= "AND a.$date BETWEEN '$from' AND '$to'\r\n";
-      }
-      else {
-          $query .= "AND a.$date BETWEEN '$eks_est_from' AND '$eks_est_to'\r\n";
-      }
-
-      // get specific page
-      $query .= "WHERE c.page IN ($pages)\r\n";
-
-      if(!$no_group_by) {
-          $query .= "GROUP BY c.type_of_costs\r\n";
-      }
-
-      if($estimated) {// close sub-query
-          $query .= ") b\r\n";
-      }
-
-      $query .= "ORDER BY ID\r\n";
-
-
-      $this->grid_sql_param[":_mode_of_employment"] = $this->clean_out(@$_GET["_mode_of_employment"]);
-
-      return $query;
-
-  }// end of generate_grid_sql_eks()
+        // generate table header
+        $head = "<tr>\n";
+        if($this->grid_multi_delete) {
+            $head .= "<th><a href='#' onclick='return _toggle();' title='toggle checkboxes'>$this->grid_text_delete</a></th>\n";
+        }
+
+        $edit_delete = "";
+        $i           = 0;
+        foreach($columns as $column_name) {
+
+            $title = $this->format_title($column_name, @$this->rename[$column_name]);
+
+            if($this->reorder_link_on_header) {
+                $order_link = "<a href='{$uri_path}_order_by=" . ($i + 1) . "&amp;_desc=$_desc_invert&amp;" . $this->get_qs('_search,_view,_lang') . "' class='lm_$column_name'>$title</a>";
+            }
+            else {
+                $order_link = $title;
+            }
+
+            if($column_name == $this->identity_name && $i == ($column_count - 1)) {
+                $edit_delete = "    <th class='col_edit'></th>\n";
+            } // if identity is last column then this is the column with the edit and delete links
+            elseif($this->multi_column_on) { // experimental multi-value column active
+                if(!in_array($column_name, $this->multi_column)) {
+                    $head .= "    <th>$order_link</th>\n";
+                }
+            }
+            else {
+                $head .= "    <th>$order_link</th>\n";
+            }
+
+            $i++;
+
+        }
+        if($this->multi_column_on) {
+            $head .= "<th>$this->multi_value_column_title</th>";
+        }
+        $head .= "$edit_delete";
+        $head .= "</tr>\n";
+
+        // start generating output //
+        $html = "";
+        // $html .= "<div class='lm'>\n";
+
+        if(mb_strlen($success) > 0) {
+            $html .= "<div class='lm_success'><p>$success</p></div>\n";
+        }
+        if(mb_strlen($error) > 0) {
+            $html .= "<div class='lm_error'><p>$error</p></div>\n";
+        }
+
+        if(!$no_form) {
+            $html .= "<form action='$uri_path$qs&amp;action=update_grid' method='post' enctype='multipart/form-data'>\n";
+            $html .= "<input type='hidden' name='_posted' value='1'>\n";
+            $html .= "<input type='hidden' name='_csrf' value='$_SESSION[_csrf]'>\n";
+        }
+
+        // save changes button on top to avoid wrong submit button on pressing `Enter`
+        $html .= $button;
+
+        // quit if there's no data
+        if($count <= 0) {
+            if(!$no_form) {
+                $html .= "<div class='lm_notice'><p>$this->grid_text_no_records_found</p></div></form>\n";
+            }
+            else {
+                $html .= "<div class='lm_notice'><p>$this->grid_text_no_records_found</p></div>\n";
+            }
+
+            return $html;
+        }
+
+        // buttons & pagination on top. only show if we have a lot of records
+        if($count > 30) {
+            $html .= $pagination_button_bar;
+        }
+
+        $html .= "<table class='lm_grid'>\r\n";
+        $html .= $head;
+
+        // optional: sums of results
+        $sum = [];
+        if($this->grid_show_column_sums) {
+            foreach($columns as $col) {
+                // no settings: sum everything except identity_name
+                if(!$this->sum_these_columns && $col != $this->identity_name) {
+                    $sum[$col] = array_sum(array_column($result, $col));
+                }
+                // with settings: sum defined column(s)
+                elseif(in_array($col, $this->sum_these_columns)) {
+                    if(is_numeric($col)) {
+                        $sum[$col] = array_sum(array_column($result, intval($col)));
+                    }
+                    else {
+                        $sum[$col] = array_sum(array_column($result, $col));
+                    }
+                }
+                else {
+                    $sum[$col] = "";
+                }
+            }
+            // inject row with sums into result
+            $this->inject_rows['last'][0]       = $sum;
+            $this->inject_rows['last'][0]["ID"] = $this->translate("sum");
+        }
+
+        // optional: inject rows at specified positions into $result
+        $count_inject_rows = count($this->inject_rows);
+        if($count_inject_rows > 0) {
+            $result = $this->inject_rows_into_result($result);
+        }
+
+        $count_result = count($result);
+
+        // print rows
+        $j = 0;
+        foreach($result as $row) {
+
+            // add extra classes to rows
+            $class = [];
+
+            $c = $this->grid_add_css_classes($row);
+            if($c != "") {
+                $class[] = $c;
+            }
+
+            // highlight last updated or inserted row
+            $shaded = '';
+            if(@$_GET[$this->identity_name] == @$row[$this->identity_name] && mb_strlen($_GET[$this->identity_name] ?? '') > 0) {
+                $class[] = "lm_active";
+            }
+
+            // add class to column sums
+            if($this->grid_show_column_sums && $j == $count_result - 1) {
+                $class[] = "column_sums";
+            }
+
+            if(!empty($class)) {
+                $shaded = " class='".trim(implode(" ", $class))."'";
+            }
+
+            $html .= "<tr$shaded>\r\n";// print a row
+
+            // delete selection checkbox
+            if($this->grid_multi_delete) {
+                $html .= "<td><label><input type='checkbox' name='_delete[]' value='{$row[$this->identity_name]}'></label></td>\r\n";
+            }
+
+            // set empty variables for test with multi-value column
+            $multi_column_content = "";
+            $edit_delete          = "";
+
+            // print columns
+            $i = 0;
+            foreach($columns as $column_name) {
+
+                $title = $this->format_title($column_name, @$this->rename[$column_name]);
+
+                $value = $row[$column_name];
+                if ($value === null) {
+                    $value = '';
+                }
+
+                // edit & delete links
+                if($column_name == $this->identity_name && $i == ($column_count - 1)) {
+                    if($this->grid_show_column_sums && $j == $count_result - 1) {
+                        $edit_delete .= "<td class='col_edit'></td>";
+                    }
+                    else {
+                        $edit_delete .= "    <td class='col_edit'>" . str_replace('[identity_id]', $value, $links) . "</td>\n";
+                    }
+                }
+
+                // experimental multi-value column
+                elseif(in_array($column_name, $this->multi_column) && $this->multi_column_on) {
+                    $multi_column_content .= "<div>";
+                    if(mb_strlen($value) > 0) {
+                        $multi_column_content .= "<strong>$title:</strong> ";
+                    }
+                    $multi_column_content .= $this->get_output_control($column_name . '-' . $row[$this->identity_name], $value, '--text', 'grid') . "</div>";
+
+                }
+
+                // input fields
+                elseif(array_key_exists($column_name, $this->grid_input_control)) {
+                    if(mb_strlen($error) > 0 && $_posted == 1) { // repopulate from previous post when validation error is displayed
+                        $value = $_POST[$column_name . '-' . $row[$this->identity_name]];
+                    }
+                    $html .= '    <td data-coltitle="'.htmlspecialchars($title).'" data-col="'.htmlspecialchars($column_name).'">' . $this->get_input_control($column_name . '-' . $row[$this->identity_name], $value, $this->grid_input_control[$column_name], 'grid') . "</td>\n";
+                }
+
+                // output
+                elseif(array_key_exists($column_name, $this->grid_output_control)) {
+                    $html .= '    <td data-coltitle="'.htmlspecialchars($title).'" data-col="'.htmlspecialchars($column_name).'">' . $this->get_output_control($column_name . '-' . $row[$this->identity_name], $value, $this->grid_output_control[$column_name], 'grid') . "</td>\n";
+                }
+
+                // anything else
+                else {
+                    $html .= '    <td data-coltitle="'.htmlspecialchars($title).'" data-col="'.htmlspecialchars($column_name).'">' . $this->get_output_control($column_name . '-' . $row[$this->identity_name], $value, '--text', 'grid') . "</td>\n";
+                }
+
+                $i++; // column index
+            }
+
+            if($this->multi_column_on) {
+                $html .= "<td class='col_multi_value'>$multi_column_content</td>";
+            }
+
+            $multi_column_content = ""; // reset
+            $html .= $edit_delete;
+            $edit_delete = ""; // reset
+            $html .= "</tr>\n";
+
+            // repeat header
+            if($this->grid_repeat_header_at > 0) {
+                if($j % $this->grid_repeat_header_at == 0 && $j < $count && $j > 0) {
+                    $html .= str_replace('<tr', '<tr class="grid_repeat_header"', $head);
+                }
+            }
+
+            // row counter
+            $j++;
+        }
+
+        $html .= "</table>\n";
+
+        // buttons & pagination, close form
+        $html .= $pagination_button_bar;
+        $html .= $button;
+        if(!$no_form) {
+            $html .= "</form>\n";
+        }
+        // $html .= "</div>\n";
+
+        return $html;
+
+    }//end of grid()
+
+    public function generate_grid_sql() {
+
+        // purpose: generate sql query ($this->grid_sql) with defined filter options
+
+        // $this->grid_sql_param = [];
+
+        $search_in_columns = $this->search_in_columns;
+        $date_filters      = $this->date_filters;
+
+        $query = "";
+        $query .= "SELECT\r\n";
+
+        $missing_identity_name = true;
+        $where                 = [];
+        $date_filter           = [];
+
+        // get active columns
+        $active_columns = [];
+        foreach($this->config['active_columns'] as $key => $val) {
+            if($val && $key != "edit_delete_column") {
+                $active_columns[] = $key;
+            }
+            elseif($val && $key == "edit_delete_column") {
+                $active_columns[] = $this->identity_name;
+            }
+        }
+
+        // list active columns (defined in config file)
+        $i = 0;
+        foreach($active_columns as $val) {
+
+            if($i != 0) {
+                $query .= ", ";
+            }
+
+            // set different aliases if sql joins are defined and
+            // if no grid_input_control for this column defined
+            $cmd = false;
+            if(isset($this->grid_input_control[$val])) {
+                $cmd = $this->grid_input_control[$val];
+                if(mb_strstr($cmd, '--select')) {
+                    $cmd = 'select';
+                }
+            }
+
+            if(array_key_exists($val, $this->config['sql_joins']) && $cmd != 'select') {
+                $query .= $this->config['sql_joins'][$val]['alias'] . "." .$this->config['sql_joins'][$val]['column'] . "\r\n";
+            }
+            else {
+                $query .= "a.$val\r\n";
+            }
+            // $query .= $this->table . ".$val\r\n";
+
+            if($val == $this->identity_name) {
+                $missing_identity_name = false;
+            }
+
+            // set variable for where filters
+            if(in_array($val, $search_in_columns)) {
+                $where[] = $val;
+            }
+
+            // set variable for date filters
+            if(in_array($val, $date_filters) && $val == @$_REQUEST['_date_between'] && (mb_strlen(trim($_REQUEST['_from'] ?? '')) > 0 || mb_strlen(trim($_REQUEST['_to'] ?? '')) > 0)) {
+                $date_filter[] = $val;
+            }
+
+            $i++;
+        }
+
+        // prevent missing ID
+        if($missing_identity_name) {
+            $query .= ", a.$this->identity_name\r\n";
+        }
+
+        // add FROM table with alias `a`
+        $query .= "FROM $this->table a\r\n";
+
+        // add LEFT JOIN
+        // if no grid_input_control for this column defined
+        foreach($this->config['sql_joins'] as $key => $val) {
+
+            $cmd = false;
+            if(isset($this->grid_input_control[$key])) {
+                $cmd = $this->grid_input_control[$key];
+                if(mb_strstr($cmd, '--select')) {
+                    $cmd = 'select';
+                }
+            }
+
+            if(array_key_exists($key, $this->config['sql_joins']) && $cmd != 'select') {
+
+                $query .= "LEFT JOIN ".$val['table']." ".$val['alias']."\r\n";
+                $query .= "ON a.$key = ".$val['alias'].".".$val['ID']."\r\n";
+
+            }
+        }
+
+        // add WHERE clause for full text search
+        if(!empty($where)) {
+
+            $query .= "WHERE (\r\n";
+
+            $i = 0;
+            foreach($where as $val) {
+                if($i != 0) {
+                    $query .= "  OR\r\n";
+                }
+                $query .= "  COALESCE(a.$val, '') LIKE :_search\r\n";
+                $i++;
+            }
+
+            // add grid_sql_param
+            $this->grid_sql_param[':_search'] = '%' . trim($_REQUEST['_search'] ?? '') . '%';
+
+        }
+
+        $query .= ")\r\n";
+
+        // add AND clause for filter by category
+        foreach($this->category_filters as $val) {
+            if(!empty($_REQUEST["_$val"])) {
+                // echo $val . PHP_EOL;
+                $query .= "AND a.$val LIKE :_$val\r\n";
+                $this->grid_sql_param[":_$val"] = $this->clean_out(@$_REQUEST["_$val"]);
+            }
+        }
+
+        // add AND clause for negative/positive amounts
+        if(mb_strlen($this->amount_filter) > 0) {
+            $column = $this->amount_filter;
+            $amount = "";
+            if(!empty($_GET["_amount"])) {
+                $amount = $this->clean_out($_GET["_amount"]);
+            }
+            if($amount == "pos") {
+                $query .= "AND ( a.$column >= 0 AND COALESCE(a.is_reimbursement, 0) = 0 OR ( a.$column < 0 AND a.is_reimbursement = 1 ) )\r\n";
+            }
+            if($amount == "neg") {
+                $query .= "AND ( a.$column < 0 AND COALESCE(a.is_reimbursement, 0) = 0 OR ( a.$column >= 0 AND a.is_reimbursement = 1 ) )\r\n";
+            }
+        }
+
+        // add AND clause for date filters
+        // if no dates are given, show all records
+        // and yes, I'm aware of the y10k bug but I don't care
+        if(!empty($date_filter)) {
+            foreach($date_filter as $val) {
+                $query .= "AND a.$val BETWEEN COALESCE(NULLIF(:_from, ''), 0) AND COALESCE(NULLIF(:_to, ''), '9999-12-31')\r\n";
+            }
+
+            // add grid_sql_param
+            $this->grid_sql_param[':_from'] = $this->date_in(@$_REQUEST['_from']);
+            $this->grid_sql_param[':_to']   = $this->date_in(@$_REQUEST['_to']);
+        }
+
+        // add AND clause for no-date filter
+        if(!empty($_GET['_missing_date_on']) && !empty($_GET['_missing_date']) == 1 && !empty($_GET['_missing_date'])) {
+            $query .= "AND (";
+
+            foreach($_GET['_missing_date'] as $key => $val) {
+                if($key == 0) {
+                    $query .= "a.$val IS NULL";
+                }
+                else {
+                    $query .= " OR a.$val IS NULL";
+                }
+            }
+
+            $query .= ")\r\n";
+        }
+
+        // add ORDER BY
+        $sort_order = $this->config['sort_order'];
+        $count      = count($sort_order);
+        if($count > 0) {
+            $query .= "ORDER BY ";
+
+            $i = 0;
+            foreach($this->config['sort_order'] as $val) {
+                if($i >= 1) {
+                    $query .= ", ";
+                }
+                $query .= "a.$val";
+                $i++;
+            }
+        }
+
+        return $query;
+
+    }//end of generate_grid_sql
+
+    public function expect_sloppy_date_filter_inputs($case = "default") {
+
+        // purpose: correct sloppy user input for date ranges filter and provide default ranges
+
+        if($case == "monthly") {
+
+            // take care of user input for _from and _to
+            if(!empty($_GET['_from']) && !empty($_GET['_to'])) {
+                // case: _from and _to given
+                // --> set first day of _from and last day of _to
+                $from = (new DateTime($this->date_in($_GET['_from'])))->modify('first day of this month')->format('Y-m-d');
+                $to   = (new DateTime($this->date_in($_GET['_to'])))->modify('last day of this month')->format('Y-m-d');
+            }
+            elseif(!empty($_GET['_from'])) {
+                // case: _from given, _to = ""
+                // --> from = first day of _from-month and to = today
+                $from = (new DateTime($this->date_in($_GET['_from'])))->modify('first day of this month')->format('Y-m-d');
+                $to   = (new DateTime())->format('Y-m-d');//today
+            }
+            elseif(!empty($_GET['_to'])) {
+                // case: _to given, _from = ""
+                // --> from = first day of _to-year, to = last day of _to-month
+                $to   = (new DateTime($this->date_in($_GET['_to'])))->modify('last day of this month')->format('Y-m-d');
+                $from = (new DateTime($to))->modify('first day of Jan this year')->format("Y-m-d");// first day of to-year
+            }
+            else {// no input, expect this year
+                $now  = new DateTime();
+                $from = $now->modify('first day of Jan this year')->format('Y-m-d');
+                $to   = $now->modify('last day of Dec this year')->format('Y-m-d');
+            }
+
+        }
+        elseif($case == "yearly") {
+            if(!empty($_GET['_from']) && !empty($_GET['_to'])) {
+                // case: _from and _to given
+                // --> from = first day of _from-year, to = last day of _to-year
+                $from = (new DateTime($this->date_in($_GET['_from'])))->modify('first day of Jan this year')->format('Y-m-d');
+                $to   = (new DateTime($this->date_in($_GET['_to'])))->modify('last day of Dec this year')->format('Y-m-d');
+            }
+            elseif(!empty($_GET['_from'])) {
+                // case: _from given, _to = ""
+                // --> from = first day of _from-year, to = today
+                $from = (new DateTime($this->date_in($_GET['_from'])))->modify('first day of Jan this year')->format('Y-m-d');
+                $to   = (new DateTime())->modify('last day of Dec this year')->format('Y-m-d');//Dec this year
+            }
+            elseif(!empty($_GET['_to'])) {
+                // case: _to given, _from = ""
+                // --> from = first day of _to-year, to = last day of _to-year
+                $to   = (new DateTime($this->date_in($_GET['_to'])))->modify('last day of Dec this year')->format('Y-m-d');
+                $from = (new DateTime($to))->modify('first day of Jan this year')->modify('- 2 years')->format("Y-m-d");// first day of to-year
+            }
+            else {// no input, expect this year and last two years
+                // $now = new DateTime();
+                $from = (new DateTime())->modify('first day of Jan this year')->modify('- 2 years')->format('Y-m-d');
+                $to   = (new DateTime())->modify('last day of Dec this year')->format('Y-m-d');
+            }
+        }
+        else {
+            $from = @$_GET['_from'];
+            $to   = @$_GET['_to'];
+        }
+
+        // set GET parameters to calculated params
+        // --> pro: params are visible
+        // --> contra: overwriting existing params
+        // $_GET['_from'] = $from;
+        // $_GET['_to'] = $to;
+
+        return [$from, $to];
+    }
+
+    public function select_interval($from, $to, $date, $interval = "monthly") {
+
+        if($interval == "monthly") {
+            // add montly summed columns in sql query in date range
+            $start = (new DateTime($from))->modify('first day of this month');
+            $end   = (new DateTime($to))->modify('first day of next month');
+            $inter = DateInterval::createFromDateString('1 month');
+        }
+        if($interval == "yearly") {
+            // add montly summed columns in sql query in date range
+            $start = (new DateTime($from))->modify('first day of this year');
+            $end   = (new DateTime($to))->modify('last day of this year');
+            $inter = DateInterval::createFromDateString('1 year');
+        }
+
+        $period = new DatePeriod($start, $inter, $end);
+
+        $query      = "";
+        $count_cols = 0;
+        foreach ($period as $dt) {
+            $month = $dt->format('m');
+            $year  = $dt->format('Y');
+
+            if($interval == "monthly") {
+                $col = $this->translate($dt->format('M')) . $dt->format(' (y)');
+                $query .= ", SUM( CASE WHEN EXTRACT(MONTH FROM a.$date) = $month AND EXTRACT(YEAR FROM a.$date) = $year THEN a.gross_amount ELSE 0 END ) AS '$col'\r\n";
+            }
+            elseif($interval == "yearly") {
+                $col = $dt->format('Y');
+                $query .= ", SUM( CASE WHEN EXTRACT(YEAR FROM a.$date) = $year THEN a.gross_amount ELSE 0 END ) AS '$col'\r\n";
+            }
+
+            // set grid output control
+            $this->grid_output_control[$col] = ['type' => 'number'];
+
+            // set column sums
+            $this->sum_these_columns[] = $col;
+
+            $count_cols++;
+        }
+
+        // set grid output control
+        $this->grid_output_control['sum']     = ['type' => 'number'];
+        $this->grid_output_control['average'] = ['type' => 'number'];
+
+        // set column sums
+        $this->sum_these_columns[] = "sum";
+        $this->sum_these_columns[] = "average";
+
+        // sum
+        if($interval == "monthly") {
+            $query .= ", SUM(COALESCE(NULLIF(a.gross_amount, ''), 0)) as sum\r\n";
+        }
+
+        // average
+        if($count_cols > 1) {
+            $query .= ", ROUND( COALESCE(SUM( a.gross_amount / $count_cols ), 0), ".($this->decimals)." ) AS average\r\n";
+        }
+
+        return $query;
+
+    }// end of select_interval()
+
+    public function generate_grid_sql_interval($interval = "monthly", $date = "", $group = "", $no_group_by = false) {
+
+        // purpose: sql query for monthly sums of amounts with $date, grouped by $group
+
+        // needs some more work to make it portable without joins or tables with different identity_names
+
+        // expected default dates need some adjusting and/or user definable variables
+        if($date == "") {
+            if(isset($this->date_filters[0])) {
+                $date = $this->date_filters[0];
+            }
+            else {
+                $this->display_error("specify a column in your date filter", "generate_grid_sql_interval()");
+            }
+        }
+
+        if($group == "") {
+            if(isset($this->category_filters[0])) {
+                $group = $this->category_filters[0];
+            }
+            else {
+                $this->display_error("specify a column in your category filter", "generate_grid_sql_interval()");
+            }
+        }
+
+        // start query
+        $query = "";
+
+        $query .= "SELECT\r\n";
+        if ($no_group_by) {
+            $query .= "  (CASE WHEN t.ID != 'sku2lkajsnclj43' THEN '".$this->translate("all")."' END) AS ID\r\n";
+        }
+        else {
+            $query .= "  t.ID\r\n";
+        }
+
+        // add column with type income/cost in interval view
+        // $query .= ", CASE WHEN t.is_income = true THEN '".$this->translate("income")."' ELSE '".$this->translate("costs")."' END AS income_costs\r\n";
+
+        if ($no_group_by) {
+            $query .= ", (CASE WHEN t.$group != 'sku2lkajsnclj43' THEN '".$this->translate("all")."' END) AS $group\r\n";
+        }
+        else {
+            $query .= ", t.$group\r\n";
+        }
+
+        $from_to = $this->expect_sloppy_date_filter_inputs($interval);
+        $from    = $from_to[0];
+        $to      = $from_to[1];
+
+        // add select summed columns in month/year interval
+        $query .= $this->select_interval($from, $to, $date, $interval);
+
+        $query .= "FROM $this->table a\r\n";
+        $query .= "RIGHT OUTER JOIN $group t\r\n";
+        $query .= "ON a.$group = t.ID\r\n";
+
+        // add WHERE clause(s) for negative/positive amounts
+        if(mb_strlen($this->amount_filter) > 0) {
+            $column = $this->amount_filter;
+            $amount = "";
+            if(!empty($_GET["_amount"])) {
+                $amount = $this->clean_out($_GET["_amount"]);
+            }
+            if($amount == "pos") {
+                $query .= "WHERE ( a.$column >= 0 AND COALESCE(a.is_reimbursement, 0) = 0 OR ( a.$column < 0 AND a.is_reimbursement = 1 ) )\r\n";
+            }
+            if($amount == "neg") {
+                $query .= "WHERE ( a.$column < 0 AND COALESCE(a.is_reimbursement, 0) = 0 OR ( a.$column >= 0 AND a.is_reimbursement = 1 ) )\r\n";
+            }
+        }
+
+        // add AND clause for filter by category
+        foreach($this->category_filters as $val) {
+            if(!empty($_GET["_$val"])) {
+                $query .= "AND a.$val LIKE :_$val\r\n";
+                $this->grid_sql_param[":_$val"] = $this->clean_out(@$_GET["_$val"]);
+            }
+        }
+
+        $query .= "AND a.$date BETWEEN '$from' AND '$to'\r\n";
+        if(!$no_group_by) {
+            $query .= "GROUP BY t.$group\r\n";
+        }
+
+        $query .= "ORDER BY t.is_income DESC, t.sort_order ASC, t.$group ASC\r\n";
+
+        return $query;
+
+    }// end of generate_grid_sql_interval()
+
+    public function generate_grid_sql_eks($pages = "1,2,3,4,5,6", $no_group_by = false) {
+
+        $date = "value_date";
+
+        $estimated = false;
+        if(@$_GET['_eks'] == 'estimated') {
+            $estimated = true;
+        }
+
+        $query = "";
+
+        $from = (new DateTime($this->date_in($_GET['_from'])))->modify('first day of this month')->format('Y-m-d');
+        $to   = (new DateTime($from))->modify('+ 5 months')->modify('last day of this month')->format('Y-m-d');
+
+        // use data in different date range to estimate future income
+        $range = 6;
+        if($estimated) {
+            // set range
+            if(empty($_GET['_eks_est_range'])) {
+                $range = 6;
+            }
+            else {
+                $range = $this->clean_out($_GET['_eks_est_range']);
+            }
+
+            // set dates
+            if(empty($_GET['_eks_est_from'])) {
+                // if nothing specified, use six months before estimation date
+                $eks_est_from = (new DateTime($from))->modify('- '.$range.' months')->format('Y-m-d');
+                $eks_est_to   = (new DateTime($from))->modify('+ ' . ($range - 1) . ' months')->modify('last day of this month')->format('Y-m-d');
+            }
+            else {
+                $eks_est_from = (new DateTime($this->date_in($_GET['_eks_est_from'])))->modify('first day of this month')->format('Y-m-d');
+                $eks_est_to   = (new DateTime($eks_est_from))->modify('+ ' . ($range - 1) . ' months')->modify('last day of this month')->format('Y-m-d');
+            }
+        }
+
+        // add montly summed columns in sql query in date range
+        $start    = (new DateTime($from));
+        $end      = (new DateTime($to))->modify('first day of next month');
+        $interval = DateInterval::createFromDateString('1 month');
+        $period   = new DatePeriod($start, $interval, $end);
+
+        $select_months = "";// contains query for summed months
+        $i             = "a";// temporary column name for estimated months
+        $cols          = [];// contains temporary month names and
+        foreach ($period as $dt) {
+
+            $month = $dt->format('m');
+            $year  = $dt->format('Y');
+
+            $col = $this->translate($dt->format('M')) . $dt->format(' (y)');
+
+            if(!$estimated) {// concluded EKS, don't change data
+                $select_months .= ",SUM( CASE WHEN EXTRACT(MONTH FROM a.$date) = $month AND EXTRACT(YEAR FROM a.$date) = $year THEN a.gross_amount ELSE 0 END ) AS '$col'\r\n";
+            }
+            else {
+                // estimated EKS, use averages and defined multipliers
+                if(!empty($_GET['_intended_growth'])) {
+                    $multiplier = $this->clean_out($_GET['_intended_growth']) / 100;
+                }
+                else {
+                    $multiplier = $this->eks_config['eks']['intended_growth'] / 100;
+                }
+
+                // $multiplier = $this->eks_config['eks']['intended_growth'] / 100;
+                $multiplier_income = $multiplier * 2 + 1;
+                $multiplier_cost   = $multiplier + 1;
+
+                $exclude_growing = false;
+                if(isset($this->eks_config['eks']['exclude_growth'])) {
+                    $exclude_growing = true;
+                    $exclude_growth  = implode(",", $this->eks_config['eks']['exclude_growth']);
+                }
+
+                $select_months .= ", ROUND( COALESCE( SUM(\r\n";
+
+                if($exclude_growing) { // add extra CASE for exclude_growth
+                    $select_months .= "    CASE
+        WHEN a.type_of_costs in ($exclude_growth)
+        THEN a.gross_amount / $range
+        ELSE\r\n";
+                }
+
+                // multiplier
+                $select_months .= "        CASE
+            WHEN c.page = 3
+            THEN a.gross_amount / $range * $multiplier_income
+            ELSE a.gross_amount / $range * $multiplier_cost
+            END\r\n";
+
+                if($exclude_growing) { // close extra CASE for exclude_growth
+                    $select_months .= "    END\r\n";
+                }
+
+                $select_months .= "  ), 0), ".($this->decimals)." ) AS '$i'\r\n";
+            }
+
+            // grid output control
+            $this->grid_output_control[$col]  = ['type' => 'number'];
+            $this->grid_output_control['sum'] = ['type' => 'number'];
+
+            $cols[$i] = $col;
+            $i++;
+        }
+
+        // add sub-query for estimated EKS to avoid rounding issues in calculated sums
+        if($estimated) {
+            $query .= "SELECT ID, type_of_costs\r\n";
+            foreach($cols as $key => $val) {
+                $query .= ", $key AS '$val'\r\n";
+            }
+            $query .= ", ". implode('+', array_keys($cols)) ." AS sum\r\n";
+            $query .= ", average AS old_average\r\n";
+            $query .= "FROM (\r\n";
+
+            $this->grid_output_control['old_average'] = ['type' => 'number'];// grid output control
+        }
+
+        $query .= "SELECT\r\n";
+        $query .= "c.ID, c.type_of_costs\r\n";
+
+        $query .= $select_months;
+
+        // sum
+        if(!$estimated) {
+            $query .= ", SUM(COALESCE(NULLIF(a.gross_amount, ''), 0)) as sum\r\n";
+        }
+
+        // average
+        $query .= ", ROUND( COALESCE(SUM( a.gross_amount / $range ), 0), ".($this->decimals)." ) AS average\r\n";
+
+        $this->grid_output_control['average'] = ['type' => 'number'];
+
+        $query .= "FROM type_of_costs t\r\n";
+        $query .= "RIGHT JOIN coa_jobcenter_eks_01_2017 c\r\n";
+        $query .= "  ON t.coa_jobcenter_eks_01_2017 = c.ID\r\n";
+        $query .= "LEFT JOIN accounting a\r\n";
+        $query .= "  ON a.type_of_costs = t.ID\r\n";
+        $query .= "AND a.mode_of_employment LIKE :_mode_of_employment\r\n";
+        if(!$estimated) {
+            $query .= "AND a.$date BETWEEN '$from' AND '$to'\r\n";
+        }
+        else {
+            $query .= "AND a.$date BETWEEN '$eks_est_from' AND '$eks_est_to'\r\n";
+        }
+
+        // get specific page
+        $query .= "WHERE c.page IN ($pages)\r\n";
+
+        if(!$no_group_by) {
+            $query .= "GROUP BY c.type_of_costs\r\n";
+        }
+
+        if($estimated) {// close sub-query
+            $query .= ") b\r\n";
+        }
+
+        $query .= "ORDER BY ID\r\n";
+
+        $this->grid_sql_param[":_mode_of_employment"] = $this->clean_out(@$_GET["_mode_of_employment"]);
+
+        return $query;
+
+    }// end of generate_grid_sql_eks()
 
     public function search_box_filter_between_dates() {
 
@@ -3194,7 +3144,6 @@ class eEKS extends lazy_mofo {
         die();
 
     }
-
 
     public function export_escape($str, $column_index) {
 
