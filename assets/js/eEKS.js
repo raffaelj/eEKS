@@ -34,11 +34,12 @@ dateInputFields.forEach(el => {
         keyboardInput: false,
         showDaysInNextAndPreviousMonths: true,
         enableSelectionDaysInNextAndPreviousMonths: true,
-        format: date_out, // var date_out is set dynamically by eEKS via PHP
+        format: 'd.m.Y',
         toString(d, format) {
 
-            // date format is set inside eEKS and has a format used py PHP strtotime function
+            // date format was set inside eEKS and has a format used py PHP strtotime function
             // it handles formats like "Y-m-d", "m/d/Y", "d.m.Y"
+            // now it is hard coded
 
             var day = ("0" + d.getDate()).slice(-2);      // day with leading zero
             var month = ("0"+(d.getMonth()+1)).slice(-2); // month with leading zero
@@ -51,6 +52,15 @@ dateInputFields.forEach(el => {
 
             return datestring
             },
+        parse(dateString, format) {
+
+            const parts = dateString.split('.');
+
+            const day   = parseInt(parts[0], 10);
+            const month = parseInt(parts[1], 10) - 1;
+            const year  = parseInt(parts[2], 10);
+            return new Date(year, month, day);
+        },
         i18n: i18n,
       }).prevMonth();
 });

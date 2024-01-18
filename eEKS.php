@@ -870,6 +870,7 @@ class eEKS extends lazy_mofo {
         // javascript
         $js = "";
         if ($this->allow_javascript) {
+            $js = "<script src='assets/js/moment.min.js'></script>";
             $js = "<script src='assets/js/pikaday.js'></script>";
             $js .= "<script>var lang = '$this->i18n', date_out = '$this->date_out'</script>";
             $js .= "<script src='assets/js/eEKS.js?v=".($debug ? time() : $version)."'></script>";
